@@ -18,7 +18,7 @@ const server = app.listen(process.env.PORT || 3030, () => {
 });
 
 // connect to DB
-connectToDB()
+//connectToDB()
 
 // middleware for diferent ports client and server
 if(process.env.NODE_ENV !== 'production') {
@@ -32,7 +32,7 @@ if(process.env.NODE_ENV !== 'production') {
 
 app.use(express.urlencoded({ extended: false }));   // x-www-form-urlencoded
 app.use(express.json());    // form-data JSON format
-
+/** 
 app.use(session({
 	secret: process.env.DB_SESSIONSECRET,
 	store: MongoStore.create(mongoose.connection),
@@ -43,7 +43,7 @@ app.use(session({
 	},
 	unset: 'destroy',
 }));
-
+*/
 // add routes
 
 // Serve static files from the React app

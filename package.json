@@ -20,7 +20,7 @@
     "nodemon": "3.0.1"
   },
   "scripts": {
-    "start": "nodemon server.js",
+    "start": "node server.js",
     "test": "set NODE_ENV=test&& mocha \"./{,!(node_modules|client)/**/}*.test.js\"",
     "test:watch": "onchange \"./**/*.js\" -i -k -- yarn test"
   }
