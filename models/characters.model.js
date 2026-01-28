@@ -1,14 +1,27 @@
 const mongoose = require('mongoose');
 
-//create shema for model
 const CharacterSchema = new mongoose.Schema({
-  firstName: { type: String, required: true },
-  lastName: { type: String},
-  role: { type: String, enum: ["main", "support", "side"], default: "side" },
-  image_url: { type: String},
-  description: { type: String},
-  favorite: { type: Boolean}
-});
+  firstName: { type: String, required: true, trim: true },
+  lastName: { type: String, trim: true },
 
-// Create and export model for data in anime colection
+  gender: {
+    type: String,
+    enum: ["male", "female", "unknown"],
+    default: "unknown"
+  },
+  role: { 
+    type: String, 
+    enum: ["main", "support", "side"], 
+    default: "side" 
+  },
+
+  imageUrl: { type: String },
+  description: { type: String },
+  species: { type: String },      // human, demon, elf
+  age: { type: Number },          // character age
+  originWorld: { type: String },  // from what world
+  favorite: { type: Boolean, default: false }
+
+}, { timestamps: true });
+
 module.exports = mongoose.model('Character', CharacterSchema);
