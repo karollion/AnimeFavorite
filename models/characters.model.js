@@ -15,12 +15,16 @@ const CharacterSchema = new mongoose.Schema({
     default: "side" 
   },
 
-  imageUrl: { type: String },
-  description: { type: String },
-  species: { type: String },      // human, demon, elf
-  age: { type: Number },          // character age
-  originWorld: { type: String },  // from what world
-  favorite: { type: Boolean, default: false }
+  imageUrl: { type: String, trim: true },
+  description: { type: String, trim: true },
+
+  species: { type: String, trim: true },
+  age: { type: Number },
+
+  originWorld: { type: String, trim: true },
+
+  is_deleted: { type: Boolean, default: false },
+  deleted_at: { type: Date },
 
 }, { timestamps: true });
 
