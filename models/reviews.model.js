@@ -13,6 +13,48 @@ const ReviewSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-ReviewSchema.index({ user: 1, anime: 1 }, { unique: true }) //Jedna recenzja na usera
+//Jedna recenzja na usera
+ReviewSchema.index({ user: 1, anime: 1 }, { unique: true });
+
+//Funkcja przeliczająca rating anime
+async function recalcAnimeRating(animeId) {
+  const stats = await mongoose.model("Review").aggregate([
+    { $match: { anime: animeId } },
+    {
+      $group: {
+        _id: "$anime",
+        avgRating: { $avg: "$rating" },
+        count: { $sum: 1 }
+      }
+    }
+  ])
+
+  const avgRating = stats.length > 0
+    ? Number(stats[0].avgRating.toFixed(2))
+    : 0
+
+  const ratingCount = stats.length > 0
+    ? stats[0].count
+    : 0
+
+  await Anime.findByIdAndUpdate(animeId, {
+    rating_overall: avgRating,
+    rating_count: ratingCount
+  })
+};
+
+//Po dodaniu lub edycji recenzji → przelicz rating
+ReviewSchema.post("save", async function () {
+  await recalcAnimeRating(this.anime)
+});
+
+//Po usunięciu recenzji → przelicz rating
+ReviewSchema.post(
+  "deleteOne",
+  { document: true, query: false },
+  async function () {
+    await recalcAnimeRating(this.anime)
+  }
+);
 
 module.exports = mongoose.model('Review', ReviewSchema);

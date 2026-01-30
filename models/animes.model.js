@@ -16,7 +16,7 @@ const AnimeSchema = new mongoose.Schema({
   genres: [{ type: String, trim: true }],
   categories: [{ type: String, trim: true }],
 
-  rating_overall: { type: Number, min: 0, max: 10 },
+  rating_overall: { type: Number, min: 0, max: 10, default: 0 },
 
   my_opinion: { type: String, trim: true },
 
