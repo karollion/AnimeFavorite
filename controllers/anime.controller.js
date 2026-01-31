@@ -14,6 +14,7 @@ exports.getAll = async (req, res) => {
   }
 };
 
+// Load one anime
 exports.getOne = async (req, res) => {
   try {
     const anime = await Anime.findById(req.params.id)

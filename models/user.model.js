@@ -4,6 +4,12 @@ const UserSchema = new mongoose.Schema({
   nick: { type: String, required: true, unique: true, trim: true },
   description: { type: String, trim: true },
 
+  role: { 
+    type: String, 
+    enum: ["admin", "user"], 
+    default: "user" 
+  },
+
   email: { type: String, required: true, unique: true, trim: true },
   birth_year: { type: Number },
 
