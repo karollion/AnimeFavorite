@@ -1,4 +1,4 @@
-const Character = require("../models/character.model")
+const Character = require("../models/character.model");
 
 // Load all Characters
 exports.getAll = async (req, res) => {
