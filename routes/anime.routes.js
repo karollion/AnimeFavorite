@@ -8,4 +8,15 @@ router.get('/', AnimeController.getAll);
 // GET /api/animes/:id
 router.get('/:id', AnimeController.getOne);
 
+/** 
+// POST /api/animes
+router.post('/', auth, isAdmin, AnimeController.create);
+
+// PUT /api/animes/:id
+router.put('/:id', auth, isAdmin, AnimeController.update);
+
+// DELETE /api/animes/:id
+router.delete('/:id', auth, isAdmin, AnimeController.remove);
+*/
+
 module.exports = router;
