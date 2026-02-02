@@ -1,28 +1,22 @@
 const mongoose = require('mongoose');
 
-const connectToDB = () => {
-  // connects our backend code with the database
-	const password = process.env.DB_PASSWORD;
-	const user = process.env.DB_USER;
-	const NODE_ENV = process.env.NODE_ENV;
-	let dbUri = '';
+const connectToDB = async () => {
+	const uri = process.env.NODE_ENV === 'production'
+		? process.env.MONGO_URI_PROD
+		: process.env.MONGO_URI_DEV
 
-	if(NODE_ENV === 'production') dbUri = ``;
-	else if(NODE_ENV === 'test') dbUri = '';
-	else dbUri = '';
+	try {
+		if (!uri) {
+		throw new Error('❌ MONGO_URI is not defined in .env')
+		}
 
-	// connect to DB
+		await mongoose.connect(uri)
 
-	mongoose.connect(dbUri, { useNewUrlParser: true, useUnifiedTopology: true });
-	const db = mongoose.connection;
-
-	// on success
-	db.once('open', () => {
-		console.log('Connected to the database');
-	});
-
-	// on error
-	db.on('error', err => console.log('Error ' + err));
-};
+		console.log('✅ MongoDB connected')
+	} catch (err) {
+		console.error('❌ MongoDB connection error:', err.message)
+		process.exit(1)
+	}
+}
 
 module.exports = connectToDB;

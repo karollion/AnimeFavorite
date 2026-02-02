@@ -1,22 +1,104 @@
-# AnimeFavorite
+# 🎌 AnimeFavorite
 
-## General info
-An application for storing your favorite Anime and Cartoons.
+AnimeFavorite is a hobby project for storing and managing anime and
+cartoon titles you have watched, want to watch, or marked as favorites.
 
-## Install and run
-To install the project use the command:
-```bash
-$ npm install 
-$ yarn install
+The app allows you to store: - anime titles - seasons and ratings -
+characters - genres, worlds, categories - personal reviews and
+opinions - cover images (Google Drive links) - multi-user accounts with
+sessions
+
+------------------------------------------------------------------------
+
+## 🛠 Tech stack
+
+**Backend** - Node.js - Express - MongoDB + Mongoose - express-session +
+connect-mongo - Helmet, CORS
+
+**Frontend** - React (client folder)
+
+------------------------------------------------------------------------
+
+## 🚀 Installation
+
+Choose **one** package manager:
+
+### Using npm
+
+``` bash
+npm install
+npm start
 ```
-To start the project use the command:
-```bash
-$ npm start 
-$ yarn start
+
+### Using yarn
+
+``` bash
+yarn install
+yarn start
 ```
-Server run on 
-$ localhost:3030
-#Client run on 
-$ localhost:3000
-Data Base local was in:
-Roads to collections: 
+
+------------------------------------------------------------------------
+
+## 🌍 Development environment
+
+  Service    Address
+  ---------- -----------------------
+  Backend    http://localhost:3030
+  Frontend   http://localhost:3000
+
+------------------------------------------------------------------------
+
+## ⚙️ Environment variables
+
+Create a `.env` file in the root directory:
+
+``` env
+NODE_ENV=development
+PORT=3030
+
+DB_SESSIONSECRET=your_super_secret_key
+
+MONGO_URI_DEV=mongodb://localhost:27017/animefavorite
+MONGO_URI_PROD=mongodb+srv://user:password@cluster.mongodb.net/animefavorite
+
+SESSION_NAME=anime.sid
+COOKIE_MAX_AGE=604800000
+```
+
+------------------------------------------------------------------------
+
+## 📁 Project structure
+
+``` bash
+.
+├── client/           # React frontend
+├── models/           # Mongoose models
+├── routes/           # Express routes
+├── controllers/      # Route controllers
+├── db.js             # MongoDB connection
+├── server.js         # Express server
+└── .env              # Environment variables
+```
+
+------------------------------------------------------------------------
+
+## 🔐 Authentication
+
+-   Session-based authentication
+-   Sessions stored in MongoDB
+-   Multi-user ready
+
+------------------------------------------------------------------------
+
+## 📌 Status
+
+🧪 Hobby project -- under active development
+
+Planned features: - user statistics - anime ratings aggregation - search
+& filters - user roles (admin / user)
+
+------------------------------------------------------------------------
+
+## 📜 License
+
+GNU General Public License v3.0 
