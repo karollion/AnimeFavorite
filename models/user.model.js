@@ -1,21 +1,19 @@
 const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema({
-  nick: { type: String, required: true, unique: true, trim: true },
-  description: { type: String, trim: true },
-
+  login: { type: String, required: true, unique: true, trim: true },
+  password: { type: String, required: true},
   role: { 
     type: String, 
     enum: ["admin", "user"], 
     default: "user" 
   },
-
+  
+  description: { type: String, trim: true },
   email: { type: String, required: true, unique: true, trim: true },
   birth_year: { type: Number },
 
-  avatar_url: { type: String, trim: true },
-
-  registered_at: { type: Date, default: Date.now },
+  avatar: { type: String, trim: true },
 
   favorite_characters: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Character" }
@@ -40,13 +38,13 @@ const UserSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-//Przygotowanie nicku do dodania do Url
+//Przygotowanie loginu do dodania do Url
 UserSchema.pre("save", async function (next) {
-  if (!this.isModified("nick")) return next()
+  if (!this.isModified("login")) return next()
 
   const User = mongoose.model("User")
 
-  let baseSlug = this.nick
+  let baseSlug = this.login
     .toLowerCase()
     .trim()
     .replace(/ł/g, "l")
