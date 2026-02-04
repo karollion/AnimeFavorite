@@ -67,6 +67,67 @@ COOKIE_MAX_AGE=604800000
 
 ------------------------------------------------------------------------
 
+## 🗄 Database
+
+The application uses **MongoDB** as the primary database.
+
+### Local development
+By default, the app connects to:
+
+mongodb://localhost:27017/animefavorite
+
+This can be changed via the `.env` file:
+
+``` env
+MONGO_URI_DEV=mongodb://localhost:27017/animefavorite
+```
+
+### Production
+
+For production, a MongoDB Atlas cluster is recommended:
+``` env
+MONGO_URI_PROD=mongodb+srv://user:password@cluster.mongodb.net/animefavorite
+```
+
+The database stores:
+- users and sessions
+- anime titles
+- seasons
+- characters
+- reviews and ratings
+- user lists (watched, favorites, watchlist)
+
+## 🌱 Seeding sample data
+
+For development and testing purposes, the project includes a seed script
+that populates the database with sample data.
+
+The seed creates:
+- 2 anime titles
+- seasons for each anime
+- characters linked to anime
+- demo users
+- sample reviews and ratings
+
+### Running the seed
+
+⚠️ Warning: This will remove existing data from the database.
+
+``` bash
+npm run seed
+```
+or
+
+``` bash
+node seed/seed.js
+```
+
+After seeding, the database will contain fully linked example data
+ready for development and testing.
+
+
+------------------------------------------------------------------------
+
 ## 📁 Project structure
 
 ``` bash
@@ -75,6 +136,7 @@ COOKIE_MAX_AGE=604800000
 ├── models/           # Mongoose models
 ├── routes/           # Express routes
 ├── controllers/      # Route controllers
+├── seed/             # Data for seed to DB
 ├── db.js             # MongoDB connection
 ├── server.js         # Express server
 └── .env              # Environment variables
