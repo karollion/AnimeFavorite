@@ -21,6 +21,7 @@
   },
   "scripts": {
     "start": "node server.js",
+    "seed": "node seed/seed.js",
     "test": "set NODE_ENV=test&& mocha \"./{,!(node_modules|client)/**/}*.test.js\"",
     "test:watch": "onchange \"./**/*.js\" -i -k -- yarn test"
   }
