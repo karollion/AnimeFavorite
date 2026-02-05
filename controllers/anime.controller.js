@@ -30,3 +30,15 @@ exports.getOne = async (req, res) => {
     res.status(500).json({ message: err.message })
   }
 };
+
+exports.getBySlug = async (req, res) => {
+  const anime = await Anime.findOne({ slug: req.params.slug })
+    .populate('characters')
+    .populate('seasons')
+
+  if (!anime) {
+    return res.status(404).json({ message: 'Anime not found' })
+  }
+
+  res.json(anime)
+};

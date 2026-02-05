@@ -1,0 +1,5 @@
+require('./user.model')
+require('./anime.model')
+require('./character.model')
+require('./season.model')
+require('./review.model')
