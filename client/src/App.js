@@ -1,3 +1,4 @@
+import Footer from './components/views/Footer/Footer';
 
 function App() {
   return (
@@ -7,6 +8,7 @@ function App() {
           Favorite Anime
         </h1>
       </header>
+      <Footer />
     </div>
   );
 }
