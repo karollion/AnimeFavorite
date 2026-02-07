@@ -1,0 +1,14 @@
+@import '../../../styles/settings.scss';
+
+.root {
+  position: relative;
+
+  a {
+    text-decoration: none;
+    text-align: center;
+  }
+
+  .navbar {
+    padding: 10px;
+  }
+}
