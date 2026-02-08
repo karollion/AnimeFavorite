@@ -1,0 +1,31 @@
+@import '../../../styles/settings.scss';
+
+.card{
+  position: relative;
+
+  &:hover {
+    transform: scale(1.075);
+    transition: $transition;
+  }
+
+  &:not(:hover) {
+    transition: $transition;
+    transform: scale(1); 
+  }
+  
+  .title {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    top: 0;
+    left: 50%;
+    height: 47px;
+  }
+  
+  .body {
+    background: yellowgreen;
+    border-radius: 0 0 10px 10px;
+    border: 1px solid blue;
+    padding: 10px;
+  }
+}
