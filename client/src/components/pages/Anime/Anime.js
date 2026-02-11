@@ -1,43 +1,44 @@
 import styles from './Anime.module.scss'
-import { getAnimeBySlug } from '../../../redux/reducers/animesRedux'
 import { useParams, Navigate, Link } from 'react-router-dom'
-import { useSelector } from 'react-redux'
-import { Col } from 'react-bootstrap'
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import {
+  fetchAnimeBySlug,
+  getSelectedAnime,
+  getAnimesLoading
+} from '../../../redux/reducers/animesRedux'
 import noImage from '../../../assets/no-image.png'
 
 const Anime = () => {
   const { slug } = useParams()
-  const anime = useSelector(state => getAnimeBySlug(state, slug))
+  const dispatch = useDispatch()
 
-  if (!anime) {
-    return <Navigate to="/" />
-  }
+  const anime = useSelector(getSelectedAnime)
+  const loading = useSelector(getAnimesLoading)
+
+  useEffect(() => {
+    dispatch(fetchAnimeBySlug(slug))
+  }, [dispatch, slug])
+
+  if (loading) return <p>Loading...</p>
+  if (!anime) return <Navigate to="/" />
 
   return (
     <div className={styles.root}>
       <h1>{anime.title}</h1>
 
-      <div>
-        <p>Slug: {anime.slug}</p>
-        <p>Age rating: {anime.age_rating}</p>
-        <p>Rating: {anime.rating_overall}</p>
+      <img
+        src={anime.anime_cover || noImage}
+        alt={anime.title}
+        className={styles.img}
+      />
 
-        <img
-          alt={anime.title}
-          src={anime.anime_cover || noImage}
-          className={styles.img}
-        />
+      <p>Age rating: {anime.age_rating}</p>
+      <p>Rating: {anime.rating_overall}</p>
 
-        <div className={styles.body}>
-          <p>{anime.type}</p>
-        </div>
-      </div>
-
-      <Col xs="12" className="d-flex justify-content-center my-3">
-        <Link to="/" className={styles.btn}>
-          Back to home
-        </Link>
-      </Col>
+      <Link to="/" className={styles.btn}>
+        Back to home
+      </Link>
     </div>
   )
 }

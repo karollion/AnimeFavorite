@@ -1,21 +1,18 @@
 import { API_URL } from '../../config'
 
 // ================= SELECTORS =================
-export const getAllAnimes = ({ animes }) => animes.data
-export const getAnimesLoading = ({ animes }) => animes.loading
-export const getAnimesError = ({ animes }) => animes.error
-
-export const getAnimeById = ({ animes }, id) =>
-  animes.data.find(anime => anime._id === id)
-
-export const getAnimeBySlug = ({ animes }, slug) =>
-  animes.data.find(anime => anime.slug === slug)
+export const getAllAnimes = state => state.animes.list
+export const getAnimesLoading = state => state.animes.loading
+export const getAnimesError = state => state.animes.error
+export const getSelectedAnime = state => state.animes.selected
+export const getAnimeById = (state, id) => state.animes.list.find(anime => anime._id === id)
 
 // ================= ACTION TYPES =================
 const createActionName = name => `app/animes/${name}`
 
 const FETCH_START = createActionName('FETCH_START')
 const FETCH_SUCCESS = createActionName('FETCH_SUCCESS')
+const FETCH_ONE_SUCCESS = createActionName('FETCH_ONE_SUCCESS')
 const FETCH_ERROR = createActionName('FETCH_ERROR')
 
 const ADD_ANIME = createActionName('ADD')
@@ -38,6 +35,17 @@ export const fetchAnimes = () => async dispatch => {
     const res = await fetch(`${API_URL}/animes`)
     const data = await res.json()
     dispatch(fetchSuccess(data))
+  } catch (err) {
+    dispatch(fetchError(err.message))
+  }
+}
+
+export const fetchAnimeBySlug = slug => async dispatch => {
+  dispatch(fetchStart())
+  try {
+    const res = await fetch(`${API_URL}/animes/slug/${slug}`)
+    const data = await res.json()
+    dispatch({ type: FETCH_ONE_SUCCESS, payload: data })
   } catch (err) {
     dispatch(fetchError(err.message))
   }
@@ -86,7 +94,8 @@ export const removeAnimeRequest = id => async dispatch => {
 
 // ================= INITIAL STATE =================
 const initialState = {
-  data: [],
+  list: [],
+  selected: null,
   loading: false,
   error: null
 }
@@ -98,18 +107,21 @@ const animesReducer = (state = initialState, action) => {
       return { ...state, loading: true, error: null }
 
     case FETCH_SUCCESS:
-      return { ...state, loading: false, data: action.payload }
+      return { ...state, loading: false, list: action.payload }
+
+    case FETCH_ONE_SUCCESS:
+      return { ...state, loading: false, selected: action.payload }
 
     case FETCH_ERROR:
       return { ...state, loading: false, error: action.payload }
 
     case ADD_ANIME:
-      return { ...state, data: [...state.data, action.payload] }
+      return { ...state, list: [...state.list, action.payload] }
 
     case UPDATE_ANIME:
       return {
         ...state,
-        data: state.data.map(anime =>
+        list: state.list.map(anime =>
           anime._id === action.payload._id
             ? { ...anime, ...action.payload }
             : anime
@@ -119,7 +131,7 @@ const animesReducer = (state = initialState, action) => {
     case REMOVE_ANIME:
       return {
         ...state,
-        data: state.data.filter(anime => anime._id !== action.payload)
+        list: state.list.filter(anime => anime._id !== action.payload)
       }
 
     default:
