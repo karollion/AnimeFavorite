@@ -1,58 +1,126 @@
-// selectors
-export const getAllAnimes = state => state.animes.list
-export const getAnimesLoading = state => state.animes.loading
-export const getAnimesError = state => state.animes.error
+import { API_URL } from '../../config'
 
-// action types
+// ================= SELECTORS =================
+export const getAllAnimes = ({ animes }) => animes.data
+export const getAnimesLoading = ({ animes }) => animes.loading
+export const getAnimesError = ({ animes }) => animes.error
+
+export const getAnimeById = ({ animes }, id) =>
+  animes.data.find(anime => anime._id === id)
+
+export const getAnimeBySlug = ({ animes }, slug) =>
+  animes.data.find(anime => anime.slug === slug)
+
+// ================= ACTION TYPES =================
 const createActionName = name => `app/animes/${name}`
 
 const FETCH_START = createActionName('FETCH_START')
 const FETCH_SUCCESS = createActionName('FETCH_SUCCESS')
 const FETCH_ERROR = createActionName('FETCH_ERROR')
 
-// action creators
-export const fetchAnimesStart = () => ({ type: FETCH_START })
-export const fetchAnimesSuccess = payload => ({
-  type: FETCH_SUCCESS,
-  payload
-})
-export const fetchAnimesError = payload => ({
-  type: FETCH_ERROR,
-  payload
-})
+const ADD_ANIME = createActionName('ADD')
+const UPDATE_ANIME = createActionName('UPDATE')
+const REMOVE_ANIME = createActionName('REMOVE')
 
-// thunk (async)
+// ================= ACTION CREATORS =================
+export const fetchStart = () => ({ type: FETCH_START })
+export const fetchSuccess = payload => ({ type: FETCH_SUCCESS, payload })
+export const fetchError = payload => ({ type: FETCH_ERROR, payload })
+
+export const addAnime = payload => ({ type: ADD_ANIME, payload })
+export const updateAnime = payload => ({ type: UPDATE_ANIME, payload })
+export const removeAnime = payload => ({ type: REMOVE_ANIME, payload })
+
+// ================= THUNKS =================
 export const fetchAnimes = () => async dispatch => {
-  dispatch(fetchAnimesStart())
-
+  dispatch(fetchStart())
   try {
-    const res = await fetch('http://localhost:3030/api/animes')
+    const res = await fetch(`${API_URL}/animes`)
     const data = await res.json()
-
-    dispatch(fetchAnimesSuccess(data))
+    dispatch(fetchSuccess(data))
   } catch (err) {
-    dispatch(fetchAnimesError(err.message))
+    dispatch(fetchError(err.message))
   }
 }
 
-// local initial state
+export const addAnimeRequest = anime => async dispatch => {
+  try {
+    const res = await fetch(`${API_URL}/animes`, {
+      method: 'POST',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(anime),
+      credentials: 'include'
+    })
+    const data = await res.json()
+    dispatch(addAnime(data))
+  } catch (err) {
+    dispatch(fetchError(err.message))
+  }
+}
+
+export const updateAnimeRequest = anime => async dispatch => {
+  try {
+    await fetch(`${API_URL}/animes/${anime._id}`, {
+      method: 'PUT',
+      headers: { 'Content-Type': 'application/json' },
+      body: JSON.stringify(anime),
+      credentials: 'include'
+    })
+    dispatch(updateAnime(anime))
+  } catch (err) {
+    dispatch(fetchError(err.message))
+  }
+}
+
+export const removeAnimeRequest = id => async dispatch => {
+  try {
+    await fetch(`${API_URL}/animes/${id}`, {
+      method: 'DELETE',
+      credentials: 'include'
+    })
+    dispatch(removeAnime(id))
+  } catch (err) {
+    dispatch(fetchError(err.message))
+  }
+}
+
+// ================= INITIAL STATE =================
 const initialState = {
-  list: [],
+  data: [],
   loading: false,
   error: null
 }
 
-// reducer
+// ================= REDUCER =================
 const animesReducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_START:
       return { ...state, loading: true, error: null }
 
     case FETCH_SUCCESS:
-      return { ...state, loading: false, list: action.payload }
+      return { ...state, loading: false, data: action.payload }
 
     case FETCH_ERROR:
       return { ...state, loading: false, error: action.payload }
+
+    case ADD_ANIME:
+      return { ...state, data: [...state.data, action.payload] }
+
+    case UPDATE_ANIME:
+      return {
+        ...state,
+        data: state.data.map(anime =>
+          anime._id === action.payload._id
+            ? { ...anime, ...action.payload }
+            : anime
+        )
+      }
+
+    case REMOVE_ANIME:
+      return {
+        ...state,
+        data: state.data.filter(anime => anime._id !== action.payload)
+      }
 
     default:
       return state

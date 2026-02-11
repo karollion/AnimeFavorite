@@ -1,19 +1,19 @@
-import { useNavigate } from 'react-router-dom';
 import styles from './WrongPage.module.scss'
+import { Link } from 'react-router-dom';
+import { Col } from 'react-bootstrap'
 
 const WrongPage = () => {
-  const navigate = useNavigate();
 
-  const handleBack = e => {
-    e.preventDefault();
-    navigate('/');
-  }
   return (
     <div className={styles.root}>
       <h1>404</h1>
       <h4>Oh no!</h4>
-      <button className={styles.btn} action={handleBack}>Back to home</button>
 
+      <Col xs="12" className="d-flex justify-content-center my-3">
+        <Link to="/" className={styles.btn}>
+          Back to home
+        </Link>
+      </Col>
     </div>
   );
 };
