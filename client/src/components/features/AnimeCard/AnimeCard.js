@@ -23,7 +23,7 @@ const AnimeCard = ({ anime }) => {
           <p>{anime.type}</p>
         </div>
         <Link
-          to={`/anime/${anime.slug}`}
+          to={`/anime/slug/${anime.slug}`}
           className={styles.btn}
         >
           More info

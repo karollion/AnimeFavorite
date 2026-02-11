@@ -9,7 +9,7 @@ router.get('/animes', AnimeController.getAll);
 //router.get('/:id', AnimeController.getOne);
 
 // GET /api/animes/slug
-router.get('/animes/slug/:slug', AnimeController.getBySlug)
+router.get('/anime/slug/:slug', AnimeController.getBySlug)
 /** 
 // POST /api/animes
 router.post('/', auth, isAdmin, AnimeController.create);
