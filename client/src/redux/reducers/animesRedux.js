@@ -42,8 +42,14 @@ export const fetchAnimes = () => async dispatch => {
 
 export const fetchAnimeBySlug = slug => async dispatch => {
   dispatch(fetchStart())
+
   try {
-    const res = await fetch(`${API_URL}/animes/slug/${slug}`)
+    const res = await fetch(`${API_URL}/animes/${slug}`)
+
+    if (!res.ok) {
+      throw new Error(`HTTP ${res.status}`)
+    }
+
     const data = await res.json()
     dispatch({ type: FETCH_ONE_SUCCESS, payload: data })
   } catch (err) {

@@ -1,8 +1,9 @@
-import { Routes, Route, useLocation } from 'react-router-dom';
+import { Routes, Route } from 'react-router-dom';
 import NavBar from './components/views/NavBar/NavBar';
 import Footer from './components/views/Footer/Footer';
 // Import pages
 import Home from './components/pages/Home/Home';
+import Anime from './components/pages/Anime/Anime'
 import WrongPage from './components/pages/WrongPage/WrongPage';
 
 function App() {
@@ -12,6 +13,7 @@ function App() {
       <div>
         <Routes>
           <Route path="/" element={<Home/>} />
+          <Route path='/anime/:slug' element={<Anime/>} />
           <Route path="*" element={<WrongPage/>} />
         </Routes>
       </div>
