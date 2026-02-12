@@ -1,7 +1,7 @@
 module.exports = [
   {
     _id: "670000000000000000000001",
-    slug: "DragonBallZ",
+    slug: "dragonballz",
     title: "Dragon Ball Z",
     original_title: "ドラゴンボールZ",
     age_rating: 12,
@@ -24,7 +24,7 @@ module.exports = [
   },
   {
     _id: "670000000000000000000002",
-    slug: "FrierenBeyondJourneysEnd",
+    slug: "frierenbeyondjourneysend",
     title: "Frieren: Beyond Journey's End",
     age_rating: 12,
     type: "TV",

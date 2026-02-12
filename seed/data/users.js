@@ -3,7 +3,7 @@ const bcrypt = require("bcryptjs")
 module.exports = [
   {
     _id: "680000000000000000000001",
-    slug: "Admin",
+    slug: "admin",
     login: "admin",
     password: bcrypt.hashSync("admin123", 10),
     role: "admin",
@@ -23,7 +23,7 @@ module.exports = [
   },
   {
     _id: "65a000000000000000000002",
-    slug: "User1",
+    slug: "user1",
     login: "otakuPL",
     password: bcrypt.hashSync("test123", 10),
     email: "otaku@anime.pl",
