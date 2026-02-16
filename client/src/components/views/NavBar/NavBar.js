@@ -17,8 +17,8 @@ const NavBar = () => {
             className={styles.img}
           />
           </Navbar.Brand>
+      <p>Favorite Anime</p>
       </Navbar>
-      <h2>navbar</h2>
     </div>
   );
 };
