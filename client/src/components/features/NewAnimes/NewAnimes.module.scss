@@ -1,6 +1,8 @@
 @import '../../../styles/settings.scss';
 
 .root{
-  border: 2px solid #333;
+  border: 2px solid #153283;
   border-radius: 10px 20px 30px 40px;
+  background-color: $homePage-bg-color;
+  color: $color-light;
 }

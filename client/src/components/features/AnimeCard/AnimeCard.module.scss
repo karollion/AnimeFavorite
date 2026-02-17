@@ -2,6 +2,9 @@
 
 .card{
   position: relative;
+  border-radius: 0 0 10px 10px;
+  border: 1px solid blue;
+  color: $color-light;
 
   &:hover {
     transform: scale(1.075);
@@ -23,9 +26,6 @@
   }
   
   .body {
-    background: yellowgreen;
-    border-radius: 0 0 10px 10px;
-    border: 1px solid blue;
     padding: 10px;
   }
 }

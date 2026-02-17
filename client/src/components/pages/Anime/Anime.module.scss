@@ -1,13 +1,7 @@
 @import '../../../styles/settings.scss';
 
 .root {
-	
-
-	@media (max-width: 500px){	
-	}
-	
-	@media (max-width: 300px){
-	}
-
-	
+	min-height: 100vh;
+	background-color: $homePage-bg-color;
+	color: $color-light;
 }

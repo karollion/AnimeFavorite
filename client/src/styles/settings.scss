@@ -1,8 +1,42 @@
-$color-light: #f5f0f0;
+// -------- Colors -------- //
+$primary-color-light: #6a89cc;
+$primary-color-light-medium: #4a69bd;
+$primary-color-medium: #1e3799;
+$primary-color-dark: #0c2461;
 
-$color-success: #26de81;
-$color-warning: #e1644e;
+$secondary-color-light: #fad390;
+$secondary-color-light-medium: #f6b93b;
+$secondary-color-medium: #fa983a;
+$secondary-color-dark: #e58e26;
 
+$warning-color-light: #e55039;
+$warning-color-dark: #b71540;
+
+$succes-color-light: #78e08f;
+$succes-color-dark: #079992;
+
+$color-light: #d1cece;
 $color-black:  #1a1a1a;
 
+// -------- Transitions -------- //
+
 $transition: all 0.5s;
+
+
+// -------- Text -------- //
+
+$base-size: 12px;
+$text-color-dark: $color-black;
+$text-color-light: $color-light;
+
+// ------ Nav bar ------ //
+
+$navbar-bg-color: $primary-color-light-medium;
+
+// ------ Home Page ------ //
+
+$homePage-bg-color: $primary-color-dark;
+
+// ------ Footer ------ //
+
+$footer-bg-color: $primary-color-dark;

@@ -1,10 +1,8 @@
 @import '../../../styles/settings.scss';
 
 .root {
-  position: relative;
-  padding: 0;
-  border: 2px solid #333;
-  border-radius: 3px 3px 3px 3px;
+  background: $navbar-bg-color;
+  color: $color-light;
 
   .navbar {
     padding: 0;
