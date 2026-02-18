@@ -2,13 +2,24 @@
 
 .card{
   position: relative;
-  border-radius: 0 0 10px 10px;
-  border: 1px solid blue;
+  border-radius:10px;
+  border: 1px solid rgb(8, 8, 14);
   color: $color-light;
+  height: $anime-card-height;
+  width: $anime-card-width; 
+  background-color: $anime-card-background;
 
+  -webkit-box-shadow: 0px 0px 24px -6px $secondary-color-dark;
+  -moz-box-shadow: 0px 0px 24px -6px $secondary-color-dark;
+  box-shadow: 0px 0px 24px -6px $secondary-color-dark;
+ 
   &:hover {
     transform: scale(1.075);
     transition: $transition;
+
+    -webkit-box-shadow: 0px 0px 28px -3px $secondary-color-light-medium;
+    -moz-box-shadow: 0px 0px 28px -3px $secondary-color-light-medium;
+    box-shadow: 0px 0px 28px -3px $secondary-color-light-medium;
   }
 
   &:not(:hover) {

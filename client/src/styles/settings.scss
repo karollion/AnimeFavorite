@@ -37,6 +37,12 @@ $navbar-bg-color: $primary-color-light-medium;
 
 $homePage-bg-color: $primary-color-dark;
 
+// ------ Anime Card ------ //
+
+$anime-card-height: 250px;
+$anime-card-width: calc( $anime-card-height * 0.75 );
+$anime-card-background: $primary-color-light;
+
 // ------ Footer ------ //
 
 $footer-bg-color: $primary-color-dark;
