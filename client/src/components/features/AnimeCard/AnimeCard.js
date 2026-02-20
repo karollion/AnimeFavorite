@@ -8,7 +8,6 @@ const AnimeCard = ({ anime }) => {
   return (
     <Col xs="12" sm="6" md="4" lg="3" className="mb-4">
       <div className={styles.card}>
-        <div><p>Slug: {anime.slug}</p></div>
         <div><p>Age rating: {anime.age_rating}</p></div>
         <div><p>Rating: {anime.rating_overall}</p></div>
 

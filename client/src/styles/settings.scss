@@ -39,8 +39,8 @@ $homePage-bg-color: $primary-color-dark;
 
 // ------ Anime Card ------ //
 
-$anime-card-height: 250px;
-$anime-card-width: calc( $anime-card-height * 0.75 );
+$anime-card-height: 297px;
+$anime-card-width: calc( $anime-card-height * 0.707 );
 $anime-card-background: $primary-color-light;
 
 // ------ Footer ------ //
