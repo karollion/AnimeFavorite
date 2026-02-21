@@ -22,6 +22,8 @@ const AnimeSchema = new mongoose.Schema({
 
   anime_cover: { type: String, trim: true },
 
+  cover_public_id: { type: String },
+
   anime_images: [{ type: String, trim: true }],
 
   characters: [

@@ -1,5 +1,6 @@
 const express = require('express');
 const router = express.Router();
+const uploadPhotoAnime = require('../utils/uploadPhotoAnime')
 const AnimeController = require('../controllers/anime.controller');
 
 // GET /api/animes
@@ -10,15 +11,18 @@ router.get('/animes/slug/:slug', AnimeController.getBySlug)
 
 // GET /api/animes/:id
 router.get('/animes/:id', AnimeController.getOne);
-/** 
+
 // POST /api/animes
-router.post('/', auth, isAdmin, AnimeController.create);
+router.post('/animes', uploadPhotoAnime.single('cover'), AnimeController.create);
+
+//router.post('/', auth, isAdmin, AnimeController.create);
 
 // PUT /api/animes/:id
-router.put('/:id', auth, isAdmin, AnimeController.update);
+router.put('/animes/:id/cover', uploadPhotoAnime.single('cover'), AnimeController.updateCover);
+//router.put('/:id', auth, isAdmin, AnimeController.update);
 
 // DELETE /api/animes/:id
-router.delete('/:id', auth, isAdmin, AnimeController.remove);
-*/
+router.delete('/animes/:id', AnimeController.remove)
+
 
 module.exports = router;

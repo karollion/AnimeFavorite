@@ -1,4 +1,5 @@
 const Anime = require('../models/anime.model');
+const cloudinary = require('../config/cloudinary')
 
 // Load all animes
 exports.getAll = async (req, res) => {
@@ -14,7 +15,7 @@ exports.getAll = async (req, res) => {
   }
 };
 
-// Load one anime
+// Load one anime by id
 exports.getOne = async (req, res) => {
   try {
     const anime = await Anime.findById(req.params.id)
@@ -31,6 +32,7 @@ exports.getOne = async (req, res) => {
   }
 };
 
+// Load one anime by slug
 exports.getBySlug = async (req, res) => {
   try {
     const anime = await Anime.findOne({ slug: req.params.slug })
@@ -45,4 +47,72 @@ exports.getBySlug = async (req, res) => {
   } catch (err) {
     res.status(500).json({ message: err.message })
   }
-}
+};
+
+// Create new anime
+exports.create = async (req, res) => {
+  try {
+    const animeData = {
+      ...req.body
+    }
+
+    if (req.file) {
+      animeData.anime_cover = req.file.path
+      animeData.cover_public_id = req.file.filename
+    }
+
+    const anime = await Anime.create(animeData)
+    res.status(201).json(anime)
+  } catch (err) {
+    res.status(400).json({ message: err.message })
+  }
+};
+
+// Update Anime
+exports.updateCover = async (req, res) => {
+  try {
+    const anime = await Anime.findById(req.params.id)
+    if (!anime) {
+      return res.status(404).json({ message: 'Anime not found' })
+    }
+
+    // usuń starą okładkę
+    if (anime.cover_public_id) {
+      await cloudinary.uploader.destroy(anime.cover_public_id)
+    }
+
+    // zapisz nową
+    anime.anime_cover = req.file.path
+    anime.cover_public_id = req.file.filename
+
+    await anime.save()
+    res.json(anime)
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+};
+
+// Remove anime
+exports.remove = async (req, res) => {
+  try {
+    const anime = await Anime.findById(req.params.id)
+
+    if (!anime) {
+      return res.status(404).json({ message: 'Anime not found' })
+    }
+
+    // usuń obraz z Cloudinary
+    if (anime.cover_public_id) {
+      await cloudinary.uploader.destroy(anime.cover_public_id)
+    }
+
+    anime.is_deleted = true
+    anime.deleted_at = new Date()
+
+    await anime.save()
+
+    res.json({ message: 'Anime deleted (soft)' })
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+};
