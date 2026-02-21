@@ -4,6 +4,7 @@ import Footer from './components/views/Footer/Footer';
 // Import pages
 import Home from './components/pages/Home/Home';
 import Anime from './components/pages/Anime/Anime'
+import AddAnime from './components/pages/AddAnime/AddAnime'
 import WrongPage from './components/pages/WrongPage/WrongPage';
 
 function App() {
@@ -14,6 +15,7 @@ function App() {
         <Routes>
           <Route path="/" element={<Home/>} />
           <Route path='/anime/:slug' element={<Anime/>} />
+          <Route path='/anime/AddAnime' element={<AddAnime/>} />
           <Route path="*" element={<WrongPage/>} />
         </Routes>
       </div>

@@ -1,11 +1,11 @@
 import styles from './NavBar.module.scss'
 import Navbar from 'react-bootstrap/Navbar';
-import { NavLink } from 'react-router-dom';
+import { NavLink, Link} from 'react-router-dom';
 import { useState } from 'react';
 import logo from '../../../assets/logo_S.png';
 
 const NavBar = () => {
-  const [expanded, setExpanded] = useState(false);
+  const [expanded] = useState(false);
 
   return (
     <div className={styles.root}>
@@ -16,8 +16,8 @@ const NavBar = () => {
             alt="Favorite Anime"
             className={styles.img}
           />
-          </Navbar.Brand>
-      <p>Favorite Anime</p>
+        </Navbar.Brand>
+        <Link to="/anime/AddAnime" className={styles.btn}>Add New</Link>
       </Navbar>
     </div>
   );

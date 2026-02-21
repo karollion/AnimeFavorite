@@ -1,7 +1,7 @@
-import multer from 'multer'
-import { CloudinaryStorage } from 'multer-storage-cloudinary'
-import cloudinary from './cloudinary.js'
-//crop: 'limit'?
+const multer = require('multer')
+const { CloudinaryStorage } = require('multer-storage-cloudinary')
+const cloudinary = require('../utils/cloudinary')
+
 const storage = new CloudinaryStorage({
   cloudinary,
   params: {
@@ -13,4 +13,6 @@ const storage = new CloudinaryStorage({
   }
 })
 
-export const uploadPhotoAnime = multer({ storage })
+const uploadPhotoAnime = multer({ storage })
+
+module.exports = uploadPhotoAnime

@@ -1,5 +1,5 @@
 const Anime = require('../models/anime.model');
-const cloudinary = require('../config/cloudinary')
+const cloudinary = require('../utils/cloudinary')
 
 // Load all animes
 exports.getAll = async (req, res) => {
