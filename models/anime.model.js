@@ -5,8 +5,6 @@ const AnimeSchema = new mongoose.Schema({
 
   original_title: { type: String, trim: true },
 
-  created_at: { type: Date, default: Date.now },
-
   age_rating: { type: Number },
 
   type: { type: String, enum: ["TV", "Movie", "OVA", "ONA"] },

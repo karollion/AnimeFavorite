@@ -44,7 +44,7 @@ export const fetchAnimeBySlug = slug => async dispatch => {
   dispatch(fetchStart())
 
   try {
-    const res = await fetch(`${API_URL}/animes/${slug}`)
+    const res = await fetch(`${API_URL}/animes/slug/${slug}`)
 
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}`)

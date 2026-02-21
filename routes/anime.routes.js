@@ -6,7 +6,7 @@ const AnimeController = require('../controllers/anime.controller');
 router.get('/animes', AnimeController.getAll);
 
 // GET /api/animes/slug
-router.get('/animes/:slug', AnimeController.getBySlug)
+router.get('/animes/slug/:slug', AnimeController.getBySlug)
 
 // GET /api/animes/:id
 router.get('/animes/:id', AnimeController.getOne);
