@@ -5,22 +5,23 @@ const AnimeSchema = new mongoose.Schema({
 
   original_title: { type: String, trim: true },
 
-  age_rating: { type: Number },
+  age_rating: { type: Number, required: true, min: 0, max: 21, default: 0 },
 
-  type: { type: String, enum: ["TV", "Movie", "OVA", "ONA"] },
+  type: { type: String, enum: ["TV", "Movie", "OVA", "ONA"], required: true },
 
   world: { type: String, trim: true },
 
   genres: [{ type: String, trim: true }],
+  
   categories: [{ type: String, trim: true }],
 
   rating_overall: { type: Number, min: 0, max: 10, default: 0 },
 
   my_opinion: { type: String, trim: true },
 
-  description_short: { type: String, trim: true },
+  description_short: { type: String, trim: true, required: true },
 
-  anime_cover: { type: String, trim: true },
+  anime_cover: { type: String, trim: true, required: true },
 
   cover_public_id: { type: String },
 

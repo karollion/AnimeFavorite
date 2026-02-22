@@ -19,8 +19,6 @@ const AnimeForm = ({ action, actionText, ...props }) => {
   const [categories, setCategories] = useState(props.categories || '');
   const [description_short, setDescription_short] = useState(props.description_short || '');
   const [anime_cover, setAnime_cover] = useState(props.anime_cover || '');
-  const [characters, setCharacters] = useState(props.characters || '');
-  const [seasons, setSeasons] = useState(props.seasonse || '');
   const [status, setStatus] = useState(props.status || '');
 
   //const [user] = useState(props.user);
@@ -29,7 +27,7 @@ const AnimeForm = ({ action, actionText, ...props }) => {
 
   const handleSubmit = () => {
     if(content ) {
-      action({ title, content, picture, price, location, user });
+      action({ title, original_title });
     }
   };
 
@@ -40,7 +38,7 @@ const AnimeForm = ({ action, actionText, ...props }) => {
   
   return (
     <Form onSubmit={validate(handleSubmit)} className={styles.root}>
-      <Form.Group  controlId="formtitle">
+      <Form.Group  controlId="form_title">
         <Form.Label>Title</Form.Label>
         <Form.Control
           {...register("title", { required: true, minLength: 5, maxLength: 70 })}
@@ -50,6 +48,58 @@ const AnimeForm = ({ action, actionText, ...props }) => {
         />
         {errors.title && <small className="d-block form-text text-danger mt-2">Title length is incorrect (min is 5, max is 70)</small>}
       </Form.Group>
+
+      <Form.Group  controlId="formt_original_itle">
+        <Form.Label>Original Title</Form.Label>
+        <Form.Control
+          {...register("original_title", { required: true, minLength: 5, maxLength: 70 })}
+          value={original_title}
+          onChange={e => setOriginal_title(e.target.value)}
+          type='text' placeholder='Enter original_title (5 to 70 characters)'
+        />
+        {errors.original_title && <small className="d-block form-text text-danger mt-2">Original Title length is incorrect (min is 5, max is 70)</small>}
+      </Form.Group>
+
+      <Form.Group  controlId="form_age_rating">
+        <Form.Label>Age Rating</Form.Label>
+        <Form.Control
+          {...register("age_rating", { required: true, min: 0, max: 21 })}
+          value={age_rating}
+          onChange={e => setAge_rating(e.target.value)}
+          type='text' placeholder='Enter age rating'
+        />
+        {errors.age_rating && <small className="d-block form-text text-danger mt-2">Age Rating is incorrect (min is 0, max is 21)</small>}
+      </Form.Group>
+
+      <Form.Group controlId="form_Type">
+        <Form.Label>Type</Form.Label>
+        <Form.Select
+          {...register("type", { required: true })}
+          value={type}
+          onChange={e => setType(e.target.value)}
+        >
+          <option value="">-- Choose Type --</option>
+          <option value="TV">TV</option>
+          <option value="Movie">Movie</option>
+          <option value="OVA">OVA</option>
+          <option value="ONA">ONA</option>
+        </Form.Select>
+
+        {errors.type && (
+          <small className="d-block form-text text-danger mt-2">
+            Type can't be empty
+          </small>
+        )}
+      </Form.Group>
+
+
+
+
+
+
+
+
+
 
       <Form.Group  controlId="formContent">
         <Form.Label>Content</Form.Label>
@@ -72,16 +122,7 @@ const AnimeForm = ({ action, actionText, ...props }) => {
         {errors.picture && <small className="d-block form-text text-danger mt-2">Picture can't be empty</small>}
       </Form.Group>
 
-      <Form.Group  controlId="formprice">
-        <Form.Label>Price</Form.Label>
-        <Form.Control
-          {...register("price", { required: true })}
-          value={price}
-          onChange={e => setPrice(e.target.value)}
-          type='text' placeholder='Enter price'
-        />
-        {errors.price && <small className="d-block form-text text-danger mt-2">Price can't be empty</small>}
-      </Form.Group>
+
 
       <Form.Group  controlId="formlocation">
         <Form.Label>Location</Form.Label>
@@ -106,7 +147,7 @@ const AnimeForm = ({ action, actionText, ...props }) => {
           <option value="office">Office</option>
           <option value="production">Production</option>
         </Form.Select>
-        
+
         {errors.location && (
           <small className="d-block form-text text-danger mt-2">
             Location can't be empty
