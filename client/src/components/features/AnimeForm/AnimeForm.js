@@ -19,9 +19,6 @@ const AnimeForm = ({ action, actionText, ...props }) => {
   const [categories, setCategories] = useState(props.categories || '');
   const [description_short, setDescription_short] = useState(props.description_short || '');
   const [anime_cover, setAnime_cover] = useState(props.anime_cover || '');
-  const [status, setStatus] = useState(props.status || '');
-
-  //const [user] = useState(props.user);
 
   const { register, handleSubmit: validate, formState: { errors } } = useForm();
 

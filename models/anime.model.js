@@ -12,7 +12,7 @@ const AnimeSchema = new mongoose.Schema({
   world: { type: String, trim: true },
 
   genres: [{ type: String, trim: true }],
-  
+
   categories: [{ type: String, trim: true }],
 
   rating_overall: { type: Number, min: 0, max: 10, default: 0 },
@@ -35,8 +35,8 @@ const AnimeSchema = new mongoose.Schema({
 
   status: {
     type: String,
-    enum: ["planned", "watching", "completed"],
-    default: "planned"
+    enum: ["not watched", "planned", "watching", "completed", "suspended", "abandoned"],
+    default: "not watched"
   },
 
   slug: { type: String, unique: true, index: true },
