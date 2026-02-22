@@ -24,8 +24,6 @@ const AnimeSchema = new mongoose.Schema({
 
   cover_public_id: { type: String },
 
-  anime_images: [{ type: String, trim: true }],
-
   characters: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Character" }
   ],
