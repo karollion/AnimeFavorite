@@ -1,173 +1,161 @@
-import styles from './AdForm.module.scss';
-import { Col, Form, Row } from "react-bootstrap";
-import Button from "../../common/Button/Button";
-import { useState } from 'react';
-import { useForm } from "react-hook-form";
-import { useParams } from 'react-router';
-import { useNavigate } from "react-router-dom";
+import styles from './AnimeForm.module.scss';
+import { Form, Row, Col } from 'react-bootstrap';
+import Button from '../../common/Button/Button';
+import { useForm } from 'react-hook-form';
+import { useNavigate, useParams, Link } from 'react-router-dom';
 
-const AnimeForm = ({ action, actionText, ...props }) => {
+const AnimeForm = ({ action, actionText = 'Save', defaultValues = {} }) => {
   const navigate = useNavigate();
-  const { slug } = useParams()
+  const { slug } = useParams();
 
-  const [title, setTitle] = useState(props.title || '');
-  const [original_title, setOriginal_title] = useState(props.title || '');
-  const [age_rating, setAge_rating] = useState(props.age_rating || '');
-  const [type, setType] = useState(props.type || '');
-  const [world, setWorld] = useState(props.world || '');
-  const [genres, setGenres] = useState(props.genres || '');
-  const [categories, setCategories] = useState(props.categories || '');
-  const [description_short, setDescription_short] = useState(props.description_short || '');
-  const [anime_cover, setAnime_cover] = useState(props.anime_cover || '');
+  const {
+    register,
+    handleSubmit,
+    formState: { errors },
+  } = useForm({
+    defaultValues: {
+      title: defaultValues.title || '',
+      original_title: defaultValues.original_title || '',
+      age_rating: defaultValues.age_rating || 0,
+      type: defaultValues.type || '',
+      world: defaultValues.world || '',
+      genres: defaultValues.genres?.join(', ') || '',
+      categories: defaultValues.categories?.join(', ') || '',
+      description_short: defaultValues.description_short || '',
+      status: defaultValues.status || 'not watched',
+    },
+  });
 
-  const { register, handleSubmit: validate, formState: { errors } } = useForm();
+  const onSubmit = data => {
+    const payload = {
+      ...data,
+      age_rating: Number(data.age_rating),
+      genres: data.genres.split(',').map(g => g.trim()),
+      categories: data.categories.split(',').map(c => c.trim()),
+    };
 
-  const handleSubmit = () => {
-    if(content ) {
-      action({ title, original_title });
+    if (data.anime_cover?.length) {
+      payload.anime_cover = data.anime_cover[0];
     }
+
+    action(payload);
   };
 
   const handleBack = e => {
     e.preventDefault();
-    navigate("/animes/slug/" + slug);
-  }
-  
+    navigate(`/animes/${slug}`);
+  };
+
   return (
-    <Form onSubmit={validate(handleSubmit)} className={styles.root}>
-      <Form.Group  controlId="form_title">
-        <Form.Label>Title</Form.Label>
+    <Form onSubmit={handleSubmit(onSubmit)} className={styles.root}>
+
+      {/* TITLE */}
+      <Form.Group className="mb-3">
+        <Form.Label>Title *</Form.Label>
         <Form.Control
-          {...register("title", { required: true, minLength: 5, maxLength: 70 })}
-          value={title}
-          onChange={e => setTitle(e.target.value)}
-          type='text' placeholder='Enter title (5 to 70 characters)'
+          {...register('title', { required: true, minLength: 5, maxLength: 70 })}
+          placeholder="Enter title"
         />
-        {errors.title && <small className="d-block form-text text-danger mt-2">Title length is incorrect (min is 5, max is 70)</small>}
+        {errors.title && <small className="text-danger">Title is required (5–70)</small>}
       </Form.Group>
 
-      <Form.Group  controlId="formt_original_itle">
-        <Form.Label>Original Title</Form.Label>
+      {/* ORIGINAL TITLE */}
+      <Form.Group className="mb-3">
+        <Form.Label>Original title</Form.Label>
         <Form.Control
-          {...register("original_title", { required: true, minLength: 5, maxLength: 70 })}
-          value={original_title}
-          onChange={e => setOriginal_title(e.target.value)}
-          type='text' placeholder='Enter original_title (5 to 70 characters)'
+          {...register('original_title', { minLength: 2, maxLength: 70 })}
+          placeholder="Original title"
         />
-        {errors.original_title && <small className="d-block form-text text-danger mt-2">Original Title length is incorrect (min is 5, max is 70)</small>}
       </Form.Group>
 
-      <Form.Group  controlId="form_age_rating">
-        <Form.Label>Age Rating</Form.Label>
+      {/* AGE RATING */}
+      <Form.Group className="mb-3">
+        <Form.Label>Age rating *</Form.Label>
         <Form.Control
-          {...register("age_rating", { required: true, min: 0, max: 21 })}
-          value={age_rating}
-          onChange={e => setAge_rating(e.target.value)}
-          type='text' placeholder='Enter age rating'
+          type="number"
+          {...register('age_rating', {
+            required: true,
+            min: 0,
+            max: 21,
+            valueAsNumber: true,
+          })}
         />
-        {errors.age_rating && <small className="d-block form-text text-danger mt-2">Age Rating is incorrect (min is 0, max is 21)</small>}
+        {errors.age_rating && <small className="text-danger">0 – 21 only</small>}
       </Form.Group>
 
-      <Form.Group controlId="form_Type">
-        <Form.Label>Type</Form.Label>
-        <Form.Select
-          {...register("type", { required: true })}
-          value={type}
-          onChange={e => setType(e.target.value)}
-        >
-          <option value="">-- Choose Type --</option>
+      {/* TYPE */}
+      <Form.Group className="mb-3">
+        <Form.Label>Type *</Form.Label>
+        <Form.Select {...register('type', { required: true })}>
+          <option value="">-- choose --</option>
           <option value="TV">TV</option>
           <option value="Movie">Movie</option>
           <option value="OVA">OVA</option>
           <option value="ONA">ONA</option>
         </Form.Select>
-
-        {errors.type && (
-          <small className="d-block form-text text-danger mt-2">
-            Type can't be empty
-          </small>
-        )}
+        {errors.type && <small className="text-danger">Type is required</small>}
       </Form.Group>
 
-
-
-
-
-
-
-
-
-
-      <Form.Group  controlId="formContent">
-        <Form.Label>Content</Form.Label>
-        <Form.Control 
-          {...register("content", { required: true, minLength: 20, maxLength: 1000 })}
-          as="textarea" placeholder="Enter content (20 to 1000 characters)" rows={3} 
-          value={content} 
-          onChange={e => setContent(e.target.value)} />
-          {errors.content && <small className="d-block form-text text-danger mt-2">Content length is incorrect (min is 20, max is 1000)</small>}
+      {/* WORLD */}
+      <Form.Group className="mb-3">
+        <Form.Label>World</Form.Label>
+        <Form.Control {...register('world', { maxLength: 30 })} />
       </Form.Group>
 
-      <Form.Group  controlId="formpicture">
-        <Form.Label>Picture</Form.Label>
+      {/* GENRES */}
+      <Form.Group className="mb-3">
+        <Form.Label>Genres *</Form.Label>
         <Form.Control
-          {...register("picture", { required: false })}
-          
-          onChange={e => setPicture(e.target.files[0])}
-          type='file'
+          {...register('genres', { required: true })}
+          placeholder="action, fantasy, drama"
         />
-        {errors.picture && <small className="d-block form-text text-danger mt-2">Picture can't be empty</small>}
       </Form.Group>
 
-
-
-      <Form.Group  controlId="formlocation">
-        <Form.Label>Location</Form.Label>
+      {/* CATEGORIES */}
+      <Form.Group className="mb-3">
+        <Form.Label>Categories *</Form.Label>
         <Form.Control
-          {...register("location", { required: true })}
-          value={location}
-          onChange={e => setLocation(e.target.value)}
-          type='text' placeholder='Enter location'
+          {...register('categories', { required: true })}
+          placeholder="shounen, seinen"
         />
-        {errors.location && <small className="d-block form-text text-danger mt-2">Location can't be empty</small>}
       </Form.Group>
 
-      <Form.Group controlId="formLocation">
-        <Form.Label>Location</Form.Label>
-        <Form.Select
-          {...register("location", { required: true })}
-          value={location}
-          onChange={e => setLocation(e.target.value)}
-        >
-          <option value="">-- choose location --</option>
-          <option value="warehouse">Warehouse</option>
-          <option value="office">Office</option>
-          <option value="production">Production</option>
-        </Form.Select>
-
-        {errors.location && (
-          <small className="d-block form-text text-danger mt-2">
-            Location can't be empty
-          </small>
-        )}
+      {/* DESCRIPTION */}
+      <Form.Group className="mb-3">
+        <Form.Label>Short description *</Form.Label>
+        <Form.Control
+          as="textarea"
+          rows={4}
+          {...register('description_short', { required: true, minLength: 10 })}
+        />
       </Form.Group>
 
-      <Row className="d-flex justify-content-center mt-3">
-        {slug ? <Col  xs='12' md='6' className='d-flex justify-content-center'>
-          <Button action={handleBack}>Back</Button>
-          
-        </Col> : null}
-        <Col>
-          <Link to="/" className={styles.btn}>
-            Back to home
-          </Link>
-        </Col>
-        <Col   xs='12' md='6' className='d-flex justify-content-center'>
-          <Button  type="submit">{actionText}</Button>
+      {/* COVER */}
+      <Form.Group className="mb-4">
+        <Form.Label>Anime cover *</Form.Label>
+        <Form.Control
+          type="file"
+          accept="image/*"
+          {...register('anime_cover', {
+            validate: files =>
+              !files?.length ||
+              ['image/jpeg', 'image/png', 'image/webp'].includes(files[0]?.type),
+          })}
+        />
+      </Form.Group>
+
+      {/* ACTIONS */}
+      <Row className="mt-4">
+        <Col className="d-flex gap-3">
+          {slug && <Button action={handleBack}>Back</Button>}
+          <Link to="/">Home</Link>
         </Col>
 
+        <Col className="text-end">
+          <Button type="submit">{actionText}</Button>
+        </Col>
       </Row>
-      
+
     </Form>
   );
 };
