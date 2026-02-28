@@ -15,6 +15,7 @@ const connectToDB = require('./db')
 /* Routes */
 const animeRoutes = require('./routes/anime.routes')
 const authRoutes = require('./routes/auth.routes')
+const userAnimeRoutes = require('./routes/userAnime.routes')
 
 const app = express()
 
@@ -69,6 +70,7 @@ const startServer = async () => {
   /* ROUTES */
   app.use('/api', animeRoutes)
   app.use('/api/auth', authRoutes)
+  app.use('/api/userAnime', userAnimeRoutes)
 
   /* STATIC */
   app.use(express.static(path.join(__dirname, 'public')))
