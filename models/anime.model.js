@@ -11,33 +11,15 @@ const AnimeSchema = new mongoose.Schema({
 
   world: { type: String, trim: true },
 
-  genres: [{ type: String, trim: true }],
+  genres: [{ type: String, trim: true, lowercase: true }],
 
-  categories: [{ type: String, trim: true }],
-
-  rating_overall: { type: Number, min: 0, max: 10, default: 0 },
-
-  my_opinion: { type: String, trim: true },
+  categories: [{ type: String, trim: true, lowercase: true }],
 
   description_short: { type: String, trim: true, required: true },
 
   anime_cover: { type: String, trim: true, required: true },
 
   cover_public_id: { type: String },
-
-  characters: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Character" }
-  ],
-
-  seasons: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Season" }
-  ],
-
-  status: {
-    type: String,
-    enum: ["not watched", "planned", "watching", "completed", "suspended", "abandoned"],
-    default: "not watched"
-  },
 
   slug: { type: String, unique: true, index: true },
 
@@ -76,5 +58,7 @@ AnimeSchema.pre("save", async function (next) {
   this.slug = slug
   next()
 })
+
+AnimeSchema.index({ slug: 1, is_deleted: 1 });
 
 module.exports = mongoose.model("Anime", AnimeSchema);

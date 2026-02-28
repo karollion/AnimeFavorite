@@ -19,18 +19,6 @@ const UserSchema = new mongoose.Schema({
     { type: mongoose.Schema.Types.ObjectId, ref: "Character" }
   ],
 
-  watched_anime: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Anime" }
-  ],
-
-  watchlist_anime: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Anime" }
-  ],
-
-  favorite_anime: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Anime" }
-  ],
-
   slug: { type: String, unique: true, index: true },
 
   is_deleted: { type: Boolean, default: false },
