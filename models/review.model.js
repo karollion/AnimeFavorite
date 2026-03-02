@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const Anime = require('./anime.model');
 
 const ReviewSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -19,7 +20,7 @@ ReviewSchema.index({ user: 1, anime: 1 }, { unique: true });
 //Funkcja przeliczająca rating anime
 async function recalcAnimeRating(animeId) {
   const stats = await mongoose.model("Review").aggregate([
-    { $match: { anime: animeId } },
+    { $match: { anime: animeId, is_deleted: { $ne: true } } },
     {
       $group: {
         _id: "$anime",

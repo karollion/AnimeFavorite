@@ -3,7 +3,7 @@ const Character = require("../models/character.model");
 // Load all Characters
 exports.getAll = async (req, res) => {
   try {
-    const characters = await Character.find().sort({ name: 1 })
+    const characters = await Character.find().sort({ firstName: 1 })
     res.json(characters)
   } catch (err) {
     res.status(500).json({ message: err.message })

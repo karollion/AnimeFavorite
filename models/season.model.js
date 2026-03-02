@@ -1,7 +1,11 @@
 const mongoose = require("mongoose");
 
 const SeasonSchema = new mongoose.Schema({
-  anime: { type: ObjectId, ref: "Anime", required: true },
+  anime: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Anime",
+    required: true
+  },
   
   season_number: { type: Number, required: true },
 

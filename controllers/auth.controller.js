@@ -74,9 +74,6 @@ exports.getProfile = async (req, res) => {
     return res.status(401).json({ message: "Not authenticated" })
   }
   const user = await User.findById(req.session.user.id)
-    .populate("favorite_anime", "title cover year")
-    .populate("watchlist_anime", "title cover")
-    .populate("watched_anime", "title cover rating_overall")
     .populate("favorite_characters", "name anime image_url")
 
   res.json(user)
@@ -90,9 +87,6 @@ exports.getUserStats = async (req, res) => {
   const user = await User.findById(req.session.user.id)
 
   res.json({
-    watched_count: user.watched_anime.length,
-    watchlist_count: user.watchlist_anime.length,
-    favorites_count: user.favorite_anime.length,
     favorite_characters_count: user.favorite_characters.length
   })
 };
@@ -142,7 +136,7 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: err.message })
   }
 };
-
+/**
 exports.addFavoriteAnime = async (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ message: "Not authenticated" })
@@ -287,3 +281,4 @@ exports.removeAnimeFromAllLists = async (req, res) => {
     res.status(500).json({ message: err.message })
   }
 };
+*/

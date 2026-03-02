@@ -1,7 +1,11 @@
 const mongoose = require('mongoose');
 
 const CharacterSchema = new mongoose.Schema({
-  anime: { type: ObjectId, ref: "Anime", required: true },
+  anime: { 
+    type: mongoose.Schema.Types.ObjectId,
+    ref: "Anime",
+    required: true
+  },
   
   firstName: { type: String, required: true, trim: true },
   lastName: { type: String, trim: true },

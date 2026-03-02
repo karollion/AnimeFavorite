@@ -8,10 +8,11 @@ const Anime = require('../models/anime.model');
 // POST /api/user-anime
 exports.upsert = async (req, res) => {
   try {
-    const { user, anime, favorite_anime, rating, status } = req.body;
+    const user = req.session.user.id;
+    const { anime, favorite_anime, rating, status } = req.body;
 
     // sprawdź czy anime istnieje
-    const animeExists = await Anime.findById(anime);
+    const animeExists = await Anime.exists({ _id: anime, is_deleted: { $ne: true } });
     if (!animeExists) {
       return res.status(404).json({ message: 'Anime not found' });
     }
@@ -52,7 +53,7 @@ exports.upsert = async (req, res) => {
 // GET /api/user-anime/:userId
 exports.getUserAnime = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const user = req.session.user.id;
 
     const list = await UserAnime.find({ user: userId })
       .populate({
@@ -75,7 +76,7 @@ exports.getUserAnime = async (req, res) => {
 // GET /api/user-anime/:userId/favorites
 exports.getFavorites = async (req, res) => {
   try {
-    const { userId } = req.params;
+    const user = req.session.user.id;
 
     const favorites = await UserAnime
       .find({
@@ -111,7 +112,10 @@ exports.getFavorites = async (req, res) => {
 // DELETE /api/user-anime/:id
 exports.remove = async (req, res) => {
   try {
-    const relation = await UserAnime.findById(req.params.id);
+    const relation = await UserAnime.findOne({
+      _id: req.params.id,
+      user: req.session.user.id
+    });
 
     if (!relation) {
       return res.status(404).json({ message: 'Relation not found' });

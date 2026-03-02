@@ -1,6 +1,6 @@
 /* ENV */
 require('dotenv').config()
-require('./models')
+require('./models/index')
 
 /* Imports */
 const path = require('path')
@@ -68,7 +68,7 @@ const startServer = async () => {
   )
 
   /* ROUTES */
-  app.use('/api', animeRoutes)
+  app.use('/api/animes', animeRoutes)
   app.use('/api/auth', authRoutes)
   app.use('/api/userAnime', userAnimeRoutes)
 
@@ -78,6 +78,11 @@ const startServer = async () => {
 
   app.use((req, res) => {
     res.status(404).json({ message: '404 Not found...' })
+  })
+
+  app.use((err, req, res, next) => {
+    console.error(err)
+    res.status(500).json({ message: 'Internal server error' })
   })
 
   const PORT = process.env.PORT || 3030
