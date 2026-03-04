@@ -1,9 +1,14 @@
 const User = require('../models/user.model');
 const bcrypt = require('bcryptjs');
+const cloudinary = require('../utils/cloudinary')
+const pick = require('../utils/pickAllowedFields');
 
+// ===============================
+// REGISTER USER
+// ===============================
 exports.register = async (req, res) => {
   try{
-    const { login, password, description, email, birth_year, avatar } = req.body
+    const { login, password, description, email, birth_year } = req.body
 
     if(typeof login !== "string" ||
       typeof password !== "string" ||
@@ -17,6 +22,14 @@ exports.register = async (req, res) => {
     if (existingUser) {
       return res.status(409).json({ message: "Login already exists" })
     }
+    const existingEmail = await User.findOne({ email })
+    if (existingEmail) {
+      return res.status(409).json({ message: "Email already exists" })
+    }
+
+    if (birth_year !== undefined && !Number.isInteger(Number(birth_year))) {
+      return res.status(400).json({ message: "Invalid birth_year" })
+    }
 
     const user = await User.create({
       login: login.trim(),
@@ -24,7 +37,6 @@ exports.register = async (req, res) => {
       description,
       email,
       birth_year: Number(birth_year),
-      avatar
     })
 
     res.status(201).json({ message: "User created", login: user.login })
@@ -33,17 +45,28 @@ exports.register = async (req, res) => {
   }
 };
 
+// ===============================
+// LOGIN USER
+// ===============================
 exports.login = async (req, res) => {
   try{
     const { login, password} = req.body;
 
     if(login && typeof login === 'string' && password && typeof password === 'string') {
-      const user = await User.findOne({ login, is_deleted: false });
+    const user = await User.findOne({ login, is_deleted: false }).select('+password');
+
+    const passwordHash = user?.password || await bcrypt.hash("fake", 10);
+
+    const valid = await bcrypt.compare(password, passwordHash);
+
+    if (!user || !valid) {
+      return res.status(401).json({ message: "User or password incorrect" });
+    }
 
       if (!user) {
         return res.status(400).send({ message: 'User or password are incorrect' });
       } else {
-        if (bcrypt.compareSync(password, user.password)) {
+        if (await bcrypt.compare(password, user.password)) {
           const userLogged = { login: user.login, id: user._id, avatar: user.avatar};
           req.session.user = {
                             id: user._id,
@@ -51,7 +74,12 @@ exports.login = async (req, res) => {
                             role: user.role
                             }
           
-          res.status(200).json( req.session.user );
+          res.json({
+            id: user._id,
+            login: user.login,
+            role: user.role,
+            avatar: user.avatar
+          });
 
           console.log('Hello ' + req.session.user.login + ' you are logged in.')
         } else {
@@ -68,35 +96,102 @@ exports.login = async (req, res) => {
   }
 };
 
-/* Get user with populate */
+// ===============================
+// Get user with populate
+// ===============================
 exports.getProfile = async (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ message: "Not authenticated" })
   }
-  const user = await User.findById(req.session.user.id)
-    .populate("favorite_characters", "name anime image_url")
+  const user = await User.findOne({ _id: req.session.user.id, is_deleted: false })
+    .populate("favorite_characters", "firstName lastName anime imageUrl")
 
-  res.json(user)
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
+
+  res.json({
+    id: user._id,
+    login: user.login,
+    email: user.email,
+    description: user.description,
+    avatar: user.avatar,
+    favorite_characters: user.favorite_characters
+  });
 };
 
-/* Dynamic user stats */
+// ===============================
+// Dynamic user stats
+// ===============================
 exports.getUserStats = async (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ message: "Not authenticated" })
   }
-  const user = await User.findById(req.session.user.id)
+  const user = await User.findOne({
+    _id: req.session.user.id,
+    is_deleted: false
+  })
+  
+  if (!user) {
+    return res.status(404).json({ message: 'User not found' });
+  }
 
   res.json({
     favorite_characters_count: user.favorite_characters.length
   })
 };
 
+// ===============================
+// LOGOUT
+// ===============================
 exports.logout = async (req, res) => {
-  req.session.destroy(() => {
-    res.send({ message: 'You are logout' })
-  })
+  req.session.destroy(err => {
+    if (err) {
+      return res.status(500).json({ message: "Logout failed" });
+    }
+
+    res.clearCookie('connect.sid');
+    res.json({ message: 'Logged out' });
+  });
 };
 
+// ===============================
+// UPDATE AVATAR
+// ===============================
+exports.updateAvatar = async (req, res) => {
+  if (!req.session.user) {
+    return res.status(401).json({ message: "Not authenticated" })
+  }
+
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" })
+  }
+
+  try {
+    const user = await User.findOne({ _id: req.session.user.id, is_deleted: false })
+
+    if (!user) {
+      return res.status(404).json({ message: 'User not found' });
+    }
+
+    if (user.avatar_public_id) {
+      await cloudinary.uploader.destroy(user.avatar_public_id);
+    }
+
+    user.avatar = req.file.path;
+    user.avatar_public_id = req.file.filename;
+
+    await user.save();
+
+    res.json(user);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
+// ===============================
+// UPDATE PROFILE
+// ===============================
 exports.updateProfile = async (req, res) => {
   if (!req.session.user) {
     return res.status(401).json({ message: "Not authenticated" })
@@ -108,20 +203,34 @@ exports.updateProfile = async (req, res) => {
     const allowedFields = [
       "description",
       "email",
-      "birth_year",
-      "avatar"
+      "birth_year"
     ]
 
-    const filteredUpdates = {}
-    for (const key of allowedFields) {
-      if (typeof updates[key] === "string" && updates[key].trim() !== "") {
-        filteredUpdates[key] = updates[key].trim()
+    const filteredUpdates = pick(req.body, allowedFields);
+
+    if (typeof updates.description === "string") {
+      filteredUpdates.description = updates.description.trim()
+    }
+
+    if (typeof updates.email === "string") {
+      filteredUpdates.email = updates.email.trim()
+    }
+
+    if (updates.birth_year !== undefined) {
+      if (!Number.isInteger(Number(updates.birth_year))) {
+        return res.status(400).json({ message: "Invalid birth_year" })
       }
-      if (key === "birth_year" && Number.isInteger(Number(updates[key]))) {
-        filteredUpdates.birth_year = Number(updates[key])
-      }
-      if (updates[key] !== undefined) {
-        filteredUpdates[key] = updates[key]
+      filteredUpdates.birth_year = Number(updates.birth_year)
+    }
+
+    if (filteredUpdates.email) {
+      const exists = await User.findOne({
+        email: filteredUpdates.email,
+        _id: { $ne: userId }
+      });
+    
+      if (exists) {
+        return res.status(409).json({ message: "Email already in use" });
       }
     }
 
@@ -136,149 +245,3 @@ exports.updateProfile = async (req, res) => {
     res.status(500).json({ message: err.message })
   }
 };
-/**
-exports.addFavoriteAnime = async (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ message: "Not authenticated" })
-  }
-  try {
-    const userId = req.session.user.id
-    const { animeId } = req.body
-
-    await User.findByIdAndUpdate(
-      userId,
-      { $addToSet: { favorite_anime: animeId } } // brak duplikatów
-    )
-
-    res.json({ message: "Anime added to favorites" })
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-};
-
-exports.removeFavoriteAnime = async (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ message: "Not authenticated" })
-  }
-  try {
-    const userId = req.session.user.id
-    const { animeId } = req.body
-
-    await User.findByIdAndUpdate(
-      userId,
-      { $pull: { favorite_anime: animeId } }
-    )
-
-    res.json({ message: "Anime removed from favorites" })
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-};
-
-exports.addFavoriteCharacter = async (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ message: "Not authenticated" })
-  }
-  try {
-    const userId = req.session.user.id
-    const { characterId } = req.body
-
-    await User.findByIdAndUpdate(
-      userId,
-      { $addToSet: { favorite_characters: characterId } }
-    )
-
-    res.json({ message: "Character added to favorites" })
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-};
-
-exports.removeFavoriteCharacter = async (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ message: "Not authenticated" })
-  }
-  try {
-    const userId = req.session.user.id
-    const { characterId } = req.body
-
-    await User.findByIdAndUpdate(
-      userId,
-      { $pull: { favorite_characters: characterId } }
-    )
-
-    res.json({ message: "Character removed from favorites" })
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-};
-
-exports.markAsWatched = async (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ message: "Not authenticated" })
-  }
-  try {
-    const userId = req.session.user.id
-    const { animeId } = req.body
-
-    await User.findByIdAndUpdate(
-      userId,
-      {
-        $addToSet: { watched_anime: animeId },
-        $pull: { watchlist_anime: animeId } // auto-usunięcie z "do obejrzenia"
-      }
-    )
-
-    res.json({ message: "Anime marked as watched" })
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-};
-
-exports.addToWatchlist = async (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ message: "Not authenticated" })
-  }
-  try {
-    const userId = req.session.user.id
-    const { animeId } = req.body
-
-    await User.findByIdAndUpdate(
-      userId,
-      {
-        $addToSet: { watchlist_anime: animeId },
-        $pull: { watched_anime: animeId }
-      }
-    )
-
-    res.json({ message: "Anime added to watchlist" })
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-};
-
-exports.removeAnimeFromAllLists = async (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ message: "Not authenticated" })
-  }
-  try {
-    const userId = req.session.user.id
-    const { animeId } = req.body
-
-    await User.findByIdAndUpdate(
-      userId,
-      {
-        $pull: {
-          favorite_anime: animeId,
-          watched_anime: animeId,
-          watchlist_anime: animeId
-        }
-      }
-    )
-
-    res.json({ message: "Anime removed from all lists" })
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-};
-*/

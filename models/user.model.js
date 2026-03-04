@@ -2,18 +2,15 @@ const mongoose = require("mongoose");
 
 const UserSchema = new mongoose.Schema({
   login: { type: String, required: true, unique: true, trim: true },
-  password: { type: String, required: true},
-  role: { 
-    type: String, 
-    enum: ["admin", "user"], 
-    default: "user" 
-  },
+  password: { type: String, required: true, select: false },
+  role: { type: String, enum: ["admin", "user"], default: "user" },
   
   description: { type: String, trim: true },
   email: { type: String, required: true, unique: true, trim: true },
   birth_year: { type: Number },
 
   avatar: { type: String, trim: true },
+  avatar_public_id: { type: String },
 
   favorite_characters: [
     { type: mongoose.Schema.Types.ObjectId, ref: "Character" }
@@ -49,7 +46,7 @@ UserSchema.pre("save", async function (next) {
   let slug = baseSlug
   let count = 1
 
-  while (await User.exists({ slug })) {
+  while (await User.exists({ slug, _id: { $ne: this._id } })) {
     slug = `${baseSlug}-${count++}`
   }
 

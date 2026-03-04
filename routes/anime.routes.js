@@ -19,7 +19,8 @@ router.post('/', uploadPhotoAnime.single('cover'), AnimeController.create);
 
 // PUT /api/animes/:id
 router.put('/:id/cover', uploadPhotoAnime.single('cover'), AnimeController.updateCover);
-//router.put('/:id', auth, isAdmin, AnimeController.update);
+
+outer.put('/:id', auth, isAdmin, AnimeController.update);
 
 // DELETE /api/animes/:id
 router.delete('/:id', AnimeController.remove)
