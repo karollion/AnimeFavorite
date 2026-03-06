@@ -18,7 +18,6 @@ const AnimeSchema = new mongoose.Schema({
   description_short: { type: String, trim: true, required: true },
 
   anime_cover: { type: String, trim: true, required: true },
-
   cover_public_id: { type: String },
   
   rating_overall: { type: Number, default: 0 },
@@ -31,7 +30,9 @@ const AnimeSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
-//Przygotowanie tytułu do dodania do Url
+// =======================================
+// Przygotowanie tytułu do dodania do Url
+// =======================================
 AnimeSchema.pre("save", async function (next) {
   if (!this.isModified("title")) return next()
 

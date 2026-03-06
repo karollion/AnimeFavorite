@@ -17,6 +17,7 @@ const SeasonSchema = new mongoose.Schema({
   rating: { type: Number, min: 0, max: 10 },
 
   cover_image: { type: String, trim: true },
+  cover_public_id: { type: String },
 
   release_date: { type: Date },
 

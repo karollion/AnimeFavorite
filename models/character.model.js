@@ -22,6 +22,8 @@ const CharacterSchema = new mongoose.Schema({
   },
 
   imageUrl: { type: String, trim: true },
+  image_public_id: { type: String },
+
   description: { type: String, trim: true },
 
   species: { type: String, trim: true },
