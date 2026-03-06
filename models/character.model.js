@@ -36,4 +36,6 @@ const CharacterSchema = new mongoose.Schema({
 
 }, { timestamps: true });
 
+CharacterSchema.index({ anime: 1, is_deleted: 1 });
+
 module.exports = mongoose.model('Character', CharacterSchema);

@@ -54,4 +54,6 @@ UserSchema.pre("save", async function (next) {
   next()
 })
 
+UserSchema.index({ slug: 1, is_deleted: 1 });
+
 module.exports = mongoose.model("User", UserSchema);

@@ -23,7 +23,7 @@ const AnimeSchema = new mongoose.Schema({
   rating_overall: { type: Number, default: 0 },
   rating_count: { type: Number, default: 0 },
 
-  slug: { type: String, unique: true, index: true },
+  slug: { type: String, required: true },
 
   is_deleted: { type: Boolean, default: false },
   deleted_at: { type: Date },
@@ -63,6 +63,6 @@ AnimeSchema.pre("save", async function (next) {
   next()
 })
 
-AnimeSchema.index({ slug: 1, is_deleted: 1 });
+AnimeSchema.index({ slug: 1, is_deleted: 1 }, { unique: true });
 
 module.exports = mongoose.model("Anime", AnimeSchema);

@@ -22,10 +22,7 @@ const UserAnimeSchema = new mongoose.Schema({
     type: Number,
     min: 0,
     max: 10,
-    validate: {
-      validator: Number.isInteger,
-      message: "Rating must be integer"
-    }
+    set: v => Math.round(v)
   },
 
   my_opinion: {

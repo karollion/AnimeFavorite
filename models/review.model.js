@@ -20,7 +20,7 @@ ReviewSchema.index({ user: 1, anime: 1 }, { unique: true });
 //Funkcja przeliczająca rating anime
 async function recalcAnimeRating(animeId) {
   const stats = await mongoose.model("Review").aggregate([
-    { $match: { anime: animeId, is_deleted: { $ne: true } } },
+    {  $match: { anime: animeId, is_deleted: false } },
     {
       $group: {
         _id: "$anime",
@@ -57,5 +57,12 @@ ReviewSchema.post(
     await recalcAnimeRating(this.anime)
   }
 );
+
+//Po zmianie recenzji → przelicz rating
+ReviewSchema.post("findOneAndUpdate", async function(doc) {
+  if (doc) {
+    await recalcAnimeRating(doc.anime)
+  }
+});
 
 module.exports = mongoose.model('Review', ReviewSchema);
