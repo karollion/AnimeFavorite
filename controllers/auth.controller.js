@@ -12,10 +12,13 @@ exports.register = async (req, res) => {
 
     if(typeof login !== "string" ||
       typeof password !== "string" ||
-      typeof email !== "string" ||
-      !Number.isInteger(Number(birth_year)) 
+      typeof email !== "string"
       ) {
       return res.status(400).json({ message: "Bad request" })
+    }
+
+    if (birth_year !== undefined && !Number.isInteger(Number(birth_year))) {
+      return res.status(400).json({ message: "Invalid birth_year" })
     }
 
     const existingUser = await User.findOne({ login })
@@ -49,50 +52,39 @@ exports.register = async (req, res) => {
 // LOGIN USER
 // ===============================
 exports.login = async (req, res) => {
-  try{
-    const { login, password} = req.body;
+  try {
+    const { login, password } = req.body;
 
-    if(login && typeof login === 'string' && password && typeof password === 'string') {
-    const user = await User.findOne({ login, is_deleted: false }).select('+password');
+    if (typeof login !== "string" || typeof password !== "string") {
+      return res.status(400).json({ message: "Bad request" });
+    }
+
+    const user = await User
+      .findOne({ login, is_deleted: false })
+      .select("+password");
 
     const passwordHash = user?.password || await bcrypt.hash("fake", 10);
-
     const valid = await bcrypt.compare(password, passwordHash);
 
     if (!user || !valid) {
       return res.status(401).json({ message: "User or password incorrect" });
     }
 
-      if (!user) {
-        return res.status(400).send({ message: 'User or password are incorrect' });
-      } else {
-        if (await bcrypt.compare(password, user.password)) {
-          const userLogged = { login: user.login, id: user._id, avatar: user.avatar};
-          req.session.user = {
-                            id: user._id,
-                            login: user.login,
-                            role: user.role
-                            }
-          
-          res.json({
-            id: user._id,
-            login: user.login,
-            role: user.role,
-            avatar: user.avatar
-          });
+    req.session.user = {
+      id: user._id,
+      login: user.login,
+      role: user.role
+    };
 
-          console.log('Hello ' + req.session.user.login + ' you are logged in.')
-        } else {
-          res.status(401).send({ message: 'User or password are incorrect' });
-        }
-      }
-
-    } else {
-      res.status(400).send({ message: 'Bad request'});
-    }
+    res.json({
+      id: user._id,
+      login: user.login,
+      role: user.role,
+      avatar: user.avatar
+    });
 
   } catch (err) {
-    res.status(500).send({ message: err.message });
+    res.status(500).json({ message: err.message });
   }
 };
 
@@ -167,6 +159,10 @@ exports.updateAvatar = async (req, res) => {
     return res.status(400).json({ message: "No file uploaded" })
   }
 
+  if (!req.file.mimetype.startsWith("image/")) {
+    return res.status(400).json({ message: "Invalid file type" })
+  }
+
   try {
     const user = await User.findOne({ _id: req.session.user.id, is_deleted: false })
 
@@ -208,19 +204,19 @@ exports.updateProfile = async (req, res) => {
 
     const filteredUpdates = pick(req.body, allowedFields);
 
-    if (typeof updates.description === "string") {
-      filteredUpdates.description = updates.description.trim()
+    if (typeof filteredUpdates.description === "string") {
+      filteredUpdates.description = filteredUpdates.description.trim()
     }
 
-    if (typeof updates.email === "string") {
-      filteredUpdates.email = updates.email.trim()
+    if (typeof filteredUpdates.email === "string") {
+      filteredUpdates.email = filteredUpdates.email.trim()
     }
 
-    if (updates.birth_year !== undefined) {
-      if (!Number.isInteger(Number(updates.birth_year))) {
+    if (filteredUpdates.birth_year !== undefined) {
+      if (!Number.isInteger(Number(filteredUpdates.birth_year))) {
         return res.status(400).json({ message: "Invalid birth_year" })
       }
-      filteredUpdates.birth_year = Number(updates.birth_year)
+      filteredUpdates.birth_year = Number(filteredUpdates.birth_year)
     }
 
     if (filteredUpdates.email) {
