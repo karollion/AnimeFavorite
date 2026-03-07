@@ -42,6 +42,36 @@ exports.getCharacter = async (req, res) => {
   }
 }
 
+// ===============================
+// UPDATE PHOTO
+// ===============================
+exports.updatePhoto = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" })
+    }
+
+    const character = await Character.findById(req.params.id);
+
+    if (!character) {
+      return res.status(404).json({ message: 'Photo not found' });
+    }
+
+    if (character.photo_public_id) {
+      await cloudinary.uploader.destroy(character.photo_public_id);
+    }
+
+    character.photo = req.file.path;
+    character.photo_public_id = req.file.filename;
+
+    await character.save();
+
+    res.json(character);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.updateCharacter = async (req, res) => {
   try {
 

@@ -21,8 +21,8 @@ const CharacterSchema = new mongoose.Schema({
     default: "side" 
   },
 
-  imageUrl: { type: String, trim: true },
-  image_public_id: { type: String },
+  photo: { type: String, trim: true },
+  photo_public_id: { type: String },
 
   description: { type: String, trim: true },
 

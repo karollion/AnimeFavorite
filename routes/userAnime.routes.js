@@ -2,7 +2,7 @@ const express = require('express');
 const router = express.Router();
 
 const controller = require('../controllers/userAnime.controller');
-const auth = require('../utils/authMiddleware')
+const auth = require("../utils/authMiddleware");
 
 // ===============================
 // GET

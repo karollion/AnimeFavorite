@@ -17,7 +17,7 @@ const AnimeSchema = new mongoose.Schema({
 
   description_short: { type: String, trim: true, required: true },
 
-  anime_cover: { type: String, trim: true, required: true },
+  anime_cover: { type: String, trim: true},
   cover_public_id: { type: String },
   
   rating_overall: { type: Number, default: 0 },

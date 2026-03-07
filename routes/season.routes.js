@@ -1,15 +1,20 @@
-const express = require("express")
-const router = express.Router()
+const express = require("express");
+const router = express.Router();
 
-const season = require("../controllers/season.controller")
-const auth = require("../utils/authMiddleware")
+const season = require("../controllers/season.controller");
+const auth = require("../utils/authMiddleware");
+const admin = require("../utils/adminMiddleware");
 
-router.get("/anime/:animeId", season.getSeasonsByAnime)
+// ===============================
+// GET
+// ===============================
+router.get("/anime/:animeId", season.getSeasonsByAnime);
 
-router.post("/", auth, season.createSeason)
+// ===============================
+// CREATE / UPDATE / DELETE
+// ===============================
+router.post("/", auth, season.createSeason);
+router.put("/:id", auth, admin, season.updateSeason);
+router.delete("/:id", auth, admin, season.deleteSeason);
 
-router.put("/:id", auth, season.updateSeason)
-
-router.delete("/:id", auth, season.deleteSeason)
-
-module.exports = router
+module.exports = router;

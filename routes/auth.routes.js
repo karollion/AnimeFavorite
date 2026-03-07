@@ -1,7 +1,7 @@
 const express = require('express');
 const router = express.Router();
 
-const uploadPhotoUser = require('../utils/uploadPhotoUser')
+const upload = require('../utils/upload');
 const authMiddleware = require('../utils/authMiddleware');
 const auth = require('../controllers/auth.controller');
 
@@ -17,7 +17,7 @@ router.post('/logout', authMiddleware, auth.logout);
 // ===============================
 router.get('/me', authMiddleware, auth.getProfile);
 router.get('/me/stats', authMiddleware, auth.getUserStats);
-router.put('/me/avatar', authMiddleware, uploadPhotoUser.single('avatar'), auth.updateAvatar);
+router.put('/me/avatar', authMiddleware, upload("avatars").single("avatar"), auth.updateAvatar);
 router.put('/me', authMiddleware, auth.updateProfile);
 
 module.exports = router;

@@ -2,6 +2,7 @@ const Anime = require('../models/anime.model');
 const Season = require('../models/season.model');
 const Character = require('../models/character.model');
 const cloudinary = require('../utils/cloudinary');
+const pick = require("../utils/pickAllowedFields");
 
 // ===============================
 // GET ALL
@@ -78,11 +79,22 @@ exports.getBySlug = async (req, res) => {
 
 
 // ===============================
-// CREATE???????????????????????????????dodawanie zdjecia
+// CREATE
 // ===============================
 exports.create = async (req, res) => {
   try {
-    const animeData = { ...req.body };
+    const allowed = [
+      "title",
+      "original_title",
+      "age_rating",
+      "type",
+      "world",
+      "genres",
+      "categories",
+      "description_short"
+    ]
+
+    const animeData = pick(req.body, allowed);
 
     if (req.file) {
       animeData.anime_cover = req.file.path;
@@ -103,6 +115,10 @@ exports.create = async (req, res) => {
 // ===============================
 exports.updateCover = async (req, res) => {
   try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" })
+    }
+
     const anime = await Anime.findById(req.params.id);
 
     if (!anime) {
@@ -123,6 +139,42 @@ exports.updateCover = async (req, res) => {
     res.status(500).json({ message: err.message });
   }
 };
+
+// ===============================
+// UPDATE ANIME
+// ===============================
+exports.update = async (req, res) => {
+  try {
+
+    const allowed = [
+      "title",
+      "original_title",
+      "age_rating",
+      "type",
+      "world",
+      "genres",
+      "categories",
+      "description_short"
+    ]
+
+    const updates = pick(req.body, allowed)
+
+    const anime = await Anime.findByIdAndUpdate(
+      req.params.id,
+      updates,
+      { new: true, runValidators: true }
+    )
+
+    if (!anime) {
+      return res.status(404).json({ message: "Anime not found" })
+    }
+
+    res.json(anime)
+
+  } catch (err) {
+    res.status(500).json({ message: err.message })
+  }
+}
 
 
 // ===============================
