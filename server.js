@@ -13,9 +13,12 @@ const helmet = require('helmet')
 const connectToDB = require('./db')
 
 /* Routes */
-const animeRoutes = require('./routes/anime.routes')
-const authRoutes = require('./routes/auth.routes')
+const animeRoutes     = require('./routes/anime.routes')
+const authRoutes      = require('./routes/auth.routes')
 const userAnimeRoutes = require('./routes/userAnime.routes')
+const characterRoutes = require("./routes/character.routes")
+const seasonRoutes    = require("./routes/season.routes")
+const reviewRoutes    = require("./routes/review.routes")
 
 const app = express()
 
@@ -70,7 +73,10 @@ const startServer = async () => {
   /* ROUTES */
   app.use('/api/animes', animeRoutes)
   app.use('/api/auth', authRoutes)
-  app.use('/api/userAnime', userAnimeRoutes)
+  app.use('/api/user-anime', userAnimeRoutes)
+  app.use("/api/characters", characterRoutes)
+  app.use("/api/seasons", seasonRoutes)
+  app.use("/api/reviews", reviewRoutes)
 
   /* STATIC */
   app.use(express.static(path.join(__dirname, 'public')))
