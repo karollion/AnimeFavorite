@@ -1,6 +1,6 @@
 const multer = require("multer");
 const { CloudinaryStorage } = require("multer-storage-cloudinary");
-const cloudinary = require("../config/cloudinary");
+const cloudinary = require("./cloudinary");
 
 // funkcja generująca storage dla konkretnego folderu
 const createStorage = (folder) => {
