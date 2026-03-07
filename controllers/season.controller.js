@@ -29,6 +29,36 @@ exports.getSeasonsByAnime = async (req, res) => {
   }
 }
 
+// ===============================
+// UPDATE COVER
+// ===============================
+exports.updateCover = async (req, res) => {
+  try {
+    if (!req.file) {
+      return res.status(400).json({ message: "No file uploaded" })
+    }
+
+    const season = await Season.findById(req.params.id);
+
+    if (!season) {
+      return res.status(404).json({ message: 'Season not found' });
+    }
+
+    if (season.cover_public_id) {
+      await cloudinary.uploader.destroy(season.cover_public_id);
+    }
+
+    season.season_cover = req.file.path;
+    season.cover_public_id = req.file.filename;
+
+    await season.save();
+
+    res.json(season);
+  } catch (err) {
+    res.status(500).json({ message: err.message });
+  }
+};
+
 exports.updateSeason = async (req, res) => {
   try {
 
