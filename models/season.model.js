@@ -29,5 +29,6 @@ const SeasonSchema = new mongoose.Schema({
 }, { timestamps: true });
 
 SeasonSchema.index( { anime: 1, season_number: 1 }, { unique: true } );
+SeasonSchema.index({ anime: 1 });
 
 module.exports = mongoose.model('Season', SeasonSchema);

@@ -65,4 +65,6 @@ ReviewSchema.post("findOneAndUpdate", async function(doc) {
   }
 });
 
+ReviewSchema.index({ anime: 1 })
+
 module.exports = mongoose.model('Review', ReviewSchema);

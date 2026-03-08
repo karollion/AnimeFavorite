@@ -5,9 +5,14 @@ const cloudinary = require('../utils/cloudinary');
 const pick = require("../utils/pickAllowedFields");
 
 // ===============================
-// GET ALL + PAGINATION + SEARCH TITLE
-// GET /anime?page=1&limit=20
-// GET /anime?search=naruto
+// GET ALL + PAGINATION + SEARCH
+// search po tytule
+// filtr genre
+// filtr type
+// filtr world
+// filtr categories
+// pagination
+// sortowanie
 // ===============================
 exports.getAll = async (req, res) => {
   try {
@@ -20,17 +25,71 @@ exports.getAll = async (req, res) => {
       is_deleted: { $ne: true }
     }
 
+    // ===============================
+    // SEARCH
+    // ===============================
+
     if (req.query.search) {
-      query.title = {
-        $regex: req.query.search,
-        $options: "i"
-      }
+      query.$text = { $search: req.query.search }
     }
+
+    // ===============================
+    // FILTER TYPE
+    // ===============================
+
+    if (req.query.type) {
+      query.type = req.query.type
+    }
+
+    // ===============================
+    // FILTER GENRE
+    // ===============================
+
+    if (req.query.genres) {
+      const genres = req.query.genres
+        .split(",")
+        .map(g => g.toLowerCase())
+      query.genres = { $in: genres }
+    }
+
+    // ===============================
+    // FILTER CATEGORY
+    // ===============================
+
+    if (req.query.category) {
+      query.categories = req.query.category.toLowerCase()
+    }
+
+    // ===============================
+    // FILTER WORLD
+    // ===============================
+
+    if (req.query.world) {
+      query.world = req.query.world
+    }
+
+    // ===============================
+    // SORT
+    // ===============================
+
+    let sort = { createdAt: -1 }
+
+    if (req.query.sort === "rating") {
+      sort = { rating_avg: -1 }
+    }
+
+    if (req.query.sort === "title") {
+      sort = { title: 1 }
+    }
+
+    // ===============================
+    // QUERY
+    // ===============================
 
     const total = await Anime.countDocuments(query)
 
     const animes = await Anime.find(query)
-      .sort({ createdAt: -1 })
+      .sort(sort)
       .skip(skip)
       .limit(limit)
 
@@ -80,31 +139,139 @@ exports.getOne = async (req, res) => {
 // ===============================
 exports.getBySlug = async (req, res) => {
   try {
-    const anime = await Anime.findOne({
-      slug: req.params.slug,
-      is_deleted: { $ne: true }
-    });
 
-    if (!anime) {
-      return res.status(404).json({ message: 'Anime not found' });
+    const result = await Anime.aggregate([
+
+      // ===============================
+      // MATCH ANIME
+      // ===============================
+
+      {
+        $match: {
+          slug: req.params.slug,
+          is_deleted: { $ne: true }
+        }
+      },
+
+      // ===============================
+      // SEASONS
+      // ===============================
+
+      {
+        $lookup: {
+          from: "seasons",
+          localField: "_id",
+          foreignField: "anime",
+          as: "seasons"
+        }
+      },
+
+      {
+        $addFields: {
+          seasons: {
+            $sortArray: {
+              input: "$seasons",
+              sortBy: { season_number: 1 }
+            }
+          }
+        }
+      },
+
+      // ===============================
+      // CHARACTERS
+      // ===============================
+
+      {
+        $lookup: {
+          from: "characters",
+          localField: "_id",
+          foreignField: "anime",
+          as: "characters"
+        }
+      },
+
+      {
+        $addFields: {
+          characters: {
+            $filter: {
+              input: "$characters",
+              as: "char",
+              cond: { $ne: ["$$char.is_deleted", true] }
+            }
+          }
+        }
+      },
+
+      // ===============================
+      // REVIEWS
+      // ===============================
+
+      {
+        $lookup: {
+          from: "reviews",
+          localField: "_id",
+          foreignField: "anime",
+          as: "reviews"
+        }
+      },
+
+      {
+        $addFields: {
+          reviews: {
+            $slice: ["$reviews", 10],
+            $filter: {
+              input: "$reviews",
+              as: "review",
+              cond: { $ne: ["$$review.is_deleted", true] }
+            }
+          }
+        }
+      },
+
+      // ===============================
+      // REVIEW STATS
+      // ===============================
+
+      {
+        $addFields: {
+          rating_count: { $size: "$reviews" },
+          rating_avg: {
+            $cond: [
+              { $gt: [{ $size: "$reviews" }, 0] },
+              { $avg: "$reviews.rating" },
+              0
+            ]
+          }
+        }
+      },
+
+      // ===============================
+      // OPTIONAL SORT REVIEWS
+      // ===============================
+
+      {
+        $addFields: {
+          reviews: {
+            $sortArray: {
+              input: "$reviews",
+              sortBy: { createdAt: -1 }
+            }
+          }
+        }
+      }
+
+    ])
+
+    if (!result.length) {
+      return res.status(404).json({ message: "Anime not found" })
     }
 
-    const seasons = await Season.find({ anime: anime._id })
-      .sort({ season_number: 1 });
-
-    const characters = await Character.find({ anime: anime._id });
-
-    res.json({
-      ...anime.toObject(),
-      seasons,
-      characters
-    });
+    res.json(result[0])
 
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message })
   }
-};
-
+}
 
 // ===============================
 // CREATE

@@ -31,6 +31,8 @@ exports.createReview = async (req, res) => {
       user: req.user.id
     })
 
+    await updateAnimeRating(review.anime)
+
     res.status(201).json(review)
 
   } catch (err) {
@@ -77,9 +79,44 @@ exports.deleteReview = async (req, res) => {
 
     await review.save()
 
+    await updateAnimeRating(review.anime)
+
     res.json({ message: "Review deleted" })
 
   } catch (err) {
     res.status(500).json({ message: err.message })
+  }
+}
+
+// ===============================
+// UPDATE ANIME RATING FUNCTION
+// ===============================
+async function updateAnimeRating(animeId) {
+
+  const stats = await Review.aggregate([
+    { $match: { anime: animeId, is_deleted: { $ne: true } } },
+    {
+      $group: {
+        _id: "$anime",
+        avgRating: { $avg: "$rating" },
+        count: { $sum: 1 }
+      }
+    }
+  ])
+
+  if (stats.length > 0) {
+
+    await Anime.findByIdAndUpdate(animeId, {
+      rating_avg: stats[0].avgRating,
+      rating_count: stats[0].count
+    })
+
+  } else {
+
+    await Anime.findByIdAndUpdate(animeId, {
+      rating_avg: 0,
+      rating_count: 0
+    })
+
   }
 }

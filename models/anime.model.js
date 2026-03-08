@@ -20,9 +20,9 @@ const AnimeSchema = new mongoose.Schema({
   anime_cover: { type: String, trim: true},
   cover_public_id: { type: String },
   
-  rating_overall: { type: Number, default: 0 },
   rating_count: { type: Number, default: 0 },
-
+  rating_avg: { type: Number, default: 0 },
+  
   slug: { type: String, required: true },
 
   is_deleted: { type: Boolean, default: false },
@@ -63,6 +63,11 @@ AnimeSchema.pre("save", async function (next) {
   next()
 })
 
+AnimeSchema.index({ slug: 1 });
 AnimeSchema.index({ slug: 1, is_deleted: 1 }, { unique: true });
+AnimeSchema.index({ title: "text", original_title: "text" });
+AnimeSchema.index({ genres: 1 });
+AnimeSchema.index({ type: 1 });
+AnimeSchema.index({ rating_avg: -1 });
 
 module.exports = mongoose.model("Anime", AnimeSchema);
