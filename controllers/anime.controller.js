@@ -5,7 +5,9 @@ const cloudinary = require('../utils/cloudinary');
 const pick = require("../utils/pickAllowedFields");
 
 // ===============================
-// GET ALL + PAGINATION
+// GET ALL + PAGINATION + SEARCH TITLE
+// GET /anime?page=1&limit=20
+// GET /anime?search=naruto
 // ===============================
 exports.getAll = async (req, res) => {
   try {
@@ -14,13 +16,20 @@ exports.getAll = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20
     const skip = (page - 1) * limit
 
-    const total = await Anime.countDocuments({
+    const query = {
       is_deleted: { $ne: true }
-    })
+    }
 
-    const animes = await Anime.find({
-      is_deleted: { $ne: true }
-    })
+    if (req.query.search) {
+      query.title = {
+        $regex: req.query.search,
+        $options: "i"
+      }
+    }
+
+    const total = await Anime.countDocuments(query)
+
+    const animes = await Anime.find(query)
       .sort({ createdAt: -1 })
       .skip(skip)
       .limit(limit)
