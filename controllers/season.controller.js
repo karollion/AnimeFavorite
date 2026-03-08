@@ -1,5 +1,8 @@
 const Season = require("../models/season.model")
 
+// ===============================
+// CREATE SEASON
+// ===============================
 exports.createSeason = async (req, res) => {
   try {
 
@@ -14,6 +17,9 @@ exports.createSeason = async (req, res) => {
   }
 }
 
+// ===============================
+// GET SEASON BY ANIME
+// ===============================
 exports.getSeasonsByAnime = async (req, res) => {
   try {
 
@@ -59,6 +65,9 @@ exports.updateCover = async (req, res) => {
   }
 };
 
+// ===============================
+// UPDATE SEASON
+// ===============================
 exports.updateSeason = async (req, res) => {
   try {
 
@@ -75,6 +84,9 @@ exports.updateSeason = async (req, res) => {
   }
 }
 
+// ===============================
+// SOFT DELETE SEASON
+// ===============================
 exports.deleteSeason = async (req, res) => {
   try {
 

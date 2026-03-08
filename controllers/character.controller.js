@@ -1,5 +1,8 @@
 const Character = require("../models/character.model")
 
+// ===============================
+// CREATE CHARACTER
+// ===============================
 exports.createCharacter = async (req, res) => {
   try {
 
@@ -14,6 +17,9 @@ exports.createCharacter = async (req, res) => {
   }
 }
 
+// ===============================
+// GET CHARACTER BY ANIME
+// ===============================
 exports.getCharactersByAnime = async (req, res) => {
   try {
 
@@ -29,6 +35,9 @@ exports.getCharactersByAnime = async (req, res) => {
   }
 }
 
+// ===============================
+// GET CHARACTER BY ID
+// ===============================
 exports.getCharacter = async (req, res) => {
   try {
 
@@ -72,6 +81,9 @@ exports.updatePhoto = async (req, res) => {
   }
 };
 
+// ===============================
+// UPDATE CHARACTER
+// ===============================
 exports.updateCharacter = async (req, res) => {
   try {
 
@@ -88,6 +100,9 @@ exports.updateCharacter = async (req, res) => {
   }
 }
 
+// ===============================
+// SOFT DELETE CHARACTER
+// ===============================
 exports.deleteCharacter = async (req, res) => {
   try {
 

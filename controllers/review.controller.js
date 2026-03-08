@@ -1,5 +1,8 @@
 const Review = require("../models/review.model")
 
+// ===============================
+// CREATE REVIEW
+// ===============================
 exports.createReview = async (req, res) => {
   try {
 
@@ -17,6 +20,9 @@ exports.createReview = async (req, res) => {
   }
 }
 
+// ===============================
+// GET REVIEWS BY ANIME
+// ===============================
 exports.getAnimeReviews = async (req, res) => {
   try {
 
@@ -33,6 +39,9 @@ exports.getAnimeReviews = async (req, res) => {
   }
 }
 
+// ===============================
+// SOFT DELETE REVIEW
+// ===============================
 exports.deleteReview = async (req, res) => {
   try {
 
