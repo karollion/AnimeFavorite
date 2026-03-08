@@ -5,18 +5,37 @@ const cloudinary = require('../utils/cloudinary');
 const pick = require("../utils/pickAllowedFields");
 
 // ===============================
-// GET ALL
+// GET ALL + PAGINATION
 // ===============================
 exports.getAll = async (req, res) => {
   try {
-    const animes = await Anime.find({ is_deleted: { $ne: true } })
-      .sort({ createdAt: -1 });
 
-    res.json(animes);
+    const page = parseInt(req.query.page) || 1
+    const limit = parseInt(req.query.limit) || 20
+    const skip = (page - 1) * limit
+
+    const total = await Anime.countDocuments({
+      is_deleted: { $ne: true }
+    })
+
+    const animes = await Anime.find({
+      is_deleted: { $ne: true }
+    })
+      .sort({ createdAt: -1 })
+      .skip(skip)
+      .limit(limit)
+
+    res.json({
+      page,
+      totalPages: Math.ceil(total / limit),
+      totalItems: total,
+      items: animes
+    })
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message })
   }
-};
+}
 
 
 // ===============================
@@ -95,7 +114,7 @@ exports.create = async (req, res) => {
     ]
 
     const animeData = pick(req.body, allowed);
-    
+
     const existing = await Anime.findOne({ title: animeData.title })
 
     if (existing) {
