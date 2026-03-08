@@ -95,7 +95,12 @@ exports.create = async (req, res) => {
     ]
 
     const animeData = pick(req.body, allowed);
+    
+    const existing = await Anime.findOne({ title: animeData.title })
 
+    if (existing) {
+      return res.status(409).json({ message: "Anime already exists" })
+    }
     if (req.file) {
       animeData.anime_cover = req.file.path;
       animeData.cover_public_id = req.file.filename;

@@ -1,31 +1,16 @@
 const Character = require("../models/character.model")
+const cloudinary = require("../utils/cloudinary")
+const pick = require("../utils/pickAllowedFields")
 
 // ===============================
-// CREATE CHARACTER
-// ===============================
-exports.createCharacter = async (req, res) => {
-  try {
-
-    const character = new Character(req.body)
-
-    await character.save()
-
-    res.status(201).json(character)
-
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-}
-
-// ===============================
-// GET CHARACTER BY ANIME
+// GET CHARACTERS BY ANIME
 // ===============================
 exports.getCharactersByAnime = async (req, res) => {
   try {
 
     const characters = await Character.find({
       anime: req.params.animeId,
-      is_deleted: false
+      is_deleted: { $ne: true }
     })
 
     res.json(characters)
@@ -34,6 +19,7 @@ exports.getCharactersByAnime = async (req, res) => {
     res.status(500).json({ message: err.message })
   }
 }
+
 
 // ===============================
 // GET CHARACTER BY ID
@@ -44,6 +30,10 @@ exports.getCharacter = async (req, res) => {
     const character = await Character.findById(req.params.id)
       .populate("anime")
 
+    if (!character || character.is_deleted) {
+      return res.status(404).json({ message: "Character not found" })
+    }
+
     res.json(character)
 
   } catch (err) {
@@ -51,35 +41,69 @@ exports.getCharacter = async (req, res) => {
   }
 }
 
+
+// ===============================
+// CREATE CHARACTER
+// ===============================
+exports.createCharacter = async (req, res) => {
+  try {
+
+    const allowed = [
+      "firstName",
+      "lastName",
+      "anime",
+      "gender",
+      "role",
+      "description",
+      "species",
+      "age",
+      "originWorld"
+    ]
+
+    const characterData = pick(req.body, allowed)
+
+    const character = await Character.create(characterData)
+
+    res.status(201).json(character)
+
+  } catch (err) {
+    res.status(400).json({ message: err.message })
+  }
+}
+
+
 // ===============================
 // UPDATE PHOTO
 // ===============================
 exports.updatePhoto = async (req, res) => {
   try {
+
     if (!req.file) {
       return res.status(400).json({ message: "No file uploaded" })
     }
 
-    const character = await Character.findById(req.params.id);
+    const character = await Character.findById(req.params.id)
 
     if (!character) {
-      return res.status(404).json({ message: 'Photo not found' });
+      return res.status(404).json({ message: "Character not found" })
     }
 
     if (character.photo_public_id) {
-      await cloudinary.uploader.destroy(character.photo_public_id);
+      await cloudinary.uploader.destroy(character.photo_public_id)
     }
 
-    character.photo = req.file.path;
-    character.photo_public_id = req.file.filename;
+    character.photo = req.file.path
+    character.photo_public_id = req.file.filename
 
-    await character.save();
+    await character.save()
 
-    res.json(character);
+    res.json(character)
+
   } catch (err) {
-    res.status(500).json({ message: err.message });
+    res.status(500).json({ message: err.message })
   }
-};
+}
+
 
 // ===============================
 // UPDATE CHARACTER
@@ -87,11 +111,28 @@ exports.updatePhoto = async (req, res) => {
 exports.updateCharacter = async (req, res) => {
   try {
 
+    const allowed = [
+      "firstName",
+      "lastName",
+      "gender",
+      "role",
+      "description",
+      "species",
+      "age",
+      "originWorld"
+    ]
+
+    const updates = pick(req.body, allowed)
+
     const character = await Character.findByIdAndUpdate(
       req.params.id,
-      req.body,
-      { new: true }
+      updates,
+      { new: true, runValidators: true }
     )
+
+    if (!character) {
+      return res.status(404).json({ message: "Character not found" })
+    }
 
     res.json(character)
 
@@ -100,16 +141,23 @@ exports.updateCharacter = async (req, res) => {
   }
 }
 
+
 // ===============================
 // SOFT DELETE CHARACTER
 // ===============================
 exports.deleteCharacter = async (req, res) => {
   try {
 
-    await Character.findByIdAndUpdate(req.params.id, {
-      is_deleted: true,
-      deleted_at: new Date()
-    })
+    const character = await Character.findById(req.params.id)
+
+    if (!character) {
+      return res.status(404).json({ message: "Character not found" })
+    }
+
+    character.is_deleted = true
+    character.deleted_at = new Date()
+
+    await character.save()
 
     res.json({ message: "Character deleted" })
 

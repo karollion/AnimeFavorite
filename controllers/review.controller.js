@@ -1,4 +1,5 @@
 const Review = require("../models/review.model")
+const pick = require("../utils/pickAllowedFields")
 
 // ===============================
 // CREATE REVIEW
@@ -6,19 +7,37 @@ const Review = require("../models/review.model")
 exports.createReview = async (req, res) => {
   try {
 
-    const review = new Review({
-      ...req.body,
+    const allowed = [
+      "user",
+      "anime",
+      "rating",
+      "review_text",
+      "contains_spoilers"
+    ]
+
+    const reviewData = pick(req.body, allowed)
+
+    const existing = await Review.findOne({
+      anime: reviewData.anime,
       user: req.user.id
     })
 
-    await review.save()
+    if (existing) {
+      return res.status(409).json({ message: "You already reviewed this anime" })
+    }
+
+    const review = await Review.create({
+      ...reviewData,
+      user: req.user.id
+    })
 
     res.status(201).json(review)
 
   } catch (err) {
-    res.status(500).json({ message: err.message })
+    res.status(400).json({ message: err.message })
   }
 }
+
 
 // ===============================
 // GET REVIEWS BY ANIME
@@ -28,9 +47,10 @@ exports.getAnimeReviews = async (req, res) => {
 
     const reviews = await Review.find({
       anime: req.params.animeId,
-      is_deleted: false
+      is_deleted: { $ne: true }
     })
       .populate("user", "login avatar")
+      .sort({ createdAt: -1 })
 
     res.json(reviews)
 
@@ -39,6 +59,7 @@ exports.getAnimeReviews = async (req, res) => {
   }
 }
 
+
 // ===============================
 // SOFT DELETE REVIEW
 // ===============================
@@ -46,6 +67,10 @@ exports.deleteReview = async (req, res) => {
   try {
 
     const review = await Review.findById(req.params.id)
+
+    if (!review) {
+      return res.status(404).json({ message: "Review not found" })
+    }
 
     review.is_deleted = true
     review.deleted_at = new Date()
