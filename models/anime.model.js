@@ -55,7 +55,7 @@ AnimeSchema.pre("save", async function (next) {
   let slug = baseSlug
   let count = 1
 
-  while (await Anime.exists({ slug })) {
+  while (await Anime.exists({ slug, is_deleted: { $ne: true } })) {
     slug = `${baseSlug}-${count++}`
   }
 

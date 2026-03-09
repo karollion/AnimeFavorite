@@ -218,12 +218,16 @@ exports.getBySlug = async (req, res) => {
       {
         $addFields: {
           reviews: {
-            $slice: ["$reviews", 10],
-            $filter: {
-              input: "$reviews",
-              as: "review",
-              cond: { $ne: ["$$review.is_deleted", true] }
-            }
+            $slice: [
+              {
+                $filter: {
+                  input: "$reviews",
+                  as: "review",
+                  cond: { $ne: ["$$review.is_deleted", true] }
+                }
+              },
+              10
+            ]
           }
         }
       },

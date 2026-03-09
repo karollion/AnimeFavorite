@@ -28,6 +28,7 @@ const app = express()
 
 app.use(helmet())
 app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }))
+app.disable("x-powered-by")
 
 if (process.env.NODE_ENV !== 'production') {
   app.use(
@@ -38,7 +39,7 @@ if (process.env.NODE_ENV !== 'production') {
   )
 }
 
-app.use(express.json())
+app.use(express.json({ limit: "1mb" }))
 app.use(express.urlencoded({ extended: true }))
 
 /* ======================
@@ -65,7 +66,7 @@ const startServer = async () => {
         httpOnly: true,
         secure: process.env.NODE_ENV === 'production',
         sameSite: process.env.NODE_ENV === 'production' ? 'none' : 'lax',
-		maxAge: Number(process.env.COOKIE_MAX_AGE)
+		    maxAge: Number(process.env.COOKIE_MAX_AGE)
       }
     })
   )

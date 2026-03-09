@@ -53,7 +53,7 @@ exports.upsert = async (req, res) => {
 // GET /api/user-anime/:userId
 exports.getUserAnime = async (req, res) => {
   try {
-    const user = req.session.user.id;
+    const userId = req.session.user.id;
 
     const list = await UserAnime.find({ user: userId })
       .populate({
@@ -76,7 +76,7 @@ exports.getUserAnime = async (req, res) => {
 // GET /api/user-anime/:userId/favorites
 exports.getFavorites = async (req, res) => {
   try {
-    const user = req.session.user.id;
+    const userId = req.session.user.id;
 
     const favorites = await UserAnime
       .find({

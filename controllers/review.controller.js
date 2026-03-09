@@ -1,5 +1,6 @@
-const Review = require("../models/review.model")
-const pick = require("../utils/pickAllowedFields")
+const Review = require("../models/review.model");
+const Anime = require("../models/anime.model");
+const pick = require("../utils/pickAllowedFields");
 
 // ===============================
 // CREATE REVIEW
@@ -19,7 +20,7 @@ exports.createReview = async (req, res) => {
 
     const existing = await Review.findOne({
       anime: reviewData.anime,
-      user: req.user.id
+      user: req.session.user.id
     })
 
     if (existing) {
@@ -28,10 +29,8 @@ exports.createReview = async (req, res) => {
 
     const review = await Review.create({
       ...reviewData,
-      user: req.user.id
+      user: req.session.user.id
     })
-
-    await updateAnimeRating(review.anime)
 
     res.status(201).json(review)
 
@@ -78,8 +77,6 @@ exports.deleteReview = async (req, res) => {
     review.deleted_at = new Date()
 
     await review.save()
-
-    await updateAnimeRating(review.anime)
 
     res.json({ message: "Review deleted" })
 

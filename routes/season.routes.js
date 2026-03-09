@@ -14,7 +14,7 @@ router.get("/anime/:animeId", season.getSeasonsByAnime);
 // ===============================
 // CREATE / UPDATE / DELETE
 // ===============================
-router.post("/", auth, season.createSeason);
+router.post("/", auth, admin, season.createSeason);
 router.put("/:id/cover", auth, admin, upload("season_covers").single("cover"), season.updateCover);
 router.put("/:id", auth, admin, season.updateSeason);
 router.delete("/:id", auth, admin, season.deleteSeason);

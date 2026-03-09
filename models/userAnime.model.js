@@ -37,6 +37,7 @@ const UserAnimeSchema = new mongoose.Schema({
 
 }, { timestamps: true })
 
-UserAnimeSchema.index({ user: 1, anime: 1 }, { unique: true })
+UserAnimeSchema.index({ user: 1, anime: 1 }, { unique: true });
+UserAnimeSchema.index({ user: 1, favorite_anime: 1 });
 
 module.exports = mongoose.model("UserAnime", UserAnimeSchema)

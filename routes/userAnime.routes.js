@@ -14,6 +14,6 @@ router.get('/me', auth, controller.getUserAnime);
 // CREATE / UPDATE / DELETE
 // ===============================
 router.post('/', auth, controller.upsert);
-router.delete('/:id', controller.remove);
+router.delete('/:id', auth, controller.remove);
 
 module.exports = router;
