@@ -10,7 +10,6 @@ exports.getCharactersByAnime = async (req, res) => {
 
     const characters = await Character.find({
       anime: req.params.animeId,
-      is_deleted: { $ne: true }
     })
 
     res.json(characters)
@@ -154,10 +153,7 @@ exports.deleteCharacter = async (req, res) => {
       return res.status(404).json({ message: "Character not found" })
     }
 
-    character.is_deleted = true
-    character.deleted_at = new Date()
-
-    await character.save()
+    await character.softDelete();
 
     res.json({ message: "Character deleted" })
 

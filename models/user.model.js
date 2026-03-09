@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const softDelete = require("../utils/softDelete.plugin");
 
 const UserSchema = new mongoose.Schema({
   login: { type: String, required: true, unique: true, trim: true },
@@ -17,9 +18,6 @@ const UserSchema = new mongoose.Schema({
   ],
 
   slug: { type: String, unique: true, index: true },
-
-  is_deleted: { type: Boolean, default: false },
-  deleted_at: { type: Date },
 
 }, { timestamps: true });
 
@@ -54,6 +52,8 @@ UserSchema.pre("save", async function (next) {
   next()
 })
 
-UserSchema.index({ slug: 1, is_deleted: 1 });
+UserSchema.index({ slug: 1 },{partialFilterExpression: { is_deleted: { $ne: true } }});
+
+UserSchema.plugin(softDelete);
 
 module.exports = mongoose.model("User", UserSchema);

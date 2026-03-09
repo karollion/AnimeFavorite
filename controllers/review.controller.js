@@ -48,7 +48,6 @@ exports.getAnimeReviews = async (req, res) => {
 
     const reviews = await Review.find({
       anime: req.params.animeId,
-      is_deleted: { $ne: true }
     })
       .populate("user", "login avatar")
       .sort({ createdAt: -1 })
@@ -73,10 +72,7 @@ exports.deleteReview = async (req, res) => {
       return res.status(404).json({ message: "Review not found" })
     }
 
-    review.is_deleted = true
-    review.deleted_at = new Date()
-
-    await review.save()
+    await review.softDelete();
 
     res.json({ message: "Review deleted" })
 

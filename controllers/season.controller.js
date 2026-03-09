@@ -38,7 +38,6 @@ exports.getSeasonsByAnime = async (req, res) => {
 
     const seasons = await Season.find({
       anime: req.params.animeId,
-      is_deleted: { $ne: true }
     }).sort({ season_number: 1 })
 
     res.json(seasons)
@@ -128,10 +127,7 @@ exports.deleteSeason = async (req, res) => {
       return res.status(404).json({ message: "Season not found" })
     }
 
-    season.is_deleted = true
-    season.deleted_at = new Date()
-
-    await season.save()
+    await season.softDelete();
 
     res.json({ message: "Season deleted" })
 

@@ -21,9 +21,7 @@ exports.getAll = async (req, res) => {
     const limit = parseInt(req.query.limit) || 20
     const skip = (page - 1) * limit
 
-    const query = {
-      is_deleted: { $ne: true }
-    }
+    const query = {}
 
     // ===============================
     // SEARCH
@@ -149,7 +147,6 @@ exports.getBySlug = async (req, res) => {
       {
         $match: {
           slug: req.params.slug,
-          is_deleted: { $ne: true }
         }
       },
 
@@ -396,10 +393,7 @@ exports.remove = async (req, res) => {
       await cloudinary.uploader.destroy(anime.cover_public_id);
     }
 
-    anime.is_deleted = true;
-    anime.deleted_at = new Date();
-
-    await anime.save();
+    await anime.softDelete();
 
     res.json({ message: 'Anime deleted (soft)' });
   } catch (err) {

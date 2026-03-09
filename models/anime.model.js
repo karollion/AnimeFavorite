@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const softDelete = require("../utils/softDelete.plugin");
 
 const AnimeSchema = new mongoose.Schema({
   title: { type: String, required: true, trim: true, index: true },
@@ -24,9 +25,6 @@ const AnimeSchema = new mongoose.Schema({
   rating_avg: { type: Number, default: 0 },
   
   slug: { type: String, required: true },
-
-  is_deleted: { type: Boolean, default: false },
-  deleted_at: { type: Date },
 
 }, { timestamps: true });
 
@@ -64,10 +62,12 @@ AnimeSchema.pre("save", async function (next) {
 })
 
 AnimeSchema.index({ slug: 1 });
-AnimeSchema.index({ slug: 1, is_deleted: 1 }, { unique: true });
+AnimeSchema.index({ slug: 1 }, {unique: true, partialFilterExpression: { is_deleted: { $ne: true } }});
 AnimeSchema.index({ title: "text", original_title: "text" });
 AnimeSchema.index({ genres: 1 });
 AnimeSchema.index({ type: 1 });
 AnimeSchema.index({ rating_avg: -1 });
+
+AnimeSchema.plugin(softDelete);
 
 module.exports = mongoose.model("Anime", AnimeSchema);

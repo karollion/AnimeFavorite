@@ -1,4 +1,5 @@
 const mongoose = require("mongoose");
+const softDelete = require("../utils/softDelete.plugin");
 
 const SeasonSchema = new mongoose.Schema({
   anime: { 
@@ -23,12 +24,11 @@ const SeasonSchema = new mongoose.Schema({
 
   notes: { type: String, trim: true },
 
-  is_deleted: { type: Boolean, default: false },
-  deleted_at: { type: Date },
-
 }, { timestamps: true });
 
 SeasonSchema.index( { anime: 1, season_number: 1 }, { unique: true } );
 SeasonSchema.index({ anime: 1 });
+
+SeasonSchema.plugin(softDelete);
 
 module.exports = mongoose.model('Season', SeasonSchema);

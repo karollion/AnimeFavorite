@@ -1,4 +1,5 @@
 const mongoose = require('mongoose');
+const softDelete = require("../utils/softDelete.plugin");
 
 const CharacterSchema = new mongoose.Schema({
   anime: { 
@@ -31,12 +32,11 @@ const CharacterSchema = new mongoose.Schema({
 
   originWorld: { type: String, trim: true },
 
-  is_deleted: { type: Boolean, default: false },
-  deleted_at: { type: Date },
-
 }, { timestamps: true });
 
-CharacterSchema.index({ anime: 1, is_deleted: 1 });
+CharacterSchema.index({ anime: 1 }, {partialFilterExpression: { is_deleted: { $ne: true } }});
 CharacterSchema.index({ anime: 1 });
+
+CharacterSchema.plugin(softDelete);
 
 module.exports = mongoose.model('Character', CharacterSchema);

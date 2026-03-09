@@ -1,5 +1,6 @@
 const mongoose = require('mongoose');
 const Anime = require('./anime.model');
+const softDelete = require("../utils/softDelete.plugin");
 
 const ReviewSchema = new mongoose.Schema({
   user: { type: mongoose.Schema.Types.ObjectId, ref: "User", required: true },
@@ -8,9 +9,6 @@ const ReviewSchema = new mongoose.Schema({
   rating: { type: Number, min: 0, max: 10, required: true },
   review_text: { type: String, trim: true },
   contains_spoilers: { type: Boolean, default: false },
-
-  is_deleted: { type: Boolean, default: false },
-  deleted_at: { type: Date },
 
 }, { timestamps: true });
 
@@ -67,5 +65,7 @@ ReviewSchema.post("findOneAndUpdate", async function(doc) {
 
 ReviewSchema.index({ anime: 1 });
 ReviewSchema.index({ anime: 1, createdAt: -1 });
+
+ReviewSchema.plugin(softDelete);
 
 module.exports = mongoose.model('Review', ReviewSchema);
