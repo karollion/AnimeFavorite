@@ -1,19 +1,27 @@
 # 🎌 AnimeFavorite
 
-AnimeFavorite is a hobby project for storing and managing anime and
-cartoon titles you have watched, want to watch, or marked as favorites.
+AnimeFavorite is a hobby full-stack application for managing anime and animated series collections.
 
-The app allows you to store: - anime titles - seasons and ratings -
-characters - genres, worlds, categories - personal reviews and
-opinions - cover images (Google Drive links) - multi-user accounts with
-sessions
+Users can:
+- track watched and planned anime
+- rate titles and write reviews
+- manage favorite characters
+- upload avatars and covers
+- maintain personal anime lists
+
+The backend provides a REST API with session-based authentication and role-based authorization.
 
 ------------------------------------------------------------------------
 
 ## 🛠 Tech stack
 
-**Backend** - Node.js - Express - MongoDB + Mongoose - express-session +
-connect-mongo - Helmet, CORS
+**Backend**
+- Node.js
+- Express
+- MongoDB + Mongoose
+- express-session + connect-mongo
+- Multer + Cloudinary (image uploads)
+- Helmet, CORS, Rate limiting
 
 **Frontend** - React (client folder)
 
@@ -117,6 +125,14 @@ This can be changed via the `.env` file:
 MONGO_URI_DEV=mongodb://localhost:27017/animefavorite
 ```
 
+## 🖼 Image uploads
+
+Images (avatars, anime covers, character images) are uploaded using:
+
+- Multer
+- Cloudinary storage
+- Automatic resizing & optimization
+
 ### Production
 
 For production, a MongoDB Atlas cluster is recommended:
@@ -160,6 +176,15 @@ node seed/seed.js
 After seeding, the database will contain fully linked example data
 ready for development and testing.
 
+------------------------------------------------------------------------
+
+## 🧱 Architecture
+
+Backend follows MVC structure:
+- Models (Mongoose schemas)
+- Controllers (business logic)
+- Routes (HTTP layer)
+- Middleware (auth, uploads, validation)
 
 ------------------------------------------------------------------------
 
@@ -179,20 +204,38 @@ ready for development and testing.
 
 ------------------------------------------------------------------------
 
+## 📡 API Overview
+
+### Auth
+POST /api/auth/register
+POST /api/auth/login
+DELETE /api/auth/logout
+
+### Anime
+GET /api/anime
+GET /api/anime/:id
+POST /api/anime (admin)
+PUT /api/anime/:id (admin)
+
+### User
+GET /api/auth/user
+PUT /api/auth/user
+PUT /api/auth/user/avatar
+
+------------------------------------------------------------------------
+
 ## 🔐 Authentication
 
--   Session-based authentication
--   Sessions stored in MongoDB
--   Multi-user ready
+- Session-based authentication (Express Session)
+- MongoDB session store
+- Role-based authorization (admin/user)
+- Session fixation protection
 
 ------------------------------------------------------------------------
 
 ## 📌 Status
 
 🧪 Hobby project -- under active development
-
-Planned features: - user statistics - anime ratings aggregation - search
-& filters - user roles (admin / user)
 
 ------------------------------------------------------------------------
 
