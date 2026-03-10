@@ -13,6 +13,10 @@ The backend provides a REST API with session-based authentication and role-based
 
 ------------------------------------------------------------------------
 
+## 📸 Preview
+
+------------------------------------------------------------------------
+
 ## 🛠 Tech stack
 
 **Backend**
