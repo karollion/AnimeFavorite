@@ -55,10 +55,6 @@ exports.login = async (req, res) => {
   try {
     const { login, password } = req.body;
 
-    if (typeof login !== "string" || typeof password !== "string") {
-      return res.status(400).json({ message: "Bad request" });
-    }
-
     const user = await User
       .findOne({ login, is_deleted: false })
       .select("+password");
@@ -70,17 +66,26 @@ exports.login = async (req, res) => {
       return res.status(401).json({ message: "User or password incorrect" });
     }
 
-    req.session.user = {
-      id: user._id,
-      login: user.login,
-      role: user.role
-    };
+    // SESSION FIXATION PROTECTION
+    req.session.regenerate((err) => {
+      if (err) {
+        return res.status(500).json({ message: "Session error" });
+      }
 
-    res.json({
-      id: user._id,
-      login: user.login,
-      role: user.role,
-      avatar: user.avatar
+      req.session.user = {
+        id: user._id,
+        login: user.login,
+        role: user.role
+      };
+
+      req.session.save(() => {
+        res.json({
+          id: user._id,
+          login: user.login,
+          role: user.role,
+          avatar: user.avatar
+        });
+      });
     });
 
   } catch (err) {

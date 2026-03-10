@@ -10,7 +10,7 @@ exports.getCharactersByAnime = async (req, res) => {
 
     const characters = await Character.find({
       anime: req.params.animeId,
-    })
+    }).lean();
 
     res.json(characters)
 
@@ -28,6 +28,7 @@ exports.getCharacter = async (req, res) => {
 
     const character = await Character.findById(req.params.id)
       .populate("anime")
+      .lean();
 
     if (!character || character.is_deleted) {
       return res.status(404).json({ message: "Character not found" })

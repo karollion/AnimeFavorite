@@ -60,7 +60,8 @@ exports.getUserAnime = async (req, res) => {
         path: 'anime',
         match: { is_deleted: { $ne: true } }
       })
-      .sort({ createdAt: -1 });
+      .sort({ createdAt: -1 })
+      .lean();
 
     res.json(list);
 
@@ -87,7 +88,8 @@ exports.getFavorites = async (req, res) => {
         path: 'anime',
         match: { is_deleted: { $ne: true } }
       })
-      .select('anime rating status');
+      .select('anime rating status')
+      .lean();
 
     // zwróć same anime (czyściej dla frontu)
     const cleaned = favorites

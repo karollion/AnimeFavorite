@@ -90,6 +90,7 @@ exports.getAll = async (req, res) => {
       .sort(sort)
       .skip(skip)
       .limit(limit)
+      .lean();
 
     res.json({
       page,
@@ -109,14 +110,15 @@ exports.getAll = async (req, res) => {
 // ===============================
 exports.getOne = async (req, res) => {
   try {
-    const anime = await Anime.findById(req.params.id);
+    const anime = await Anime.findById(req.params.id).lean();
 
     if (!anime || anime.is_deleted) {
       return res.status(404).json({ message: "Anime not found" });
     }
 
     const seasons = await Season.find({ anime: anime._id })
-      .sort({ season_number: 1 });
+      .sort({ season_number: 1 })
+      .lean();
 
     const characters = await Character.find({ anime: anime._id });
 

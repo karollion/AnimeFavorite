@@ -51,6 +51,7 @@ exports.getAnimeReviews = async (req, res) => {
     })
       .populate("user", "login avatar")
       .sort({ createdAt: -1 })
+      .lean();
 
     res.json(reviews)
 

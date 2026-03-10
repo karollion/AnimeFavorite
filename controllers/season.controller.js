@@ -36,9 +36,9 @@ exports.createSeason = async (req, res) => {
 exports.getSeasonsByAnime = async (req, res) => {
   try {
 
-    const seasons = await Season.find({
-      anime: req.params.animeId,
-    }).sort({ season_number: 1 })
+    const seasons = await Season.find({ anime: req.params.animeId,})
+      .sort({ season_number: 1 })
+      .lean();
 
     res.json(seasons)
 
