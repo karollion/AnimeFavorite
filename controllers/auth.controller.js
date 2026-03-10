@@ -30,13 +30,9 @@ exports.register = async (req, res) => {
       return res.status(409).json({ message: "Email already exists" })
     }
 
-    if (birth_year !== undefined && !Number.isInteger(Number(birth_year))) {
-      return res.status(400).json({ message: "Invalid birth_year" })
-    }
-
     const user = await User.create({
       login: login.trim(),
-      password: await bcrypt.hash(password, 10),
+      password: await bcrypt.hash(password, Number(process.env.BCRYPT_ROUNDS)),
       description,
       email,
       birth_year: Number(birth_year),
@@ -147,7 +143,7 @@ exports.logout = async (req, res) => {
       return res.status(500).json({ message: "Logout failed" });
     }
 
-    res.clearCookie('connect.sid');
+    res.clearCookie(process.env.SESSION_NAME);
     res.json({ message: 'Logged out' });
   });
 };

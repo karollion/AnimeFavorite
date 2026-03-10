@@ -9,7 +9,6 @@ exports.createReview = async (req, res) => {
   try {
 
     const allowed = [
-      "user",
       "anime",
       "rating",
       "review_text",

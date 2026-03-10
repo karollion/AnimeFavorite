@@ -120,10 +120,12 @@ exports.getOne = async (req, res) => {
       .sort({ season_number: 1 })
       .lean();
 
-    const characters = await Character.find({ anime: anime._id });
+    const characters = await Character
+      .find({ anime: anime._id })
+      .lean();
 
     res.json({
-      ...anime.toObject(),
+      ...anime,
       seasons,
       characters
     });

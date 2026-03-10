@@ -6,20 +6,14 @@ module.exports = function softDeletePlugin(schema) {
   });
 
   schema.pre(/^find/, function () {
-    this.where({ is_deleted: { $ne: true } });
+    if (!this.getOptions().withDeleted) {
+      this.where({ is_deleted: { $ne: true } });
+    }
   });
 
-  // 🔥 universal delete
   schema.methods.softDelete = function () {
     this.is_deleted = true;
     this.deleted_at = new Date();
     return this.save();
   };
-
-  // Bypass dla admina zeby pokazac usuniete
-  schema.pre(/^find/, function () {
-  if (!this.getOptions().withDeleted) {
-    this.where({ is_deleted: { $ne: true } });
-  }
-});
 };

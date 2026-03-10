@@ -53,20 +53,51 @@ yarn start
 Create a `.env` file in the root directory:
 
 ``` env
+# ======================================
+# APP
+# ======================================
 NODE_ENV=development
 PORT=3030
+APP_URL=http://localhost:3000
 
-DB_SESSIONSECRET=your_super_secret_key
+# ======================================
+# DATABASE
+# ======================================
+DB_SESSIONSECRET=XXXXXXX
+MONGO_URI_PROD=mongodb+srv://...
+MONGO_URI_DEV=mongodb://127.0.0.1:27017/XXXXXXXXXX
 
-MONGO_URI_DEV=mongodb://localhost:27017/animefavorite
-MONGO_URI_PROD=mongodb+srv://user:password@cluster.mongodb.net/animefavorite
-
+# ======================================
+# SESSION (EXPRESS SESSION)
+# ======================================
+SESSION_SECRET=XXXXXXXXXXXXXXXXXXXX
 SESSION_NAME=anime.sid
-COOKIE_MAX_AGE=604800000
 
-CLOUDINARY_CLOUD_NAME=your_cloud_name
-CLOUDINARY_API_KEY=your_api_key
-CLOUDINARY_API_SECRET=your_api_secret
+# cookie settings
+SESSION_MAX_AGE=604800000
+
+# ======================================
+# AUTH
+# ======================================
+BCRYPT_ROUNDS=10
+
+# ======================================
+# CLOUDINARY (UPLOADS)
+# ======================================
+CLOUDINARY_CLOUD_NAME=XXXXXXXXXXXXXXX
+CLOUDINARY_API_KEY=XXXXXXXXXXXXXXXXX
+CLOUDINARY_API_SECRET=XXXXXXXXXXXXXXXXXXXX
+
+# ======================================
+# RATE LIMIT
+# ======================================
+LOGIN_RATE_LIMIT_MAX=50
+LOGIN_RATE_LIMIT_WINDOW=900000
+
+# ======================================
+# SECURITY
+# ======================================
+TRUST_PROXY=true
 ```
 
 ------------------------------------------------------------------------

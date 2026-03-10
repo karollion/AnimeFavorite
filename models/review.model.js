@@ -37,7 +37,7 @@ async function recalcAnimeRating(animeId) {
     : 0
 
   await Anime.findByIdAndUpdate(animeId, {
-    rating_overall: avgRating,
+    rating_avg: avgRating,
     rating_count: ratingCount
   })
 };
