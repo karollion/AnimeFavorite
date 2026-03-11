@@ -1,6 +1,7 @@
-const Season = require("../models/season.model")
-const cloudinary = require("../utils/cloudinary")
-const pick = require("../utils/pickAllowedFields")
+const Season = require("../models/season.model");
+const cloudinary = require("../utils/cloudinary");
+const pick = require("../utils/pickAllowedFields");
+const asyncHandler = require("../utils/asyncHandler");
 
 // ===============================
 // CREATE SEASON

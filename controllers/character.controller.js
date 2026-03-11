@@ -1,6 +1,7 @@
-const Character = require("../models/character.model")
-const cloudinary = require("../utils/cloudinary")
-const pick = require("../utils/pickAllowedFields")
+const Character = require("../models/character.model");
+const cloudinary = require("../utils/cloudinary");
+const pick = require("../utils/pickAllowedFields");
+const asyncHandler = require("../utils/asyncHandler");
 
 // ===============================
 // GET CHARACTERS BY ANIME

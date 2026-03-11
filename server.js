@@ -66,7 +66,7 @@ const startServer = async () => {
   app.use(
     session({
       name: process.env.SESSION_NAME,
-      secret: process.env.DB_SESSIONSECRET,
+      secret: process.env.SESSION_SECRET,
       resave: false,
       saveUninitialized: false,
       store: MongoStore.create({

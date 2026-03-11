@@ -1,6 +1,6 @@
 const UserAnime = require('../models/userAnime.model');
 const Anime = require('../models/anime.model');
-
+const asyncHandler = require("../utils/asyncHandler");
 
 // =======================================
 // ADD / UPDATE USER ANIME RELATION

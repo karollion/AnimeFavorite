@@ -1,6 +1,7 @@
 const Review = require("../models/review.model");
 const Anime = require("../models/anime.model");
 const pick = require("../utils/pickAllowedFields");
+const asyncHandler = require("../utils/asyncHandler");
 
 // ===============================
 // CREATE REVIEW
