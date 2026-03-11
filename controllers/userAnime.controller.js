@@ -1,58 +1,97 @@
-const UserAnime = require('../models/userAnime.model');
-const Anime = require('../models/anime.model');
+const UserAnime = require("../models/userAnime.model");
+const Anime = require("../models/anime.model");
+
 const asyncHandler = require("../utils/asyncHandler");
 
-// =======================================
-// ADD / UPDATE USER ANIME RELATION
-// =======================================
-// POST /api/user-anime
+/* =====================================================
+   ADD OR UPDATE USER ↔ ANIME RELATION
+   ===================================================== */
+
+/**
+ * Create or update user-anime relation (UPSERT)
+ *
+ * @route   POST /api/user-anime
+ * @access  Authenticated user
+ *
+ * Allows user to:
+ * - set watch status
+ * - rate anime
+ * - mark as favorite
+ *
+ * Logic:
+ * 1. Verify anime exists
+ * 2. Check if relation already exists
+ * 3. Update existing OR create new record
+ */
 exports.upsert = asyncHandler(async (req, res) => {
-  const user = req.session.user.id;
+  const userId = req.session.user.id;
   const { anime, favorite_anime, rating, status } = req.body;
 
-  // sprawdź czy anime istnieje
-  const animeExists = await Anime.exists({ _id: anime, is_deleted: { $ne: true } });
+  /* ---------- VALIDATE ANIME ---------- */
+  const animeExists = await Anime.exists({
+    _id: anime,
+    is_deleted: { $ne: true },
+  });
+
   if (!animeExists) {
-    return res.status(404).json({ message: 'Anime not found' });
+    return res.status(404).json({
+      message: "Anime not found",
+    });
   }
 
-  // sprawdź czy już istnieje relacja
-  let userAnime = await UserAnime.findOne({ user, anime });
+  /* ---------- CHECK EXISTING RELATION ---------- */
+  let userAnime = await UserAnime.findOne({
+    user: userId,
+    anime,
+  });
 
+  /* ---------- UPDATE EXISTING ---------- */
   if (userAnime) {
-    // update
-    userAnime.favorite_anime = favorite_anime ?? userAnime.favorite_anime;
+    userAnime.favorite_anime =
+      favorite_anime ?? userAnime.favorite_anime;
+
     userAnime.rating = rating ?? userAnime.rating;
     userAnime.status = status ?? userAnime.status;
 
     await userAnime.save();
+
     return res.json(userAnime);
   }
 
-  // create
+  /* ---------- CREATE NEW RELATION ---------- */
   userAnime = await UserAnime.create({
-    user,
+    user: userId,
     anime,
     favorite_anime,
     rating,
-    status
+    status,
   });
 
   res.status(201).json(userAnime);
 });
 
+/* =====================================================
+   GET USER ANIME LIST
+   ===================================================== */
 
-// =======================================
-// GET ALL ANIME FOR USER
-// =======================================
-// GET /api/user-anime/:userId
+/**
+ * Get all anime associated with logged user
+ *
+ * @route   GET /api/user-anime
+ * @access  Authenticated user
+ *
+ * Returns user's anime list with populated anime data.
+ * Soft-deleted anime are automatically excluded.
+ */
 exports.getUserAnime = asyncHandler(async (req, res) => {
   const userId = req.session.user.id;
 
-  const list = await UserAnime.find({ user: userId })
+  const list = await UserAnime.find({
+    user: userId,
+  })
     .populate({
-      path: 'anime',
-      match: { is_deleted: { $ne: true } }
+      path: "anime",
+      match: { is_deleted: { $ne: true } },
     })
     .sort({ createdAt: -1 })
     .lean();
@@ -60,54 +99,72 @@ exports.getUserAnime = asyncHandler(async (req, res) => {
   res.json(list);
 });
 
+/* =====================================================
+   GET FAVORITE ANIME
+   ===================================================== */
 
-// =======================================
-// GET FAVORITES
-// =======================================
-// GET /api/user-anime/:userId/favorites
+/**
+ * Get user's favorite anime list
+ *
+ * @route   GET /api/user-anime/favorites
+ * @access  Authenticated user
+ *
+ * Response is flattened for frontend convenience:
+ * returns anime object merged with user rating/status.
+ */
 exports.getFavorites = asyncHandler(async (req, res) => {
   const userId = req.session.user.id;
 
-  const favorites = await UserAnime
-    .find({
-      user: userId,
-      favorite_anime: true
-    })
+  const favorites = await UserAnime.find({
+    user: userId,
+    favorite_anime: true,
+  })
     .populate({
-      path: 'anime',
-      match: { is_deleted: { $ne: true } }
+      path: "anime",
+      match: { is_deleted: { $ne: true } },
     })
-    .select('anime rating status')
+    .select("anime rating status")
     .lean();
 
-  // zwróć same anime (czyściej dla frontu)
+  /* ---------- CLEAN RESPONSE ---------- */
   const cleaned = favorites
-    .filter(f => f.anime) // usuń null jeśli anime soft deleted
-    .map(f => ({
-      ...f.anime.toObject(),
+    .filter((f) => f.anime) // remove soft-deleted anime
+    .map((f) => ({
+      ...f.anime,
       rating: f.rating,
-      status: f.status
+      status: f.status,
     }));
 
   res.json(cleaned);
 });
 
+/* =====================================================
+   REMOVE ANIME FROM USER LIST
+   ===================================================== */
 
-// =======================================
-// REMOVE FROM USER LIST
-// =======================================
-// DELETE /api/user-anime/:id
+/**
+ * Remove anime from user's list
+ *
+ * @route   DELETE /api/user-anime/:id
+ * @access  Authenticated user
+ *
+ * User can delete only their own relation.
+ */
 exports.remove = asyncHandler(async (req, res) => {
   const relation = await UserAnime.findOne({
     _id: req.params.id,
-    user: req.session.user.id
+    user: req.session.user.id,
   });
 
   if (!relation) {
-    return res.status(404).json({ message: 'Relation not found' });
+    return res.status(404).json({
+      message: "Relation not found",
+    });
   }
 
   await relation.deleteOne();
 
-  res.json({ message: 'Removed from user list' });
+  res.json({
+    message: "Removed from user list",
+  });
 });
