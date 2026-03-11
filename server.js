@@ -1,6 +1,7 @@
 /* ENV */
 require('dotenv').config();
 require('./models/index');
+require("./utils/env");
 
 /* Imports */
 const path = require('path');
