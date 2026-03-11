@@ -6,111 +6,60 @@ const asyncHandler = require("../utils/asyncHandler");
 // ===============================
 // CREATE REVIEW
 // ===============================
-exports.createReview = async (req, res) => {
-  try {
+exports.createReview = asyncHandler(async (req, res) => {
+  const allowed = [
+    "anime",
+    "rating",
+    "review_text",
+    "contains_spoilers"
+  ]
 
-    const allowed = [
-      "anime",
-      "rating",
-      "review_text",
-      "contains_spoilers"
-    ]
+  const reviewData = pick(req.body, allowed)
 
-    const reviewData = pick(req.body, allowed)
+  const existing = await Review.findOne({
+    anime: reviewData.anime,
+    user: req.session.user.id
+  })
 
-    const existing = await Review.findOne({
-      anime: reviewData.anime,
-      user: req.session.user.id
-    })
-
-    if (existing) {
-      return res.status(409).json({ message: "You already reviewed this anime" })
-    }
-
-    const review = await Review.create({
-      ...reviewData,
-      user: req.session.user.id
-    })
-
-    res.status(201).json(review)
-
-  } catch (err) {
-    res.status(400).json({ message: err.message })
+  if (existing) {
+    return res.status(409).json({ message: "You already reviewed this anime" })
   }
-}
+
+  const review = await Review.create({
+    ...reviewData,
+    user: req.session.user.id
+  })
+
+  res.status(201).json(review)
+});
 
 
 // ===============================
 // GET REVIEWS BY ANIME
 // ===============================
-exports.getAnimeReviews = async (req, res) => {
-  try {
+exports.getAnimeReviews = asyncHandler(async (req, res) => {
+  const reviews = await Review.find({
+    anime: req.params.animeId,
+  })
+    .populate("user", "login avatar")
+    .sort({ createdAt: -1 })
+    .lean();
 
-    const reviews = await Review.find({
-      anime: req.params.animeId,
-    })
-      .populate("user", "login avatar")
-      .sort({ createdAt: -1 })
-      .lean();
-
-    res.json(reviews)
-
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-}
+  res.json(reviews)
+});
 
 
 // ===============================
 // SOFT DELETE REVIEW
 // ===============================
-exports.deleteReview = async (req, res) => {
-  try {
+exports.deleteReview = asyncHandler(async (req, res) => {
+  const review = await Review.findById(req.params.id)
 
-    const review = await Review.findById(req.params.id)
-
-    if (!review) {
-      return res.status(404).json({ message: "Review not found" })
-    }
-
-    await review.softDelete();
-
-    res.json({ message: "Review deleted" })
-
-  } catch (err) {
-    res.status(500).json({ message: err.message })
+  if (!review) {
+    return res.status(404).json({ message: "Review not found" })
   }
-}
 
-// ===============================
-// UPDATE ANIME RATING FUNCTION
-// ===============================
-async function updateAnimeRating(animeId) {
+  await review.softDelete();
 
-  const stats = await Review.aggregate([
-    { $match: { anime: animeId, is_deleted: { $ne: true } } },
-    {
-      $group: {
-        _id: "$anime",
-        avgRating: { $avg: "$rating" },
-        count: { $sum: 1 }
-      }
-    }
-  ])
-
-  if (stats.length > 0) {
-
-    await Anime.findByIdAndUpdate(animeId, {
-      rating_avg: stats[0].avgRating,
-      rating_count: stats[0].count
-    })
-
-  } else {
-
-    await Anime.findByIdAndUpdate(animeId, {
-      rating_avg: 0,
-      rating_count: 0
-    })
-
-  }
-}
+  res.json({ message: "Review deleted" })
+});

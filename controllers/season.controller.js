@@ -6,133 +6,103 @@ const asyncHandler = require("../utils/asyncHandler");
 // ===============================
 // CREATE SEASON
 // ===============================
-exports.createSeason = async (req, res) => {
-  try {
+exports.createSeason = asyncHandler(async (req, res) => {
+  const allowed = [
+    "anime",
+    "title",
+    "season_number",
+    "episodes_count",
+    "year",
+    "release_date",
+    "notes"
+  ]
 
-    const allowed = [
-      "anime",
-      "title",
-      "season_number",
-      "episodes_count",
-      "year",
-      "release_date",
-      "notes"
-    ]
+  const seasonData = pick(req.body, allowed)
 
-    const seasonData = pick(req.body, allowed)
+  const season = await Season.create(seasonData)
 
-    const season = await Season.create(seasonData)
-
-    res.status(201).json(season)
-
-  } catch (err) {
-    res.status(400).json({ message: err.message })
-  }
-}
+  res.status(201).json(season)
+});
 
 
 // ===============================
 // GET SEASONS BY ANIME
 // ===============================
-exports.getSeasonsByAnime = async (req, res) => {
-  try {
+exports.getSeasonsByAnime = asyncHandler(async (req, res) => {
+  const seasons = await Season.find({ anime: req.params.animeId,})
+    .sort({ season_number: 1 })
+    .lean();
 
-    const seasons = await Season.find({ anime: req.params.animeId,})
-      .sort({ season_number: 1 })
-      .lean();
-
-    res.json(seasons)
-
-  } catch (err) {
-    res.status(500).json({ message: err.message })
-  }
-}
+  res.json(seasons)
+});
 
 
 // ===============================
 // UPDATE COVER
 // ===============================
-exports.updateCover = async (req, res) => {
-  try {
-
-    if (!req.file) {
-      return res.status(400).json({ message: "No file uploaded" })
-    }
-
-    const season = await Season.findById(req.params.id)
-
-    if (!season) {
-      return res.status(404).json({ message: "Season not found" })
-    }
-
-    if (season.cover_public_id) {
-      await cloudinary.uploader.destroy(season.cover_public_id)
-    }
-
-    season.season_cover = req.file.path
-    season.cover_public_id = req.file.filename
-
-    await season.save()
-
-    res.json(season)
-
-  } catch (err) {
-    res.status(500).json({ message: err.message })
+exports.updateCover = asyncHandler(async (req, res) => {
+  if (!req.file) {
+    return res.status(400).json({ message: "No file uploaded" })
   }
-}
+
+  const season = await Season.findById(req.params.id)
+
+  if (!season) {
+    return res.status(404).json({ message: "Season not found" })
+  }
+
+  if (season.cover_public_id) {
+    await cloudinary.uploader.destroy(season.cover_public_id)
+  }
+
+  season.season_cover = req.file.path
+  season.cover_public_id = req.file.filename
+
+  await season.save()
+
+  res.json(season)
+});
 
 
 // ===============================
 // UPDATE SEASON
 // ===============================
-exports.updateSeason = async (req, res) => {
-  try {
+exports.updateSeason = asyncHandler(async (req, res) => {
+  const allowed = [
+    "title",
+    "season_number",
+    "episodes_count",
+    "release_date",
+    "notes"
+  ]
 
-    const allowed = [
-      "title",
-      "season_number",
-      "episodes_count",
-      "release_date",
-      "notes"
-    ]
+  const updates = pick(req.body, allowed)
 
-    const updates = pick(req.body, allowed)
+  const season = await Season.findByIdAndUpdate(
+    req.params.id,
+    updates,
+    { new: true, runValidators: true }
+  )
 
-    const season = await Season.findByIdAndUpdate(
-      req.params.id,
-      updates,
-      { new: true, runValidators: true }
-    )
-
-    if (!season) {
-      return res.status(404).json({ message: "Season not found" })
-    }
-
-    res.json(season)
-
-  } catch (err) {
-    res.status(500).json({ message: err.message })
+  if (!season) {
+    return res.status(404).json({ message: "Season not found" })
   }
-}
+
+  res.json(season)
+});
 
 
 // ===============================
 // SOFT DELETE SEASON
 // ===============================
-exports.deleteSeason = async (req, res) => {
-  try {
+exports.deleteSeason = asyncHandler(async (req, res) => {
+  const season = await Season.findById(req.params.id)
 
-    const season = await Season.findById(req.params.id)
-
-    if (!season) {
-      return res.status(404).json({ message: "Season not found" })
-    }
-
-    await season.softDelete();
-
-    res.json({ message: "Season deleted" })
-
-  } catch (err) {
-    res.status(500).json({ message: err.message })
+  if (!season) {
+    return res.status(404).json({ message: "Season not found" })
   }
-}
+
+  await season.softDelete();
+
+  res.json({ message: "Season deleted" })
+});
