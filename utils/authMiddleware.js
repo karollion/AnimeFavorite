@@ -1,8 +1,33 @@
-module.exports = (req, res, next) => {
+/* =====================================================
+   AUTHENTICATION MIDDLEWARE
+   ===================================================== */
 
-  if (!req.session.user) {
-    return res.status(401).json({ message: "Not authenticated" })
+/**
+ * Ensures that a user is authenticated.
+ *
+ * @middleware
+ * @access Private
+ *
+ * Flow:
+ * 1. Check if session contains authenticated user
+ * 2. If not → return 401 Unauthorized
+ * 3. Otherwise continue request
+ *
+ * Used for endpoints that require login.
+ */
+function authMiddleware(req, res, next) {
+
+  /* ---------- AUTHENTICATION CHECK ---------- */
+
+  if (!req.session?.user) {
+    return res.status(401).json({
+      message: "Not authenticated",
+    });
   }
 
-  next()
-}
+  /* ---------- ACCESS GRANTED ---------- */
+
+  next();
+};
+
+module.exports = authMiddleware;
