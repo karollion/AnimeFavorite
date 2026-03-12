@@ -1,31 +1,68 @@
+/* =====================================================
+   User Model
+   ===================================================== */
+
+/**
+ * @file user.model.js
+ * @description Mongoose schema and model for User entities.
+ *              Users can be admin or regular users, have login, password, avatar,
+ *              favorite characters, email, birth year, and soft delete support.
+ */
+
 const mongoose = require("mongoose");
 const softDelete = require("../utils/softDelete.plugin");
 
-const UserSchema = new mongoose.Schema({
-  login: { type: String, required: true, unique: true, trim: true },
-  password: { type: String, required: true, select: false },
-  role: { type: String, enum: ["admin", "user"], default: "user" },
-  
-  description: { type: String, trim: true },
-  email: { type: String, required: true, unique: true, trim: true },
-  birth_year: { type: Number },
+/* =====================================================
+   SCHEMA DEFINITION
+   ===================================================== */
+const UserSchema = new mongoose.Schema(
+  {
+    /** Unique login of the user */
+    login: { type: String, required: true, unique: true, trim: true },
 
-  avatar: { type: String, trim: true },
-  avatar_public_id: { type: String },
+    /** Hashed password (excluded by default in queries) */
+    password: { type: String, required: true, select: false },
 
-  favorite_characters: [
-    { type: mongoose.Schema.Types.ObjectId, ref: "Character" }
-  ],
+    /** Role of the user: admin or regular user */
+    role: { type: String, enum: ["admin", "user"], default: "user" },
 
-  slug: { type: String, unique: true, index: true },
+    /** Optional description of the user */
+    description: { type: String, trim: true },
 
-}, { timestamps: true });
+    /** Unique email of the user */
+    email: { type: String, required: true, unique: true, trim: true },
 
-//Przygotowanie loginu do dodania do Url
+    /** Birth year of the user */
+    birth_year: { type: Number },
+
+    /** URL to avatar image */
+    avatar: { type: String, trim: true },
+
+    /** Cloudinary public ID of the avatar */
+    avatar_public_id: { type: String },
+
+    /** List of favorite characters by reference */
+    favorite_characters: [
+      { type: mongoose.Schema.Types.ObjectId, ref: "Character" }
+    ],
+
+    /** Slug version of login for URLs */
+    slug: { type: String, unique: true, index: true },
+  },
+  { timestamps: true }
+);
+
+/* =====================================================
+   SLUG PRE-SAVE HOOK
+   ===================================================== */
+/**
+ * Generates a URL-friendly slug from the login before saving.
+ * Ensures uniqueness by appending a counter if needed.
+ */
 UserSchema.pre("save", async function (next) {
-  if (!this.isModified("login")) return next()
+  if (!this.isModified("login")) return next();
 
-  const User = mongoose.model("User")
+  const User = mongoose.model("User");
 
   let baseSlug = this.login
     .toLowerCase()
@@ -39,21 +76,34 @@ UserSchema.pre("save", async function (next) {
     .replace(/ń/g, "n")
     .replace(/ó/g, "o")
     .replace(/[^\w\s-]/g, "")
-    .replace(/\s+/g, "-")
+    .replace(/\s+/g, "-");
 
-  let slug = baseSlug
-  let count = 1
+  let slug = baseSlug;
+  let count = 1;
 
   while (await User.exists({ slug, _id: { $ne: this._id } })) {
-    slug = `${baseSlug}-${count++}`
+    slug = `${baseSlug}-${count++}`;
   }
 
-  this.slug = slug
-  next()
-})
+  this.slug = slug;
+  next();
+});
 
-UserSchema.index({ slug: 1 },{partialFilterExpression: { is_deleted: { $ne: true } }});
+/* =====================================================
+   INDEXES
+   ===================================================== */
+// Index slug for fast lookup; skip soft-deleted users
+UserSchema.index(
+  { slug: 1 },
+  { partialFilterExpression: { is_deleted: { $ne: true } } }
+);
 
+/* =====================================================
+   PLUGINS
+   ===================================================== */
 UserSchema.plugin(softDelete);
 
+/* =====================================================
+   EXPORT MODEL
+   ===================================================== */
 module.exports = mongoose.model("User", UserSchema);
