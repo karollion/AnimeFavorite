@@ -49,9 +49,7 @@ exports.getAll = asyncHandler(async (req, res) => {
 
   /* ================= FILTERS ================= */
 
-  if (req.query.type) {
-    query.type = req.query.type;
-  }
+  if (req.query.type) query.type = req.query.type;
 
   if (req.query.genres) {
     query.genres = {
@@ -63,9 +61,7 @@ exports.getAll = asyncHandler(async (req, res) => {
     query.categories = req.query.category.toLowerCase();
   }
 
-  if (req.query.world) {
-    query.world = req.query.world;
-  }
+  if (req.query.world) query.world = req.query.world;
 
   /* ================= SORT ================= */
 
@@ -79,6 +75,9 @@ exports.getAll = asyncHandler(async (req, res) => {
   const total = await Anime.countDocuments(query);
 
   const animes = await Anime.find(query)
+    .select(
+      "title slug anime_cover rating_avg rating_count type age_rating"
+    )
     .sort(sort)
     .skip(skip)
     .limit(limit)
@@ -103,23 +102,31 @@ exports.getAll = asyncHandler(async (req, res) => {
  * @access  Public
  */
 exports.getOne = asyncHandler(async (req, res) => {
-  const anime = await Anime.findById(req.params.id).lean();
+  const anime = await Anime.findById(req.params.id)
+    .populate({
+      path: "characters",
+      match: { is_deleted: { $ne: true } },
+    })
+    .populate({
+      path: "seasons",
+      options: { sort: { season_number: 1 } },
+    })
+    .populate({
+      path: "reviews",
+      match: { is_deleted: { $ne: true } },
+      options: { sort: { createdAt: -1 }, limit: 10 },
+      populate: {
+        path: "user",
+        select: "login slug avatar",
+      },
+    })
+    .lean();
 
   if (!anime) {
     return res.status(404).json({ message: "Anime not found" });
   }
 
-  const seasons = await Season.find({ anime: anime._id })
-    .sort({ season_number: 1 })
-    .lean();
-
-  const characters = await Character.find({ anime: anime._id }).lean();
-
-  res.json({
-    ...anime,
-    seasons,
-    characters,
-  });
+  res.json(anime);
 });
 
 /* =====================================================
@@ -151,10 +158,16 @@ exports.getBySlug = asyncHandler(async (req, res) => {
       },
     },
     {
-      $addFields: {
+      $set: {
         seasons: {
           $sortArray: {
-            input: "$seasons",
+            input: {
+              $filter: {
+                input: "$seasons",
+                as: "s",
+                cond: { $ne: ["$$s.is_deleted", true] },
+              },
+            },
             sortBy: { season_number: 1 },
           },
         },
@@ -171,12 +184,12 @@ exports.getBySlug = asyncHandler(async (req, res) => {
       },
     },
     {
-      $addFields: {
+      $set: {
         characters: {
           $filter: {
             input: "$characters",
-            as: "char",
-            cond: { $ne: ["$$char.is_deleted", true] },
+            as: "c",
+            cond: { $ne: ["$$c.is_deleted", true] },
           },
         },
       },
@@ -191,15 +204,55 @@ exports.getBySlug = asyncHandler(async (req, res) => {
         as: "reviews",
       },
     },
+
+    /* populate user inside reviews */
     {
-      $addFields: {
+      $lookup: {
+        from: "users",
+        localField: "reviews.user",
+        foreignField: "_id",
+        as: "review_users",
+      },
+    },
+
+    {
+      $set: {
+        reviews: {
+          $map: {
+            input: "$reviews",
+            as: "r",
+            in: {
+              $mergeObjects: [
+                "$$r",
+                {
+                  user: {
+                    $arrayElemAt: [
+                      {
+                        $filter: {
+                          input: "$review_users",
+                          as: "u",
+                          cond: { $eq: ["$$u._id", "$$r.user"] },
+                        },
+                      },
+                      0,
+                    ],
+                  },
+                },
+              ],
+            },
+          },
+        },
+      },
+    },
+
+    {
+      $set: {
         reviews: {
           $slice: [
             {
-              $filter: {
+              $sortArray: {
                 input: "$reviews",
-                as: "review",
-                cond: { $ne: ["$$review.is_deleted", true] },
+                sortBy: { createdAt: -1 },
               },
             },
             10,
@@ -210,7 +263,7 @@ exports.getBySlug = asyncHandler(async (req, res) => {
 
     /* ---------- REVIEW STATS ---------- */
     {
-      $addFields: {
+      $set: {
         rating_count: { $size: "$reviews" },
         rating_avg: {
           $cond: [
@@ -223,14 +276,7 @@ exports.getBySlug = asyncHandler(async (req, res) => {
     },
 
     {
-      $addFields: {
-        reviews: {
-          $sortArray: {
-            input: "$reviews",
-            sortBy: { createdAt: -1 },
-          },
-        },
-      },
+      $unset: "review_users",
     },
   ]);
 
