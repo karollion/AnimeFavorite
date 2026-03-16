@@ -17,6 +17,7 @@ const Anime = () => {
   
   const anime = useSelector(state => getAnimeBySlug(state, slug) )
   
+  console.log(anime)
   useEffect(() => {
     if (!slug || anime) return
   
@@ -38,6 +39,8 @@ const Anime = () => {
 
       <p>Age rating: {anime.age_rating}</p>
       <p>Rating: {anime.rating_overall}</p>
+
+      
 
       <Link to="/" className={styles.btn}>
         Back to home
