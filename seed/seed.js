@@ -1,26 +1,37 @@
-/* ENV */
-require('dotenv').config()
+/* =====================================================
+   🌱 DATABASE SEED SCRIPT
+   ===================================================== */
 
-/* Imports */
+/* ENV */
+require("dotenv").config()
+
+/* DB */
 const mongoose = require("mongoose")
 const connectDB = require("../db")
 
+/* MODELS */
 const User = require("../models/user.model")
 const Anime = require("../models/anime.model")
 const Character = require("../models/character.model")
 const Review = require("../models/review.model")
 const Season = require("../models/season.model")
 
+/* DATA */
 const users = require("./data/users")
 const anime = require("./data/anime")
 const characters = require("./data/characters")
 const reviews = require("./data/reviews")
 const seasons = require("./data/seasons")
 
+/* =====================================================
+   🚀 SEED FUNCTION
+   ===================================================== */
+
 async function seed() {
   await connectDB()
 
   console.log("🧹 Cleaning database...")
+
   await Promise.all([
     User.deleteMany(),
     Anime.deleteMany(),
@@ -29,23 +40,25 @@ async function seed() {
     Season.deleteMany()
   ])
 
-  console.log("👤 Inserting users...")
+  console.log("👤 Seeding users...")
   await User.insertMany(users)
 
-  console.log("📺 Inserting anime...")
-  await Anime.insertMany(anime)
-
-  console.log("🎭 Inserting characters...")
+  console.log("🎭 Seeding characters...")
   await Character.insertMany(characters)
 
-  console.log("⭐ Inserting reviews...")
-  await Review.insertMany(reviews)
-
-  console.log("📺 Inserting seasons...")
+  console.log("📺 Seeding seasons...")
   await Season.insertMany(seasons)
 
-  console.log("✅ SEED DONE")
-  process.exit()
+  console.log("📺 Seeding anime...")
+  await Anime.insertMany(anime)
+
+  console.log("⭐ Seeding reviews...")
+  await Review.insertMany(reviews)
+
+  console.log("✅ DATABASE SEEDED SUCCESSFULLY")
+
+  process.exit(0)
 }
 
+/* START */
 seed()

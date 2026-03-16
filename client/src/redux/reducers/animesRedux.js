@@ -6,6 +6,10 @@ export const getAnimesLoading = state => state.animes.loading
 export const getAnimesError = state => state.animes.error
 export const getSelectedAnime = state => state.animes.selected
 export const getAnimeById = (state, id) => state.animes.list.find(anime => anime._id === id)
+export const getAnimeBySlug = (state, slug) => state.animes.list.find(a => a.slug === slug)
+export const getAnimesPage = state => state.animes.page
+export const getAnimesTotalPages = state => state.animes.totalPages
+export const getAnimesTotalItems = state => state.animes.totalItems
 
 // ================= ACTION TYPES =================
 const createActionName = name => `app/animes/${name}`
@@ -29,11 +33,13 @@ export const updateAnime = payload => ({ type: UPDATE_ANIME, payload })
 export const removeAnime = payload => ({ type: REMOVE_ANIME, payload })
 
 // ================= THUNKS =================
-export const fetchAnimes = () => async dispatch => {
+export const fetchAnimes = (page = 1) => async dispatch => {
   dispatch(fetchStart())
+
   try {
-    const res = await fetch(`${API_URL}/animes`)
+    const res = await fetch(`${API_URL}/animes?page=${page}`)
     const data = await res.json()
+
     dispatch(fetchSuccess(data))
   } catch (err) {
     dispatch(fetchError(err.message))
@@ -101,6 +107,9 @@ export const removeAnimeRequest = id => async dispatch => {
 // ================= INITIAL STATE =================
 const initialState = {
   list: [],
+  page: 1,
+  totalPages: 1,
+  totalItems: 0,
   selected: null,
   loading: false,
   error: null
@@ -113,7 +122,14 @@ const animesReducer = (state = initialState, action) => {
       return { ...state, loading: true, error: null }
 
     case FETCH_SUCCESS:
-      return { ...state, loading: false, list: action.payload }
+      return {
+        ...state,
+        loading: false,
+        list: action.payload.items,
+        page: action.payload.page,
+        totalPages: action.payload.totalPages,
+        totalItems: action.payload.totalItems
+      }
 
     case FETCH_ONE_SUCCESS:
       return { ...state, loading: false, selected: action.payload }

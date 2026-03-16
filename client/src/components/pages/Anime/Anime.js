@@ -4,7 +4,7 @@ import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchAnimeBySlug,
-  getSelectedAnime,
+  getAnimeBySlug,
   getAnimesLoading
 } from '../../../redux/reducers/animesRedux'
 import noImage from '../../../assets/no-image.png'
@@ -13,12 +13,15 @@ const Anime = () => {
   const { slug } = useParams()
   const dispatch = useDispatch()
 
-  const anime = useSelector(getSelectedAnime)
   const loading = useSelector(getAnimesLoading)
-
+  
+  const anime = useSelector(state => getAnimeBySlug(state, slug) )
+  
   useEffect(() => {
+    if (!slug || anime) return
+  
     dispatch(fetchAnimeBySlug(slug))
-  }, [dispatch, slug])
+  }, [dispatch, slug, anime])
 
   if (loading) return <p>Loading...</p>
   if (!anime) return <Navigate to="/" />

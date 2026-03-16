@@ -1,47 +1,171 @@
 module.exports = [
-  {
-    _id: "670000000000000000000001",
-    slug: "dragonballz",
-    title: "Dragon Ball Z",
-    original_title: "ドラゴンボールZ",
-    age_rating: 12,
-    type: "TV",
-    world: "Earth",
-    genres: ["Action", "Shounen"],
-    categories: ["Classic"],
-    description_short: "Saiyanie i epickie walki",
-    anime_cover: "https://example.com/dbz.jpg",
-    characters: [
-      "650000000000000000000001"
-    ],
-    seasons: [
-      "660000000000000000000001"
-    ],
-    status: "completed",
-    rating_overall: 9.1,
-    createdAt: "2020-01-01T00:00:00Z",
-    updatedAt: "2020-01-01T00:00:00Z"
-  },
-  {
-    _id: "670000000000000000000002",
-    slug: "frierenbeyondjourneysend",
-    title: "Frieren: Beyond Journey's End",
-    age_rating: 12,
-    type: "TV",
-    world: "Fantasy World",
-    genres: ["Fantasy", "Drama"],
-    categories: ["Emotional"],
-    description_short: "Życie po przygodzie",
-    anime_cover: "https://example.com/frieren.jpg",
-    characters: [
-      "650000000000000000000002"
-    ],
-    "seasons": [
-      "660000000000000000000002"
-    ],
-    status: "completed",
-    rating_overall: 9.5,
-    createdAt: "2023-01-01T00:00:00Z",
-    updatedAt: "2023-01-01T00:00:00Z" 
-  }
+{
+_id:"670000000000000000000001",
+title:"Dragon Ball Z",
+original_title:"ドラゴンボールZ",
+age_rating:12,
+type:"TV",
+world:"Earth",
+genres:["Action","Shounen"],
+categories:["Classic"],
+description_short:"Saiyanie bronią Ziemi przed potężnymi wrogami",
+anime_cover:"https://example.com/dbz.jpg",
+rating_count:200,
+rating_avg:9,
+createdAt:"2020-01-01T00:00:00Z",
+updatedAt:"2020-01-01T00:00:00Z"
+},
+
+{
+_id:"670000000000000000000002",
+title:"Frieren Beyond Journey's End",
+original_title:"葬送のフリーレン",
+age_rating:12,
+type:"TV",
+world:"Fantasy World",
+genres:["Fantasy","Drama"],
+categories:["Adventure"],
+description_short:"Elfka wspomina dawną podróż bohaterów",
+anime_cover:"https://example.com/frieren.jpg",
+rating_count:150,
+rating_avg:9.5,
+createdAt:"2023-01-01T00:00:00Z",
+updatedAt:"2023-01-01T00:00:00Z"
+},
+
+{
+_id:"670000000000000000000003",
+title:"Konosuba",
+original_title:"この素晴らしい世界に祝福を!",
+age_rating:12,
+type:"TV",
+world:"Isekai",
+genres:["Comedy","Fantasy"],
+categories:["Adventure"],
+description_short:"Grupa nieudaczników ratuje fantasy świat",
+anime_cover:"https://example.com/konosuba.jpg",
+rating_count:140,
+rating_avg:8.7,
+createdAt:"2020-01-01T00:00:00Z",
+updatedAt:"2020-01-01T00:00:00Z"
+},
+
+{
+_id:"670000000000000000000004",
+title:"Attack on Titan",
+original_title:"進撃の巨人",
+age_rating:16,
+type:"TV",
+world:"Titan World",
+genres:["Action","Drama"],
+categories:["Dark"],
+description_short:"Ludzkość walczy z gigantycznymi tytanami",
+anime_cover:"https://example.com/aot.jpg",
+rating_count:300,
+rating_avg:9.4,
+createdAt:"2015-01-01T00:00:00Z",
+updatedAt:"2015-01-01T00:00:00Z"
+},
+
+{
+_id:"670000000000000000000005",
+title:"Naruto",
+original_title:"ナルト",
+age_rating:12,
+type:"TV",
+world:"Shinobi World",
+genres:["Action","Adventure"],
+categories:["Shounen"],
+description_short:"Ninja marzący o zostaniu Hokage",
+anime_cover:"https://example.com/naruto.jpg",
+rating_count:280,
+rating_avg:8.8,
+createdAt:"2010-01-01T00:00:00Z",
+updatedAt:"2010-01-01T00:00:00Z"
+},
+
+{
+_id:"670000000000000000000006",
+title:"One Piece",
+original_title:"ワンピース",
+age_rating:12,
+type:"TV",
+world:"Pirate World",
+genres:["Adventure","Action"],
+categories:["Shounen"],
+description_short:"Piraci szukają legendarnego skarbu",
+anime_cover:"https://example.com/onepiece.jpg",
+rating_count:400,
+rating_avg:9.3,
+createdAt:"2010-01-01T00:00:00Z",
+updatedAt:"2010-01-01T00:00:00Z"
+},
+
+{
+_id:"670000000000000000000007",
+title:"Death Note",
+original_title:"デスノート",
+age_rating:16,
+type:"TV",
+world:"Modern World",
+genres:["Thriller","Supernatural"],
+categories:["Psychological"],
+description_short:"Notes śmierci daje władzę nad życiem ludzi",
+anime_cover:"https://example.com/dn.jpg",
+rating_count:310,
+rating_avg:9.2,
+createdAt:"2010-01-01T00:00:00Z",
+updatedAt:"2010-01-01T00:00:00Z"
+},
+
+{
+_id:"670000000000000000000008",
+title:"Fullmetal Alchemist Brotherhood",
+original_title:"鋼の錬金術師",
+age_rating:14,
+type:"TV",
+world:"Alchemy World",
+genres:["Adventure","Fantasy"],
+categories:["Epic"],
+description_short:"Dwóch braci alchemików szuka kamienia filozoficznego",
+anime_cover:"https://example.com/fma.jpg",
+rating_count:350,
+rating_avg:9.6,
+createdAt:"2010-01-01T00:00:00Z",
+updatedAt:"2010-01-01T00:00:00Z"
+},
+
+{
+_id:"670000000000000000000009",
+title:"Jujutsu Kaisen",
+original_title:"呪術廻戦",
+age_rating:16,
+type:"TV",
+world:"Curse World",
+genres:["Action","Supernatural"],
+categories:["Dark"],
+description_short:"Egzorcyści walczą z klątwami",
+anime_cover:"https://example.com/jjk.jpg",
+rating_count:210,
+rating_avg:9.0,
+createdAt:"2020-01-01T00:00:00Z",
+updatedAt:"2020-01-01T00:00:00Z"
+},
+
+{
+_id:"670000000000000000000010",
+title:"Demon Slayer",
+original_title:"鬼滅の刃",
+age_rating:16,
+type:"TV",
+world:"Demon World",
+genres:["Action","Adventure"],
+categories:["Shounen"],
+description_short:"Łowca demonów próbuje uratować siostrę",
+anime_cover:"https://example.com/ds.jpg",
+rating_count:250,
+rating_avg:9.1,
+createdAt:"2020-01-01T00:00:00Z",
+updatedAt:"2020-01-01T00:00:00Z"
+}
 ]

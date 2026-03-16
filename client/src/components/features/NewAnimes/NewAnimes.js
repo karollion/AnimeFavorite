@@ -29,13 +29,13 @@ const NewAnimes = () => {
 
       {!isLoading && error && <p>Error: {error}</p>}
 
-      {!isLoading && !error && animes.length === 0 && (
+      {!isLoading && !error && animes?.length === 0 && (
         <p>No animes</p>
       )}
 
       {!isLoading && !error && (
         <Row className='py-4'>
-          {animes.map(anime => (
+          {animes?.map(anime => (
             <AnimeCard key={anime._id} anime={anime} />
           ))}
         </Row>
