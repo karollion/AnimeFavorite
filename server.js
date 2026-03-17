@@ -26,6 +26,7 @@ const connectToDB = require("./db");
 
 /* ================= ROUTES ================= */
 
+const homeRoutes = require("./routes/home.routes");
 const animeRoutes = require("./routes/anime.routes");
 const authRoutes = require("./routes/auth.routes");
 const userAnimeRoutes = require("./routes/userAnime.routes");
@@ -167,6 +168,7 @@ const startServer = async () => {
    */
   app.use("/api/auth/login", loginLimiter);
 
+  app.use("/api/home", homeRoutes);
   app.use("/api/animes", animeRoutes);
   app.use("/api/auth", authRoutes);
   app.use("/api/user-anime", userAnimeRoutes);
