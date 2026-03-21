@@ -6,7 +6,7 @@ const RandomAnime = ({ anime }) => {
   if (!anime) {
     return (
       <div className={styles.root}>
-        <h2>Random Anime</h2>
+        <h3>Random Anime</h3>
         <p>No anime</p>
       </div>
     )
@@ -14,7 +14,7 @@ const RandomAnime = ({ anime }) => {
 
   return (
     <div className={styles.root}>
-      <h2>Random Anime</h2>
+      <h3>Random Anime</h3>
       <AnimeCard key={anime._id} anime={anime} />
     </div>
   )

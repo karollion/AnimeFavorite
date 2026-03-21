@@ -29,12 +29,15 @@ const Home = () => {
 
   return (
     <div className={styles.root}>
-      <h2>Home</h2>
-        <RandomAnime anime={random} />
+      <div>
         <AnimeSection title="New Animes" animes={newest} />
         <AnimeSection title="Top Rated" animes={topRated} />
         <AnimeSection title="Movies" animes={films} />
         <AnimeSection title="TV series" animes={tvSeries} />
+      </div>
+      <div>
+        <RandomAnime anime={random} />
+      </div>
     </div>
   );
 };
