@@ -11,11 +11,11 @@ const Home = () => {
   const dispatch = useDispatch();
 
   const {
-    newAnimes,
+    newest,
     topRated,
-    animeFilms,
-    animeTV,
-    randomAnime,
+    films,
+    tvSeries,
+    random,
     loading,
   } = useSelector(state => state.home);
 
@@ -30,11 +30,11 @@ const Home = () => {
   return (
     <div className={styles.root}>
       <h2>Home</h2>
-        <RandomAnime anime={randomAnime} />
-        <AnimeSection title="New Animes" animes={newAnimes} />
+        <RandomAnime anime={random} />
+        <AnimeSection title="New Animes" animes={newest} />
         <AnimeSection title="Top Rated" animes={topRated} />
-        <AnimeSection title="Movies" animes={animeFilms} />
-        <AnimeSection title="TV series" animes={animeTV} />
+        <AnimeSection title="Movies" animes={films} />
+        <AnimeSection title="TV series" animes={tvSeries} />
     </div>
   );
 };

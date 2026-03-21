@@ -49,11 +49,11 @@ const homeSlice = createSlice({
       .addCase(fetchHome.fulfilled, (state, action) => {
         state.loading = false;
 
-        state.newAnimes = action.payload.newAnimes;
+        state.newest = action.payload.newest;
         state.topRated = action.payload.topRated;
-        state.animeFilms = action.payload.animeFilms;
-        state.animeTV = action.payload.animeTV;
-        state.randomAnime = action.payload.randomAnime;
+        state.films = action.payload.films;
+        state.tvSeries = action.payload.tvSeries;
+        state.random = action.payload.random;
       })
 
       .addCase(fetchHome.rejected, (state, action) => {
