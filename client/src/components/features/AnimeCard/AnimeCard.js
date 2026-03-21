@@ -7,20 +7,22 @@ import noImage from '../../../assets/no-image.png'
 const AnimeCard = ({ anime }) => {
   return (
     <Col xs="12" sm="6" md="4" lg="3" className="mb-4">
-      <div className={styles.card}>
-        <div><p>Age rating: {anime.age_rating}</p></div>
-        <div><p>Rating: {anime.rating_overall}</p></div>
-
-        <img
-          alt={anime.title}
-          src={anime.anime_cover || noImage}
-          className={styles.img}
-        />
+      <div
+        className={styles.card}
+        style={{
+          backgroundImage: `url(${anime.anime_cover || noImage})`,
+        }}
+      >
+        <div className={styles.top}>
+          <p>Age rating: {anime.age_rating}</p>
+          <p>Rating: {anime.rating_avg}</p>
+        </div>
 
         <div className={styles.body}>
           <p>{anime.title}</p>
           <p>{anime.type}</p>
         </div>
+
         <Link to={`/anime/${anime.slug}`} className={styles.btn}>
           More info
         </Link>
