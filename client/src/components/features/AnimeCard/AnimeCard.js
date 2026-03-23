@@ -6,7 +6,7 @@ import noImage from '../../../assets/no-image.png'
 
 const AnimeCard = ({ anime }) => {
   return (
-    <Col xs="12" sm="6" md="4" lg="3" className="mb-4">
+    <Col xs="12" sm="6" md="3" lg="2" className="mb-4">
       <div
         className={styles.card}
         style={{
