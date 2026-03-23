@@ -14,17 +14,17 @@ const AnimeCard = ({ anime }) => {
         }}
       >
         <div className={styles.top}>
-          <p>Age rating: {anime.age_rating}</p>
-          <p>Rating: {anime.rating_avg}</p>
+          <p>{anime.age_rating}+</p>
+          <p>{anime.type}</p>
+          <p>{anime.rating_avg}</p>
         </div>
 
         <div className={styles.body}>
-          <p>{anime.title}</p>
-          <p>{anime.type}</p>
+          
         </div>
 
         <Link to={`/anime/${anime.slug}`} className={styles.btn}>
-          More info
+          {anime.title}
         </Link>
       </div>
     </Col>
