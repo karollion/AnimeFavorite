@@ -19,13 +19,11 @@ const AnimeCard = ({ anime }) => {
           <p>{anime.rating_avg}</p>
         </div>
 
-        <div className={styles.body}>
-          
+        <div className={styles.bottom}>
+          <Link to={`/anime/${anime.slug}`} className={styles.btn}>
+            {anime.title}
+          </Link>
         </div>
-
-        <Link to={`/anime/${anime.slug}`} className={styles.btn}>
-          {anime.title}
-        </Link>
       </div>
     </Col>
   )

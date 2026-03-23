@@ -47,14 +47,32 @@
     padding: 10px;
   }
 
-  .btn {
+  .top {
+    background: $anime-card-background;
+    width: 100%;
+    height: 15%;
+    
+    p {
+      color: $anime-card-text-color;
+    }
+  }
+
+  .bottom {
+    background: $anime-card-background;
+    width: 100%;
+    height: 15%;
     display: flex;
     align-items: center;
     justify-content: center;
+
+    .btn {
+      text-decoration: none;
+      color: $anime-card-text-color;
+    }
   }
 
   .top,
-  .body,
+  .bottom,
   .btn {
     position: relative;
     z-index: 2;
