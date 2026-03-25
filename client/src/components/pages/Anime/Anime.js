@@ -40,7 +40,7 @@ const Anime = () => {
       <div className={styles.characters}>
         {anime.characters?.map(c => (
           <div key={c._id} className={styles.characterCard}>
-            <img src={c.image || noImage} alt={c.firstName} />
+            <img src={c.photo || noImage} alt={c.firstName} />
             <p>{c.firstName}</p>
           </div>
         ))}
