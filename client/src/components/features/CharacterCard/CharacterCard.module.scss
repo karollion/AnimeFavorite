@@ -1,0 +1,24 @@
+@import '../../../styles/settings.scss';
+
+.card {
+  position: relative;
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  
+
+  color: $color-light;
+
+  cursor: pointer;
+
+  .img {
+    width: 100px;
+    height: 100px;
+    overflow: hidden; // VERY IMPORTANT
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}

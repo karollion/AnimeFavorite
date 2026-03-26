@@ -8,6 +8,7 @@ import {
   getAnimesLoading
 } from '../../../redux/reducers/animesRedux'
 import noImage from '../../../assets/no-image.png'
+import CharacterCard from '../../features/CharacterCard/CharacterCard'
 
 const Anime = () => {
   const { slug } = useParams()
@@ -39,9 +40,8 @@ const Anime = () => {
 
       <div className={styles.characters}>
         {anime.characters?.map(c => (
-          <div key={c._id} className={styles.characterCard}>
-            <img src={c.photo || noImage} alt={c.firstName} />
-            <p>{c.firstName}</p>
+          <div key={c._id} >
+            <CharacterCard character={c} />
           </div>
         ))}
       </div>

@@ -33,4 +33,4 @@ AnimeCard.propTypes = {
   anime: PropTypes.object.isRequired,
 }
 
-export default AnimeCard
+export default AnimeCard;
