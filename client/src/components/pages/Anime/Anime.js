@@ -36,8 +36,16 @@ const Anime = () => {
         className={styles.img}
       />
 
+      <p>Title:  {anime.title}</p>
+      <p>Original title: {anime.original_title}</p>
       <p>Age rating: {anime.age_rating}</p>
-      <p>Rating: {anime.rating_avg}</p>
+      <p>Type: {anime.type}</p>
+      <p>World: {anime.world}</p>
+      <p>Genres: {anime.genres}</p>
+      <p>Categories: {anime.categories}</p>
+      <p>Rating avg: {anime.rating_avg}</p>
+      <p>Rating count: {anime.rating_count}</p>
+      <p>Description: {anime.description_short}</p>
 
       <p>Characters:</p>
       <div className={styles.characters}>
