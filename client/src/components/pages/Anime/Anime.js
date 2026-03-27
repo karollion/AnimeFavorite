@@ -9,6 +9,7 @@ import {
 } from '../../../redux/reducers/animesRedux'
 import noImage from '../../../assets/no-image.png'
 import CharacterCard from '../../features/CharacterCard/CharacterCard'
+import SeasonCard from '../../features/SeasonCard/SeasonCard'
 
 const Anime = () => {
   const { slug } = useParams()
@@ -38,6 +39,7 @@ const Anime = () => {
       <p>Age rating: {anime.age_rating}</p>
       <p>Rating: {anime.rating_avg}</p>
 
+      <p>Characters:</p>
       <div className={styles.characters}>
         {anime.characters?.map(c => (
           <div key={c._id} >
@@ -47,13 +49,13 @@ const Anime = () => {
       </div>
 
       <p>Seasons:</p>
-      <ul>
+      <div>
         {anime.seasons?.map(season => (
-          <li key={season._id}>
-            {season.title}
-          </li>
+          <div key={season._id}>
+            <SeasonCard season={season} />
+          </div>
         ))}
-      </ul>
+      </div>
 
       <p>Reviews:</p>
       <ul>

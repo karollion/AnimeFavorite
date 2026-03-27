@@ -1,0 +1,25 @@
+@import '../../../styles/settings.scss';
+
+.card {
+  position: relative;
+  border: 2px solid $season-card-border-color;
+  border-radius: 10px;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+  
+
+  color: $color-light;
+
+  cursor: pointer;
+
+  .img {
+    width: 100px;
+    height: 100px;
+    overflow: hidden;
+    background-size: cover;
+    background-position: center;
+    background-repeat: no-repeat;
+  }
+}
