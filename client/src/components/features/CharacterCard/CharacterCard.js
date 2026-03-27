@@ -32,7 +32,7 @@ const CharacterCard = ({ character }) => {
 }
 
 CharacterCard.propTypes = {
-  anime: PropTypes.object.isRequired,
+  character: PropTypes.object.isRequired,
 }
 
 export default CharacterCard;

@@ -10,6 +10,7 @@ import {
 import noImage from '../../../assets/no-image.png'
 import CharacterCard from '../../features/CharacterCard/CharacterCard'
 import SeasonCard from '../../features/SeasonCard/SeasonCard'
+import ReviewCard from '../../features/ReviewCard/ReviewCard'
 
 const Anime = () => {
   const { slug } = useParams()
@@ -69,8 +70,7 @@ const Anime = () => {
       <ul>
         {anime.reviews?.map(review => (
           <li key={review._id}>
-            {review.user.login + ": "}
-            {review.review_text}
+            <ReviewCard review={review} />
           </li>
         ))}
       </ul>
