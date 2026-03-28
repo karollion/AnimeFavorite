@@ -5,12 +5,12 @@ import Container from '../../common/container/Container';
 const AddAnime = () => {
   
   return (
-    <Container>
-      <div className={styles.root}>
+    <div className={styles.root}>
+      <Container>
         <h1>Add new anime</h1>
         <AnimeForm/>
-      </div>
-    </Container>
+      </Container>
+    </div>
   )
 }
 

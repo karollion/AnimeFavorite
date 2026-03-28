@@ -6,6 +6,7 @@ import { fetchHome } from "../../../redux/reducers/homeSliceRedux";
 
 import RandomAnime from '../../features/RandomAnime/RandomAnime';
 import AnimeSection from '../../features/AnimeSection/AnimeSection';
+import Container from '../../common/container/Container';
 
 const Home = () => { 
   const dispatch = useDispatch();
@@ -29,15 +30,15 @@ const Home = () => {
 
   return (
     <div className={styles.root}>
-      <div>
-        <AnimeSection title="New Animes" animes={newest} />
-        <AnimeSection title="Top Rated" animes={topRated} />
-        <AnimeSection title="Movies" animes={films} />
-        <AnimeSection title="TV series" animes={tvSeries} />
-      </div>
-      <div>
-        <RandomAnime anime={random} />
-      </div>
+      <Container>
+        <div>
+          <AnimeSection title="New Animes" animes={newest} />
+          <AnimeSection title="Top Rated" animes={topRated} />
+          <RandomAnime anime={random} />
+          <AnimeSection title="Movies" animes={films} />
+          <AnimeSection title="TV series" animes={tvSeries} />
+        </div>
+      </Container>
     </div>
   );
 };
