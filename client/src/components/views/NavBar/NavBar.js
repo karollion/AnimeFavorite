@@ -1,5 +1,6 @@
 import styles from './NavBar.module.scss'
 import Navbar from 'react-bootstrap/Navbar';
+import Button from '../../common/Button/Button';
 import { NavLink, Link} from 'react-router-dom';
 import { useState } from 'react';
 import logo from '../../../assets/logo_S.png';
@@ -17,7 +18,15 @@ const NavBar = () => {
             className={styles.img}
           />
         </Navbar.Brand>
-        <Link to="/anime/AddAnime" className={styles.btn}>Add New</Link>
+        <div>
+            <Button to="/Login">Login</Button>
+
+            <Button to="/SignUp" color="secondary">Sign up</Button>
+
+            <Button to="/Profile">Profile</Button>
+
+            <Button to="/anime/AddAnime" color="primary">Add New</Button>
+        </div>
       </Navbar>
     </div>
   );
