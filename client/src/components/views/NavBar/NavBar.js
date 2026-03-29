@@ -21,11 +21,11 @@ const NavBar = () => {
         <div>
             <Button to="/Login">Login</Button>
 
-            <Button to="/SignUp" color="secondary">Sign up</Button>
+            <Button to="/SignUp">Sign up</Button>
 
             <Button to="/Profile">Profile</Button>
 
-            <Button to="/anime/AddAnime" color="primary">Add New</Button>
+            <Button to="/anime/AddAnime">Add New</Button>
         </div>
       </Navbar>
     </div>

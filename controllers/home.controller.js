@@ -45,7 +45,7 @@ exports.getHome = asyncHandler(async (req, res) => {
     topRated,
     films,
     tvSeries,
-    randomAnime
+    random
   ] = await Promise.all([
 
     /* =====================================================
@@ -115,7 +115,7 @@ exports.getHome = asyncHandler(async (req, res) => {
        ===================================================== */
 
     Anime.aggregate([
-      { $sample: { size: 1 } },
+      { $sample: { size: 10 } },
       {
         $project: {
           _id: 1,
@@ -136,6 +136,6 @@ exports.getHome = asyncHandler(async (req, res) => {
     topRated,
     films,
     tvSeries,
-    random: randomAnime[0] || null,
+    random,
   });
 });

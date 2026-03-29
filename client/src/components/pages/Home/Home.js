@@ -4,7 +4,6 @@ import { useEffect } from "react";
 import { useDispatch, useSelector } from "react-redux";
 import { fetchHome } from "../../../redux/reducers/homeSliceRedux";
 
-import RandomAnime from '../../features/RandomAnime/RandomAnime';
 import AnimeSection from '../../features/AnimeSection/AnimeSection';
 import Container from '../../common/container/Container';
 
@@ -34,7 +33,7 @@ const Home = () => {
         <div>
           <AnimeSection title="New Animes" animes={newest} />
           <AnimeSection title="Top Rated" animes={topRated} />
-          <RandomAnime anime={random} />
+          <AnimeSection title="Random" animes={random} />
           <AnimeSection title="Movies" animes={films} />
           <AnimeSection title="TV series" animes={tvSeries} />
         </div>

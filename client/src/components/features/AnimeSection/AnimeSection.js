@@ -3,6 +3,7 @@ import { Row } from 'react-bootstrap'
 import AnimeCard from '../AnimeCard/AnimeCard'
 import PropTypes from 'prop-types'
 import { Link } from 'react-router-dom'
+import Button from '../../common/Button/Button'
 
 const AnimeSection = ({ title, animes }) => {
   if (!animes?.length) {
@@ -22,9 +23,7 @@ const AnimeSection = ({ title, animes }) => {
           <AnimeCard key={a._id} anime={a} />
         ))}
       </Row>
-      <Link to={`/`} className={styles.btn}>
-        Show more
-      </Link>
+      <Button to="/">Show more</Button>
     </div>
   )
 }

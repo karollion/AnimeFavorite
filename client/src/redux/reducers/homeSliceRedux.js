@@ -31,7 +31,7 @@ const homeSlice = createSlice({
     topRated: [],
     animeFilms: [],
     animeTV: [],
-    randomAnime: null,
+    randomAnime: [],
 
     loading: false,
     error: null,

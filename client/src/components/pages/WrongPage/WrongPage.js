@@ -2,6 +2,7 @@ import styles from './WrongPage.module.scss'
 import { Link } from 'react-router-dom';
 import { Col } from 'react-bootstrap'
 import Container from '../../common/container/Container';
+import Button from '../../common/Button/Button';
 
 const WrongPage = () => {
 
@@ -12,9 +13,7 @@ const WrongPage = () => {
         <h4>Oh no!</h4>
     
         <Col xs="12" className="d-flex justify-content-center my-3">
-          <Link to="/" className={styles.btn}>
-            Back to home
-          </Link>
+          <Button to="/">Back to home</Button>
         </Col>
       </Container>
     </div>

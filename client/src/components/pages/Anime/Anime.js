@@ -12,6 +12,7 @@ import CharacterCard from '../../features/CharacterCard/CharacterCard'
 import SeasonCard from '../../features/SeasonCard/SeasonCard'
 import ReviewCard from '../../features/ReviewCard/ReviewCard'
 import Container from '../../common/container/Container'
+import Button from '../../common/Button/Button'
 
 const Anime = () => {
   const { slug } = useParams()
@@ -75,10 +76,8 @@ const Anime = () => {
             </li>
           ))}
         </ul>
-
-        <Link to="/" className={styles.btn}>
-          Back to home
-        </Link>
+        
+        <Button to="/">Back to home</Button>
       </Container>
     </div>
   )
