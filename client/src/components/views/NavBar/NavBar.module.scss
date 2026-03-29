@@ -17,13 +17,9 @@
       margin: 0;
     }
 
-    p {
-      padding: 0;
-      margin: 0;
-    }
-
-    .btn {
-      color: $color-light;
+    .buttons {
+      display: flex;
+      gap: 8px;
     }
   }
 }

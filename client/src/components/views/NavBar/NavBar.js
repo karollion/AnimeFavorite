@@ -18,7 +18,7 @@ const NavBar = () => {
             className={styles.img}
           />
         </Navbar.Brand>
-        <div>
+        <div className={styles.buttons}>
             <Button to="/Login">Login</Button>
 
             <Button to="/SignUp">Sign up</Button>
