@@ -1,6 +1,22 @@
 import { API_URL } from '../../config'
 
-// ================= SELECTORS =================
+/* =====================================================
+   ANIMES REDUX
+   ===================================================== */
+
+/**
+ * @file animesRedux.js
+ * @description Handles anime collection state:
+ * - pagination
+ * - fetching lists
+ * - single anime view
+ * - CRUD operations
+ */
+
+/* =====================================================
+   SELECTORS
+   ===================================================== */
+
 export const getAllAnimes = state => state.animes.list
 export const getAnimesLoading = state => state.animes.loading
 export const getAnimesError = state => state.animes.error
@@ -11,7 +27,10 @@ export const getAnimesPage = state => state.animes.page
 export const getAnimesTotalPages = state => state.animes.totalPages
 export const getAnimesTotalItems = state => state.animes.totalItems
 
-// ================= ACTION TYPES =================
+/* =====================================================
+   ACTION TYPES
+   ===================================================== */
+
 const createActionName = name => `app/animes/${name}`
 
 const FETCH_START = createActionName('FETCH_START')
@@ -23,7 +42,10 @@ const ADD_ANIME = createActionName('ADD')
 const UPDATE_ANIME = createActionName('UPDATE')
 const REMOVE_ANIME = createActionName('REMOVE')
 
-// ================= ACTION CREATORS =================
+/* =====================================================
+   ACTION CREATORS
+   ===================================================== */
+
 export const fetchStart = () => ({ type: FETCH_START })
 export const fetchSuccess = payload => ({ type: FETCH_SUCCESS, payload })
 export const fetchError = payload => ({ type: FETCH_ERROR, payload })
@@ -32,7 +54,11 @@ export const addAnime = payload => ({ type: ADD_ANIME, payload })
 export const updateAnime = payload => ({ type: UPDATE_ANIME, payload })
 export const removeAnime = payload => ({ type: REMOVE_ANIME, payload })
 
-// ================= THUNKS =================
+/* =====================================================
+   THUNKS — ANIME
+   ===================================================== */
+
+
 export const fetchAnimes = (page = 1) => async dispatch => {
   dispatch(fetchStart())
 
@@ -104,7 +130,10 @@ export const removeAnimeRequest = id => async dispatch => {
   }
 }
 
-// ================= INITIAL STATE =================
+/* =====================================================
+   INITIAL STATE
+   ===================================================== */
+
 const initialState = {
   list: [],
   page: 1,
@@ -115,7 +144,10 @@ const initialState = {
   error: null
 }
 
-// ================= REDUCER =================
+/* =====================================================
+   REDUCER
+   ===================================================== */
+   
 const animesReducer = (state = initialState, action) => {
   switch (action.type) {
     case FETCH_START:
