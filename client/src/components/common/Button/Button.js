@@ -29,7 +29,7 @@ const Button = ({
 
   if (to) {
     return (
-      <Link to={to} className={classNames}>
+      <Link to={to} className={classNames} onClick={action}>
         <span className={styles.content}>{children}</span>
       </Link>
     );

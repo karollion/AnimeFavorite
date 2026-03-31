@@ -1,0 +1,14 @@
+@import '../../../styles/settings.scss';
+
+.root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;  // ⬅️ pion (środek ekranu)
+  align-items: center;      // ⬅️ poziom
+
+  background-color: $homePage-bg-color;
+  color: $color-light;
+
+}
