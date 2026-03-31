@@ -41,11 +41,6 @@ const AnimeForm = ({ action, actionText = 'Save', defaultValues = {} }) => {
     action(payload);
   };
 
-  const handleBack = e => {
-    e.preventDefault();
-    navigate(`/animes/${slug}`);
-  };
-
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.root}>
 
@@ -147,8 +142,7 @@ const AnimeForm = ({ action, actionText = 'Save', defaultValues = {} }) => {
       {/* ACTIONS */}
       <Row className="mt-4">
         <Col className="d-flex gap-3">
-          {slug && <Button action={handleBack}>Back</Button>}
-          <Link to="/">Home</Link>
+          <Button to="/">Back to home</Button>
         </Col>
 
         <Col className="text-end">

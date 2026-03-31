@@ -3,7 +3,7 @@ import Navbar from 'react-bootstrap/Navbar';
 import Button from '../../common/Button/Button';
 import Nav from 'react-bootstrap/Nav';
 import { getUser } from '../../../redux/reducers/userRedux';
-import { NavLink, Link} from 'react-router-dom';
+import { NavLink} from 'react-router-dom';
 import { useSelector } from 'react-redux';
 import { useState } from 'react';
 import logo from '../../../assets/logo_S.png';
