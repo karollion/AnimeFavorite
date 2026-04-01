@@ -10,8 +10,17 @@ import Login from './components/pages/Login/Login';
 import Logout from './components/pages/Logout/Logout';
 import Signup from './components/pages/Signup/Signup';
 import Profile from './components/pages/Profile/Profile';
+import { fetchProfile } from './redux/reducers/userRedux';
+import { useEffect } from 'react';
+import { useDispatch } from 'react-redux';
 
 function App() {
+  const dispatch = useDispatch()
+
+  useEffect(() => {
+    dispatch(fetchProfile())
+  }, [dispatch])
+
   return (
     <div>
       <NavBar />

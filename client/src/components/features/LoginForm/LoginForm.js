@@ -2,8 +2,13 @@ import styles from './LoginForm.module.scss';
 import { Form, Row, Col } from 'react-bootstrap';
 import Button from '../../common/Button/Button';
 import { useForm } from 'react-hook-form';
+import { useDispatch } from 'react-redux';
+import { loginRequest } from '../../../redux/reducers/userRedux';
+import { useNavigate } from 'react-router-dom';
 
-const LoginForm = ({ action, actionText = 'Login' }) => {
+const LoginForm = ({ actionText = 'Login' }) => {
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   const {
     register,
@@ -12,11 +17,10 @@ const LoginForm = ({ action, actionText = 'Login' }) => {
   } = useForm({});
 
   const onSubmit = data => {
-    const payload = {
-      ...data,
-    };
-    action(payload);
+    dispatch(loginRequest(data));
+    navigate('/')
   };
+
 
   return (
     <Form onSubmit={handleSubmit(onSubmit)} className={styles.root}>

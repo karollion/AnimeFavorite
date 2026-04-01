@@ -30,11 +30,11 @@ const NavBar = () => {
 
                 {!user ? (<Button to="/SignUp">Sign up</Button>) : null }
 
-                {!user ? (<Button to={"/Profile/"}>Profile</Button>) : null }
+                {user ? (<Button to={"/Profile/"}>Profile</Button>) : null }
 
-                {!user ? (<Button to="/Logout">Logout</Button>) : null }
-
-                {!user ? (<Button to="/anime/AddAnime">Add New</Button>) : null }
+                {user ? (<Button to="/Logout">Logout</Button>) : null }
+                
+                {user?.role === 'admin' && (<Button to="/anime/AddAnime">Add New</Button>)}
                 
               </Nav>
             </Navbar.Collapse>

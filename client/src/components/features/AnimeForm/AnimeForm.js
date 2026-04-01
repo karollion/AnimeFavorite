@@ -2,11 +2,8 @@ import styles from './AnimeForm.module.scss';
 import { Form, Row, Col } from 'react-bootstrap';
 import Button from '../../common/Button/Button';
 import { useForm } from 'react-hook-form';
-import { useNavigate, useParams, Link } from 'react-router-dom';
 
 const AnimeForm = ({ action, actionText = 'Save', defaultValues = {} }) => {
-  const navigate = useNavigate();
-  const { slug } = useParams();
 
   const {
     register,

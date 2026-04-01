@@ -1,7 +1,5 @@
-import styles from './Login.module.scss'
-import { Col } from 'react-bootstrap'
+import styles from './Login.module.scss';
 import Container from '../../common/container/Container';
-import Button from '../../common/Button/Button';
 import LoginForm from '../../features/LoginForm/LoginForm';
 
 const Login = () => {

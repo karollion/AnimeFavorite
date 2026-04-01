@@ -11,4 +11,8 @@
   background-color: $homePage-bg-color;
   color: $color-light;
 
+  .img {
+		height: $anime-card-height;
+  		width: $anime-card-width;
+	}
 }
