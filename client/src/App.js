@@ -10,6 +10,7 @@ import Login from './components/pages/Login/Login';
 import Logout from './components/pages/Logout/Logout';
 import Signup from './components/pages/Signup/Signup';
 import Profile from './components/pages/Profile/Profile';
+import ProtectedRoute from './components/routing/ProtectedRoute';
 import { fetchProfile } from './redux/reducers/userRedux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
@@ -28,11 +29,37 @@ function App() {
         <Routes>
           <Route path="/" element={<Home/>} />
           <Route path='/anime/:slug' element={<Anime/>} />
-          <Route path='/anime/AddAnime' element={<AddAnime/>} />
+
           <Route path='/Signup' element={<Signup/>} />
           <Route path='/Login' element={<Login/>} />
-          <Route path='/Logout' element={<Logout/>} />
-          <Route path='/Profile/:id' element={<Profile/>} />
+
+          <Route
+            path='/Logout'
+            element={
+              <ProtectedRoute>
+                <Logout />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path='/Profile'
+            element={
+              <ProtectedRoute>
+                <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path='/anime/AddAnime'
+            element={
+              <ProtectedRoute role="admin">
+                <AddAnime />
+              </ProtectedRoute>
+            }
+          />
+
           <Route path="*" element={<WrongPage/>} />
         </Routes>
       </div>

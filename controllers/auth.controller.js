@@ -125,7 +125,10 @@ exports.login = asyncHandler(async (req, res) => {
       role: user.role,
     };
 
-    req.session.save(() => {
+    console.log("SESSION AFTER LOGIN:", req.session);
+
+    req.session.save(err => {
+      if (err) return res.status(500).json(err);
       res.json({
         id: user._id,
         login: user.login,
@@ -133,6 +136,7 @@ exports.login = asyncHandler(async (req, res) => {
         avatar: user.avatar,
       });
     });
+
   });
 });
 
@@ -164,13 +168,14 @@ exports.getProfile = asyncHandler(async (req, res) => {
   }
 
   res.json({
-    id: user._id,
-    login: user.login,
-    email: user.email,
-    description: user.description,
-    avatar: user.avatar,
-    favorite_characters: user.favorite_characters,
-  });
+  id: user._id,
+  login: user.login,
+  email: user.email,
+  description: user.description,
+  birth_year: user.birth_year,
+  avatar: user.avatar,
+  favorite_characters: user.favorite_characters,
+});
 });
 
 /* =====================================================
@@ -183,22 +188,62 @@ exports.getProfile = asyncHandler(async (req, res) => {
  * @route   GET /api/auth/user/stats
  * @access  Private
  */
-exports.getUserStats = asyncHandler(async (req, res) => {
-  if (!req.session.user) {
-    return res.status(401).json({ message: "Not authenticated" });
-  }
+const UserAnime = require("../models/userAnime.model");
 
-  const user = await User.findOne({
-    _id: req.session.user.id,
-    is_deleted: false,
+exports.getUserStats = asyncHandler(async (req, res) => {
+  const userId = req.session.user.id;
+
+  /* ===============================
+     STATUS COUNTS
+     =============================== */
+
+  const statusStats = await UserAnime.aggregate([
+    {
+      $match: { user: new mongoose.Types.ObjectId(userId) }
+    },
+    {
+      $group: {
+        _id: "$status",
+        count: { $sum: 1 }
+      }
+    }
+  ]);
+
+  const statuses = {
+    planned: 0,
+    watching: 0,
+    completed: 0,
+    suspended: 0,
+    abandoned: 0
+  };
+
+  statusStats.forEach(s => {
+    statuses[s._id] = s.count;
   });
 
-  if (!user) {
-    return res.status(404).json({ message: "User not found" });
-  }
+  /* ===============================
+     FAVORITE ANIME (AnimeCard data)
+     =============================== */
+
+  const favorites = await UserAnime.find({
+    user: userId,
+    favorite_anime: true
+  })
+    .populate({
+      path: "anime",
+      select:
+        "slug title anime_cover rating_avg rating_count type age_rating"
+    })
+    .lean();
+
+  const favoriteAnime = favorites
+    .filter(f => f.anime)
+    .map(f => f.anime);
 
   res.json({
-    favorite_characters_count: user.favorite_characters.length,
+    statuses,
+    favoriteAnimeCount: favoriteAnime.length,
+    favoriteAnime
   });
 });
 

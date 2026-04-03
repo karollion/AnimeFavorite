@@ -5,20 +5,15 @@ import Container from '../../common/container/Container';
 import Button from '../../common/Button/Button';
 import {
   getUser,
-  fetchUserStats
+  getUserStats
 } from '../../../redux/reducers/userRedux';
-import { useDispatch, useSelector } from 'react-redux';
+import { useSelector } from 'react-redux';
 import CharacterCard from '../../features/CharacterCard/CharacterCard';
-import { useEffect } from 'react';
+import AnimeCard from '../../features/AnimeCard/AnimeCard';
 
 const Profile = () => {
-  const dispatch = useDispatch()
-
   const user = useSelector(getUser);
-    
-  useEffect(() => {
-    dispatch(fetchUserStats())
-  }, [dispatch])
+  const stats = useSelector(getUserStats);
 
   return (
     <div className={styles.root}>
@@ -29,7 +24,7 @@ const Profile = () => {
           className={styles.img}
         />
         
-        <p>avatar: {user.avatar}</p>
+        
         <h1>User Profile</h1>
         <p>Login: {user.login}</p>
         <p>Role: {user.role}</p>
@@ -38,6 +33,7 @@ const Profile = () => {
         <p>Birth year: {user.birth_year}</p>
 
         <p>Favorite characters:</p>
+        <p>number of favorite characters {user.favorite_characters_count}</p>
         <div className={styles.characters}>
           {user.favorite_characters?.map(c => (
             <div key={c._id} >
@@ -45,6 +41,20 @@ const Profile = () => {
             </div>
           ))}
         </div>
+
+        <p>Favorite animes:</p>
+        <div>
+          {stats?.favoriteAnime?.map(anime => (
+            <AnimeCard
+              key={anime._id}
+              {...anime}
+            />
+          ))}
+        </div>
+
+        <p>Watching: {stats?.statuses?.watching}</p>
+        <p>Completed: {stats?.statuses?.completed}</p>
+        <p>Planned: {stats?.statuses?.planned}</p>
 
           
         <Col xs="12" className="d-flex justify-content-center my-3">

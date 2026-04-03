@@ -85,8 +85,8 @@ export const loginRequest = credentials => async dispatch => {
   try {
     const res = await fetch(`${API_URL}/auth/login`, {
       method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
       credentials: 'include',
+      headers: { 'Content-Type': 'application/json' },
       body: JSON.stringify(credentials)
     })
 
@@ -98,6 +98,7 @@ export const loginRequest = credentials => async dispatch => {
   } catch (err) {
     dispatch(fetchError(err.message))
   }
+  
 }
 
 /**
@@ -123,6 +124,7 @@ export const logoutRequest = () => async dispatch => {
  */
 export const fetchProfile = () => async dispatch => {
   dispatch(fetchStart())
+  dispatch(fetchUserStats())
 
   try {
     const res = await fetch(`${API_URL}/auth/me`, {

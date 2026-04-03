@@ -30,7 +30,7 @@ const NavBar = () => {
 
                 {!user ? (<Button to="/SignUp">Sign up</Button>) : null }
 
-                {user ? (<Button to={"/Profile/"}>Profile</Button>) : null }
+                {user ? (<Button to={"/Profile"}>Profile</Button>) : null }
 
                 {user ? (<Button to="/Logout">Logout</Button>) : null }
                 
