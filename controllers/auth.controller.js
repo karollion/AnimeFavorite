@@ -1,6 +1,7 @@
 const User = require("../models/user.model");
 const bcrypt = require("bcryptjs");
 const cloudinary = require("../utils/cloudinary");
+const mongoose = require('mongoose');
 
 const pick = require("../utils/pickAllowedFields");
 const asyncHandler = require("../utils/asyncHandler");

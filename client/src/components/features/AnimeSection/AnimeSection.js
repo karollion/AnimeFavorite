@@ -2,7 +2,6 @@ import styles from './AnimeSection.module.scss'
 import { Row } from 'react-bootstrap'
 import AnimeCard from '../AnimeCard/AnimeCard'
 import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
 import Button from '../../common/Button/Button'
 
 const AnimeSection = ({ title, animes }) => {

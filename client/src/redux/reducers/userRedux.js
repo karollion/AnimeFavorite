@@ -32,7 +32,7 @@ export const isAuthenticated = state => !!state.user.data
 const createActionName = name => `app/user/${name}`
 
 const FETCH_START = createActionName('FETCH_START')
-const FETCH_SUCCESS = createActionName('FETCH_SUCCESS')
+//const FETCH_SUCCESS = createActionName('FETCH_SUCCESS')
 const FETCH_ERROR = createActionName('FETCH_ERROR')
 
 const LOGIN_SUCCESS = createActionName('LOGIN_SUCCESS')
