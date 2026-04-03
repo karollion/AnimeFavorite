@@ -4,8 +4,8 @@ import axios from "axios";
    AXIOS INSTANCE
    ===================================================== */
 
-const instance = axios.create({
-  baseURL: "http://localhost:3030/api", // backend URL
+const api = axios.create({
+  baseURL: "http://127.0.0.1::3030/api", // backend URL
   withCredentials: true,
 });
 
@@ -14,7 +14,7 @@ const instance = axios.create({
    (auto token attach later)
    ===================================================== */
 
-instance.interceptors.request.use(
+api.interceptors.request.use(
   config => {
     const token = localStorage.getItem("token");
 
@@ -27,4 +27,4 @@ instance.interceptors.request.use(
   error => Promise.reject(error)
 );
 
-export default instance;
+export default api;

@@ -1,5 +1,5 @@
-import { API_URL } from '../../config'
-
+import { API_URL } from '../../config';
+import api from "../../utils/axios"
 /* =====================================================
    USER REDUX
    ===================================================== */
@@ -80,26 +80,17 @@ export const setStats = payload => ({
  * POST /api/auth/login
  */
 export const loginRequest = credentials => async dispatch => {
-  dispatch(fetchStart())
+  dispatch(fetchStart());
 
   try {
-    const res = await fetch(`${API_URL}/auth/login`, {
-      method: 'POST',
-      credentials: 'include',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(credentials)
-    })
+    const res = await api.post('/auth/login', credentials);
 
-    const data = await res.json()
+    dispatch(loginSuccess(res.data));
 
-    if (!res.ok) throw new Error(data.message)
-
-    dispatch(loginSuccess(data))
   } catch (err) {
-    dispatch(fetchError(err.message))
+    dispatch(fetchError(err.response?.data?.message || 'Login failed'));
   }
-  
-}
+};
 
 /**
  * Logout user
@@ -123,25 +114,17 @@ export const logoutRequest = () => async dispatch => {
  * GET /api/auth/me
  */
 export const fetchProfile = () => async dispatch => {
-  dispatch(fetchStart())
-  dispatch(fetchUserStats())
+  dispatch(fetchStart());
 
   try {
-    const res = await fetch(`${API_URL}/auth/me`, {
-      credentials: 'include'
-    })
+    const res = await api.get('/auth/me');
 
-    if (res.status === 401) {
-      dispatch(logoutUser())
-      return
-    }
+    dispatch(loginSuccess(res.data));
 
-    const data = await res.json()
-    dispatch(loginSuccess(data))
-  } catch (err) {
-    dispatch(fetchError(err.message))
+  } catch {
+    dispatch(fetchError(null));
   }
-}
+};
 
 /* =====================================================
    THUNKS — USER PROFILE

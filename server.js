@@ -77,7 +77,11 @@ const loginLimiter = rateLimit({
  * Helmet sets secure HTTP headers.
  */
 app.use(helmet());
-app.use(helmet.crossOriginResourcePolicy({ policy: "cross-origin" }));
+app.use(
+  helmet({
+    crossOriginResourcePolicy: false,
+  })
+);
 
 /**
  * Removes Express fingerprint header.
@@ -89,12 +93,10 @@ app.disable("x-powered-by");
  * Production should be handled by reverse proxy.
  */
 if (process.env.NODE_ENV !== "production") {
-  app.use(
-    cors({
-      origin: ["http://localhost:3000"],
-      credentials: true,
-    })
-  );
+  app.use(cors({
+    origin: "http://127.0.0.1:3000",
+    credentials: true
+  }));
 }
 
 /**
@@ -123,6 +125,8 @@ const startServer = async () => {
    * Session stored in MongoDB.
    * Enables persistent login across restarts.
    */
+  const isProd = process.env.NODE_ENV === "production";
+
   app.use(
     session({
       name: process.env.SESSION_NAME,
@@ -138,26 +142,31 @@ const startServer = async () => {
         collectionName: "sessions",
       }),
 
+
       cookie: {
         httpOnly: true,
-
-        /**
-         * Secure cookies only over HTTPS in production.
-         */
-        secure: process.env.NODE_ENV === "production",
-
-        /**
-         * Required for cross-site cookies (React frontend).
-         */
-        sameSite:
-          process.env.NODE_ENV === "production"
-            ? "none"
-            : "lax",
-
-        maxAge: Number(process.env.COOKIE_MAX_AGE) || 1000 * 60 * 60 * 24,
-      },
+        secure: isProd,
+        sameSite: isProd ? "none" : "lax",
+        maxAge: 1000 * 60 * 60 * 24,
+      }
     })
   );
+
+  /* =====================================================
+   COOKIE DEBUG MIDDLEWARE
+   ===================================================== */
+
+  app.use((req, res, next) => {
+    console.log("\n===== REQUEST DEBUG =====");
+    console.log("URL:", req.method, req.url);
+    console.log("Origin:", req.headers.origin);
+    console.log("Cookie header:", req.headers.cookie);
+    console.log("Session ID:", req.sessionID);
+    console.log("Session exists:", !!req.session);
+    console.log("=========================\n");
+
+    next();
+  });
 
   /* =====================================================
      ROUTES
@@ -175,6 +184,14 @@ const startServer = async () => {
   app.use("/api/characters", characterRoutes);
   app.use("/api/seasons", seasonRoutes);
   app.use("/api/reviews", reviewRoutes);
+
+
+  app.get("/debug-session", (req, res) => {
+  res.json({
+      cookie: req.headers.cookie || null,
+      session: req.session || null,
+    });
+  });
 
   /* =====================================================
      STATIC FILES

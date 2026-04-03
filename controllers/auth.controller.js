@@ -264,7 +264,11 @@ exports.logout = asyncHandler(async (req, res) => {
       return res.status(500).json({ message: "Logout failed" });
     }
 
-    res.clearCookie(process.env.SESSION_NAME);
+    res.clearCookie(process.env.SESSION_NAME, {
+      httpOnly: true,
+      sameSite: "lax",
+      secure: false,
+    });
     res.json({ message: "Logged out" });
   });
 });
