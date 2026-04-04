@@ -17,13 +17,18 @@
  */
 function authMiddleware(req, res, next) {
 
+  console.log("AUTH CHECK SESSION:", req.session);
+
   /* ---------- AUTHENTICATION CHECK ---------- */
 
-  if (!req.session || !req.session.user) {
+   if (!req.session || !req.session.user) {
     return res.status(401).json({
-      message: "Unauthorized",
+      message: "Unauthorized"
     });
   }
+
+  // attach user to request
+  req.user = req.session.user;
 
   /* ---------- ACCESS GRANTED ---------- */
 

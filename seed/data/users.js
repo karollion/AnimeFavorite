@@ -3,17 +3,25 @@ const bcrypt = require("bcryptjs")
 module.exports = [
 
 {
-_id:"680000000000000000000001",
-slug:"admin",
-login:"admin",
-password:bcrypt.hashSync("admin123",10),
-role:"admin",
-email:"admin@example.com",
-birth_year:1995,
-avatar:"https://www.superherodb.com/pictures2/portraits/10/050/27492.jpg?v=1739841912",
-favorite_characters:["650000000000000000000001"],
-createdAt:"2020-01-01T00:00:00Z",
-updatedAt:"2020-01-01T00:00:00Z"
+  _id: "680000000000000000000001",
+  slug: "admin",
+  login: "admin",
+  password: bcrypt.hashSync("admin123", 10),
+  role: "admin",
+  email: "admin@example.com",
+  birth_year: 1995,
+  avatar: "https://www.superherodb.com/pictures2/portraits/10/050/27492.jpg?v=1739841912",
+  // Zaktualizowana lista: Goku + 5 kolejnych postaci z Twojego seeda
+  favorite_characters: [
+    "650000000000000000000001", // Goku
+    "650000000000000000000002", // Frieren
+    "650000000000000000000003", // Megumin
+    "650000000000000000000004", // Eren
+    "650000000000000000000005", // Naruto
+    "650000000000000000000006"  // Luffy
+  ],
+  createdAt: "2020-01-01T00:00:00Z",
+  updatedAt: "2020-01-01T00:00:00Z"
 },
 
 {

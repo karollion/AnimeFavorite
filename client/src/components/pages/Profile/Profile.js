@@ -15,6 +15,11 @@ const Profile = () => {
   const user = useSelector(getUser);
   const stats = useSelector(getUserStats);
 
+  console.log("User data: ");
+  console.log(user);
+  console.log("User stats: ");
+  console.log(stats);
+  
   return (
     <div className={styles.root}>
       <Container>

@@ -169,13 +169,13 @@ exports.getProfile = asyncHandler(async (req, res) => {
   }
 
   res.json({
-  id: user._id,
-  login: user.login,
-  email: user.email,
-  description: user.description,
-  birth_year: user.birth_year,
-  avatar: user.avatar,
-  favorite_characters: user.favorite_characters,
+  id: req.user._id,
+  login: req.user.login,
+  email: req.user.email,
+  description: req.user.description,
+  birth_year: req.user.birth_year,
+  avatar: req.user.avatar,
+  favorite_characters: req.user.favorite_characters,
 });
 });
 
@@ -192,15 +192,39 @@ exports.getProfile = asyncHandler(async (req, res) => {
 const UserAnime = require("../models/userAnime.model");
 
 exports.getUserStats = asyncHandler(async (req, res) => {
-  const userId = req.session.user.id;
 
-  /* ===============================
-     STATUS COUNTS
-     =============================== */
+  console.log("===== USER STATS DEBUG =====");
+
+  console.log("SESSION USER:", req.session.user);
+
+  const userId = new mongoose.Types.ObjectId(
+    req.session.user.id
+  );
+
+  console.log("USER ID OBJECT:", userId);
+  console.log("USER ID STRING:", userId.toString());
+
+  /* TEST 1 — normal find */
+  const testFind = await UserAnime.find({
+    user: userId
+  });
+
+  console.log("FOUND BY FIND:", testFind.length);
+
+  /* TEST 2 — raw Mongo aggregation */
+  const testAgg = await UserAnime.aggregate([
+    { $match: { user: userId } }
+  ]);
+
+  console.log("FOUND BY AGG:", testAgg.length);
+
+  console.log("============================");
+
+  /* ===== NORMAL CODE ===== */
 
   const statusStats = await UserAnime.aggregate([
     {
-      $match: { user: new mongoose.Types.ObjectId(userId) }
+      $match: { user: userId }
     },
     {
       $group: {
@@ -221,10 +245,6 @@ exports.getUserStats = asyncHandler(async (req, res) => {
   statusStats.forEach(s => {
     statuses[s._id] = s.count;
   });
-
-  /* ===============================
-     FAVORITE ANIME (AnimeCard data)
-     =============================== */
 
   const favorites = await UserAnime.find({
     user: userId,
@@ -348,7 +368,9 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     return res.status(401).json({ message: "Not authenticated" });
   }
 
-  const userId = req.session.user.id;
+  const userId = new mongoose.Types.ObjectId(
+    req.session.user.id
+  );
 
   const allowedFields = [
     "description",

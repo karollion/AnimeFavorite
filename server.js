@@ -76,7 +76,6 @@ const loginLimiter = rateLimit({
 /**
  * Helmet sets secure HTTP headers.
  */
-app.use(helmet());
 app.use(
   helmet({
     crossOriginResourcePolicy: false,

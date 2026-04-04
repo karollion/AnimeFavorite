@@ -87,6 +87,10 @@ export const loginRequest = credentials => async dispatch => {
 
     dispatch(loginSuccess(res.data));
 
+    // 🔥 AUTOMATYCZNIE pobierz stats po loginie
+    const statsRes = await api.get('/auth/me/stats');
+    dispatch(setStats(statsRes.data));
+
   } catch (err) {
     dispatch(fetchError(err.response?.data?.message || 'Login failed'));
   }
@@ -98,10 +102,7 @@ export const loginRequest = credentials => async dispatch => {
  */
 export const logoutRequest = () => async dispatch => {
   try {
-    await fetch(`${API_URL}/auth/logout`, {
-      method: 'POST',
-      credentials: 'include'
-    })
+    await api.post('/auth/logout');
 
     dispatch(logoutUser())
   } catch (err) {
@@ -117,11 +118,15 @@ export const fetchProfile = () => async dispatch => {
   dispatch(fetchStart());
 
   try {
-    const res = await api.get('/auth/me');
+    // 1️⃣ restore user
+    const userRes = await api.get('/auth/me');
+    dispatch(loginSuccess(userRes.data));
 
-    dispatch(loginSuccess(res.data));
+    // 2️⃣ fetch stats AUTOMATYCZNIE
+    const statsRes = await api.get('/auth/me/stats');
+    dispatch(setStats(statsRes.data));
 
-  } catch {
+  } catch (err) {
     dispatch(fetchError(null));
   }
 };
@@ -136,19 +141,12 @@ export const fetchProfile = () => async dispatch => {
  */
 export const updateProfileRequest = updates => async dispatch => {
   try {
-    const res = await fetch(`${API_URL}/auth/me`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      credentials: 'include',
-      body: JSON.stringify(updates)
-    })
-
-    const data = await res.json()
-    dispatch(updateProfileSuccess(data))
+    const res = await api.put('/auth/me', updates);
+    dispatch(updateProfileSuccess(res.data));
   } catch (err) {
-    dispatch(fetchError(err.message))
+    dispatch(fetchError(err.message));
   }
-}
+};
 
 /**
  * Upload avatar
@@ -156,21 +154,16 @@ export const updateProfileRequest = updates => async dispatch => {
  */
 export const updateAvatarRequest = file => async dispatch => {
   try {
-    const formData = new FormData()
-    formData.append('avatar', file)
+    const formData = new FormData();
+    formData.append('avatar', file);
 
-    const res = await fetch(`${API_URL}/auth/me/avatar`, {
-      method: 'PUT',
-      credentials: 'include',
-      body: formData
-    })
+    const res = await api.put('/auth/me/avatar', formData);
 
-    const data = await res.json()
-    dispatch(updateAvatarSuccess(data))
+    dispatch(updateAvatarSuccess(res.data));
   } catch (err) {
-    dispatch(fetchError(err.message))
+    dispatch(fetchError(err.message));
   }
-}
+};
 
 /**
  * Fetch user stats
@@ -178,16 +171,12 @@ export const updateAvatarRequest = file => async dispatch => {
  */
 export const fetchUserStats = () => async dispatch => {
   try {
-    const res = await fetch(`${API_URL}/auth/me/stats`, {
-      credentials: 'include'
-    })
-
-    const data = await res.json()
-    dispatch(setStats(data))
+    const res = await api.get('/auth/me/stats');
+    dispatch(setStats(res.data));
   } catch (err) {
-    dispatch(fetchError(err.message))
+    dispatch(fetchError(err.message));
   }
-}
+};
 
 /* =====================================================
    INITIAL STATE
@@ -227,6 +216,7 @@ const userReducer = (state = initialState, action) => {
     case SET_STATS:
       return {
         ...state,
+        loading: false,
         stats: action.payload
       }
 

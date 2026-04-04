@@ -16,9 +16,9 @@ const LoginForm = ({ actionText = 'Login' }) => {
     formState: { errors },
   } = useForm({});
 
-  const onSubmit = data => {
-    dispatch(loginRequest(data));
-    navigate('/')
+  const onSubmit = async data => {
+    await dispatch(loginRequest(data));
+    navigate('/');
   };
 
 
