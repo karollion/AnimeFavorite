@@ -126,7 +126,7 @@ exports.login = asyncHandler(async (req, res) => {
       role: user.role,
     };
 
-    console.log("SESSION AFTER LOGIN:", req.session);
+    //console.log("SESSION AFTER LOGIN:", req.session);
 
     req.session.save(err => {
       if (err) return res.status(500).json(err);
@@ -148,7 +148,7 @@ exports.login = asyncHandler(async (req, res) => {
 /**
  * Get authenticated user profile
  *
- * @route   GET /api/auth/user
+ * @route   GET /api/auth/me
  * @access  Private
  */
 exports.getProfile = asyncHandler(async (req, res) => {
@@ -167,15 +167,24 @@ exports.getProfile = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
-
+  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+  console.log("getProfile user: ")
+  console.log(user._id)
+  console.log(user.login)
+  console.log(user.email)
+  console.log(user.description)
+  console.log(user.birth_year)
+  console.log(user.avatar)
+  console.log(user.favorite_characters)
+  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
   res.json({
-  id: req.user._id,
-  login: req.user.login,
-  email: req.user.email,
-  description: req.user.description,
-  birth_year: req.user.birth_year,
-  avatar: req.user.avatar,
-  favorite_characters: req.user.favorite_characters,
+  id: user._id,
+  login: user.login,
+  email: user.email,
+  description: user.description,
+  birth_year: user.birth_year,
+  avatar: user.avatar,
+  favorite_characters: user.favorite_characters,
 });
 });
 
@@ -192,35 +201,13 @@ exports.getProfile = asyncHandler(async (req, res) => {
 const UserAnime = require("../models/userAnime.model");
 
 exports.getUserStats = asyncHandler(async (req, res) => {
-
-  console.log("===== USER STATS DEBUG =====");
-
-  console.log("SESSION USER:", req.session.user);
-
   const userId = new mongoose.Types.ObjectId(
     req.session.user.id
   );
 
-  console.log("USER ID OBJECT:", userId);
-  console.log("USER ID STRING:", userId.toString());
-
-  /* TEST 1 — normal find */
-  const testFind = await UserAnime.find({
-    user: userId
-  });
-
-  console.log("FOUND BY FIND:", testFind.length);
-
-  /* TEST 2 — raw Mongo aggregation */
-  const testAgg = await UserAnime.aggregate([
-    { $match: { user: userId } }
-  ]);
-
-  console.log("FOUND BY AGG:", testAgg.length);
-
-  console.log("============================");
-
-  /* ===== NORMAL CODE ===== */
+  /* ===============================
+     STATUS COUNTS
+     =============================== */
 
   const statusStats = await UserAnime.aggregate([
     {
@@ -245,6 +232,10 @@ exports.getUserStats = asyncHandler(async (req, res) => {
   statusStats.forEach(s => {
     statuses[s._id] = s.count;
   });
+
+  /* ===============================
+     FAVORITE ANIME (AnimeCard data)
+     =============================== */
 
   const favorites = await UserAnime.find({
     user: userId,

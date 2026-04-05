@@ -17,7 +17,7 @@
  */
 function authMiddleware(req, res, next) {
 
-  console.log("AUTH CHECK SESSION:", req.session);
+  //console.log("AUTH CHECK SESSION:", req.session);
 
   /* ---------- AUTHENTICATION CHECK ---------- */
 

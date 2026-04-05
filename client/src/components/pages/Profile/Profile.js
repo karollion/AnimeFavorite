@@ -52,14 +52,16 @@ const Profile = () => {
           {stats?.favoriteAnime?.map(anime => (
             <AnimeCard
               key={anime._id}
-              {...anime}
+              anime={anime}
             />
           ))}
         </div>
-
+        
         <p>Watching: {stats?.statuses?.watching}</p>
         <p>Completed: {stats?.statuses?.completed}</p>
         <p>Planned: {stats?.statuses?.planned}</p>
+        <p>Suspended: {stats?.statuses?.suspended}</p>
+        <p>Abandoned: {stats?.statuses?.abandoned}</p>
 
           
         <Col xs="12" className="d-flex justify-content-center my-3">

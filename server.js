@@ -154,7 +154,7 @@ const startServer = async () => {
   /* =====================================================
    COOKIE DEBUG MIDDLEWARE
    ===================================================== */
-
+  /*
   app.use((req, res, next) => {
     console.log("\n===== REQUEST DEBUG =====");
     console.log("URL:", req.method, req.url);
@@ -166,6 +166,7 @@ const startServer = async () => {
 
     next();
   });
+  */
 
   /* =====================================================
      ROUTES
