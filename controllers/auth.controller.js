@@ -167,16 +167,10 @@ exports.getProfile = asyncHandler(async (req, res) => {
   if (!user) {
     return res.status(404).json({ message: "User not found" });
   }
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
-  console.log("getProfile user: ")
-  console.log(user._id)
-  console.log(user.login)
-  console.log(user.email)
-  console.log(user.description)
-  console.log(user.birth_year)
-  console.log(user.avatar)
-  console.log(user.favorite_characters)
-  console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+  //console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
+  //console.log("getProfile user: ")
+  //console.log(user)
+  //console.log("!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!!")
   res.json({
   id: user._id,
   login: user.login,

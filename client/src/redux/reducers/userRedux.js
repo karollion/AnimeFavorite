@@ -1,4 +1,4 @@
-import { API_URL } from '../../config';
+//import { API_URL } from '../../config';
 import api from "../../utils/axios"
 /* =====================================================
    USER REDUX
@@ -32,7 +32,7 @@ export const isAuthenticated = state => !!state.user.data
 const createActionName = name => `app/user/${name}`
 
 const FETCH_START = createActionName('FETCH_START')
-//const FETCH_SUCCESS = createActionName('FETCH_SUCCESS')
+const PROFILE_SUCCESS = createActionName('PROFILE_SUCCESS');
 const FETCH_ERROR = createActionName('FETCH_ERROR')
 
 const LOGIN_SUCCESS = createActionName('LOGIN_SUCCESS')
@@ -65,6 +65,11 @@ export const updateAvatarSuccess = payload => ({
   type: UPDATE_AVATAR,
   payload
 })
+
+export const profileSuccess = payload => ({
+  type: PROFILE_SUCCESS,
+  payload
+});
 
 export const setStats = payload => ({
   type: SET_STATS,
@@ -120,7 +125,7 @@ export const fetchProfile = () => async dispatch => {
   try {
     // 1️⃣ restore user
     const userRes = await api.get('/auth/me');
-    dispatch(loginSuccess(userRes.data));
+    dispatch(profileSuccess(userRes.data));
 
     // 2️⃣ fetch stats AUTOMATYCZNIE
     const statsRes = await api.get('/auth/me/stats');
@@ -194,6 +199,10 @@ const initialState = {
    ===================================================== */
 
 const userReducer = (state = initialState, action) => {
+
+  console.log("PROFILE PAYLOAD:", action.payload);
+console.log("STATE BEFORE:", state.data);
+
   switch (action.type) {
 
     case FETCH_START:
@@ -205,6 +214,16 @@ const userReducer = (state = initialState, action) => {
         loading: false,
         data: action.payload
       }
+
+    case PROFILE_SUCCESS:
+      return {
+        ...state,
+        loading: false,
+        data: {
+          ...(state.data || {}),
+          ...action.payload
+        }
+      };
 
     case UPDATE_PROFILE:
     case UPDATE_AVATAR:
