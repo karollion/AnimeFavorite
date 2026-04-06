@@ -1,4 +1,5 @@
 import { API_URL } from '../../config'
+import api from "../../utils/axios";
 
 /* =====================================================
    ANIMES REDUX
@@ -63,7 +64,7 @@ export const fetchAnimes = (page = 1) => async dispatch => {
   dispatch(fetchStart())
 
   try {
-    const res = await fetch(`${API_URL}/animes?page=${page}`)
+    const res = await api.get('/animes?page=' + page);
     const data = await res.json()
 
     dispatch(fetchSuccess(data))
@@ -76,7 +77,7 @@ export const fetchAnimeBySlug = slug => async dispatch => {
   dispatch(fetchStart())
 
   try {
-    const res = await fetch(`${API_URL}/animes/slug/${slug}`)
+    const res = await api.get('/animes/slug/' + slug)
 
     if (!res.ok) {
       throw new Error(`HTTP ${res.status}`)

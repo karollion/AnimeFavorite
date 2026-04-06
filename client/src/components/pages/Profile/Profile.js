@@ -5,15 +5,24 @@ import Container from '../../common/container/Container';
 import Button from '../../common/Button/Button';
 import {
   getUser,
+  fetchProfile,
   getUserStats
 } from '../../../redux/reducers/userRedux';
 import { useSelector } from 'react-redux';
+import { useDispatch } from 'react-redux';
+import { useEffect } from 'react';
 import CharacterCard from '../../features/CharacterCard/CharacterCard';
 import AnimeCard from '../../features/AnimeCard/AnimeCard';
 
 const Profile = () => {
+  const dispatch = useDispatch();
+
   const user = useSelector(getUser);
   const stats = useSelector(getUserStats);
+
+  //useEffect(() => {
+  //  dispatch(fetchProfile());
+  //}, [dispatch]);
 
   console.log("User data: ");
   console.log(user);
@@ -38,7 +47,6 @@ const Profile = () => {
         <p>Birth year: {user.birth_year}</p>
 
         <p>Favorite characters:</p>
-        <p>number of favorite characters {user.favorite_characters_count}</p>
         <div className={styles.characters}>
           {user.favorite_characters?.map(c => (
             <div key={c._id} >

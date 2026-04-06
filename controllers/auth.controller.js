@@ -161,7 +161,7 @@ exports.getProfile = asyncHandler(async (req, res) => {
     is_deleted: false,
   }).populate(
     "favorite_characters",
-    "firstName lastName anime imageUrl"
+    "firstName lastName anime photo"
   );
 
   if (!user) {

@@ -11,16 +11,21 @@ import Logout from './components/pages/Logout/Logout';
 import Signup from './components/pages/Signup/Signup';
 import Profile from './components/pages/Profile/Profile';
 import ProtectedRoute from './components/routing/ProtectedRoute';
-import { fetchProfile } from './redux/reducers/userRedux';
+import { fetchProfile, getUser } from './redux/reducers/userRedux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import { useSelector } from 'react-redux';
 
 function App() {
   const dispatch = useDispatch()
 
+  const user = useSelector(getUser);
+
   useEffect(() => {
-    dispatch(fetchProfile())
-  }, [dispatch])
+    if (user?.id) {
+      dispatch(fetchProfile());
+    }
+  }, [user?.id]);
 
   return (
     <div>

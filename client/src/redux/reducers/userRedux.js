@@ -200,8 +200,8 @@ const initialState = {
 
 const userReducer = (state = initialState, action) => {
 
-  console.log("PROFILE PAYLOAD:", action.payload);
-console.log("STATE BEFORE:", state.data);
+  //console.log("PROFILE PAYLOAD:", action.payload);
+  //console.log("STATE BEFORE:", state.data);
 
   switch (action.type) {
 
