@@ -195,36 +195,45 @@ exports.getProfile = asyncHandler(async (req, res) => {
 const UserAnime = require("../models/userAnime.model");
 
 exports.getUserStats = asyncHandler(async (req, res) => {
+
   const userId = new mongoose.Types.ObjectId(
     req.session.user.id
   );
 
   /* ===============================
-     STATUS COUNTS
+     FETCH USER ANIME WITH DATA
      =============================== */
 
-  const statusStats = await UserAnime.aggregate([
-    {
-      $match: { user: userId }
-    },
-    {
-      $group: {
-        _id: "$status",
-        count: { $sum: 1 }
-      }
-    }
-  ]);
+  const userAnime = await UserAnime.find({
+    user: userId
+  })
+    .populate({
+      path: "anime",
+      select: "slug title anime_cover rating_avg"
+    })
+    .lean();
+
+  /* ===============================
+     BUILD STATUS OBJECT
+     =============================== */
 
   const statuses = {
-    planned: 0,
-    watching: 0,
-    completed: 0,
-    suspended: 0,
-    abandoned: 0
+    planned: { count: 0, anime: [] },
+    watching: { count: 0, anime: [] },
+    completed: { count: 0, anime: [] },
+    suspended: { count: 0, anime: [] },
+    abandoned: { count: 0, anime: [] }
   };
 
-  statusStats.forEach(s => {
-    statuses[s._id] = s.count;
+  userAnime.forEach(entry => {
+    if (!entry.anime) return;
+
+    const status = entry.status;
+
+    if (statuses[status]) {
+      statuses[status].count++;
+      statuses[status].anime.push(entry.anime);
+    }
   });
 
   /* ===============================

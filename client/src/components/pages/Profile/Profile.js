@@ -65,11 +65,55 @@ const Profile = () => {
           ))}
         </div>
         
-        <p>Watching: {stats?.statuses?.watching}</p>
-        <p>Completed: {stats?.statuses?.completed}</p>
-        <p>Planned: {stats?.statuses?.planned}</p>
-        <p>Suspended: {stats?.statuses?.suspended}</p>
-        <p>Abandoned: {stats?.statuses?.abandoned}</p>
+        <p>Watching: {stats?.statuses?.watching.count}</p>
+        <div>
+          {stats?.statuses?.watching.anime.map(anime => (
+            <AnimeCard
+              key={anime._id}
+              anime={anime}
+            />
+          ))}
+        </div>
+
+        <p>Completed: {stats?.statuses?.completed.count}</p>
+        <div>
+          {stats?.statuses?.completed.anime.map(anime => (
+            <AnimeCard
+              key={anime._id}
+              anime={anime}
+            />
+          ))}
+        </div>
+
+        <p>Planned: {stats?.statuses?.planned.count}</p>
+        <div>
+          {stats?.statuses?.planned.anime.map(anime => (
+            <AnimeCard
+              key={anime._id}
+              anime={anime}
+            />
+          ))}
+        </div>
+
+        <p>Suspended: {stats?.statuses?.suspended.count}</p>
+        <div>
+          {stats?.statuses?.suspended.anime.map(anime => (
+            <AnimeCard
+              key={anime._id}
+              anime={anime}
+            />
+          ))}
+        </div>
+
+        <p>Abandoned: {stats?.statuses?.abandoned.count}</p>
+        <div>
+          {stats?.statuses?.abandoned.anime.map(anime => (
+            <AnimeCard
+              key={anime._id}
+              anime={anime}
+            />
+          ))}
+        </div>
 
           
         <Col xs="12" className="d-flex justify-content-center my-3">
