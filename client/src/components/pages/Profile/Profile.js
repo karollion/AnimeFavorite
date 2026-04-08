@@ -13,6 +13,7 @@ import { useDispatch } from 'react-redux';
 import { useEffect } from 'react';
 import CharacterCard from '../../features/CharacterCard/CharacterCard';
 import AnimeCard from '../../features/AnimeCard/AnimeCard';
+import StatsList from '../../features/StatsList/StatsList';
 
 const Profile = () => {
   const dispatch = useDispatch();
@@ -24,10 +25,10 @@ const Profile = () => {
   //  dispatch(fetchProfile());
   //}, [dispatch]);
 
-  console.log("User data: ");
-  console.log(user);
-  console.log("User stats: ");
-  console.log(stats);
+  //console.log("User data: ");
+  //console.log(user);
+  //console.log("User stats: ");
+  //console.log(stats);
   
   return (
     <div className={styles.root}>
@@ -55,67 +56,35 @@ const Profile = () => {
           ))}
         </div>
 
-        <p>Favorite animes:</p>
-        <div>
-          {stats?.favoriteAnime?.map(anime => (
-            <AnimeCard
-              key={anime._id}
-              anime={anime}
-            />
-          ))}
+        <div className={styles.stats_nav}>
+          <Button action="OnClick">Favorites</Button>
+          <Button action="OnClick">Watching</Button>
+          <Button action="OnClick">Completed</Button>
+          <Button action="OnClick">Planned</Button>
+          <Button action="OnClick">Suspended</Button>
+          <Button action="OnClick">Abandoned</Button>
         </div>
+
+        <p>Favorite:</p>
+        <p>Total favorites: {stats?.favoriteAnime.length}</p>
+        <StatsList stats={stats?.favoriteAnime} />
         
-        <p>Watching: {stats?.statuses?.watching.count}</p>
-        <div>
-          {stats?.statuses?.watching.anime.map(anime => (
-            <AnimeCard
-              key={anime._id}
-              anime={anime}
-            />
-          ))}
-        </div>
+        <p>Total watching: {stats?.statuses?.watching.count}</p>
+        <StatsList stats={stats?.statuses?.watching.anime} />
 
-        <p>Completed: {stats?.statuses?.completed.count}</p>
-        <div>
-          {stats?.statuses?.completed.anime.map(anime => (
-            <AnimeCard
-              key={anime._id}
-              anime={anime}
-            />
-          ))}
-        </div>
+        <p>Total completed: {stats?.statuses?.completed.count}</p>
+        <StatsList stats={stats?.statuses?.completed.anime} />
 
-        <p>Planned: {stats?.statuses?.planned.count}</p>
-        <div>
-          {stats?.statuses?.planned.anime.map(anime => (
-            <AnimeCard
-              key={anime._id}
-              anime={anime}
-            />
-          ))}
-        </div>
+        <p>Total planned: {stats?.statuses?.planned.count}</p>
+        <StatsList stats={stats?.statuses?.planned.anime} />
 
-        <p>Suspended: {stats?.statuses?.suspended.count}</p>
-        <div>
-          {stats?.statuses?.suspended.anime.map(anime => (
-            <AnimeCard
-              key={anime._id}
-              anime={anime}
-            />
-          ))}
-        </div>
+        <p>Total suspended: {stats?.statuses?.suspended.count}</p>
+        <StatsList stats={stats?.statuses?.suspended.anime} />
 
-        <p>Abandoned: {stats?.statuses?.abandoned.count}</p>
-        <div>
-          {stats?.statuses?.abandoned.anime.map(anime => (
-            <AnimeCard
-              key={anime._id}
-              anime={anime}
-            />
-          ))}
-        </div>
+        <p>Total abandoned: {stats?.statuses?.abandoned.count}</p>
+        <StatsList stats={stats?.statuses?.abandoned.anime} />
+        
 
-          
         <Col xs="12" className="d-flex justify-content-center my-3">
           <Button to="/">Back to home</Button>
         </Col>

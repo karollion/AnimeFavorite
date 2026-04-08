@@ -15,4 +15,9 @@
 		height: $anime-card-height;
   		width: $anime-card-width;
 	}
+
+  .stats_nav {
+     display: flex;
+     gap: 15px;
+  }
 }

@@ -1,0 +1,86 @@
+@import '../../../styles/settings.scss';
+
+.card {
+  position: relative;
+  border-radius: 10px;
+  overflow: hidden; // VERY IMPORTANT
+  height: $anime-card-height;
+  width: $anime-card-width;
+
+  background-size: cover;
+  background-position: center;
+  background-repeat: no-repeat;
+
+  display: flex;
+  flex-direction: column;
+  justify-content: space-between;
+
+  color: $color-light;
+
+  box-shadow: 0px 0px 24px -6px $anime-card-shadow;
+  cursor: pointer;
+ 
+  &:hover {
+    transform: scale(1.025);
+    transition: $transition;
+
+    -webkit-box-shadow: 0px 0px 28px -3px $anime-card-shadow;
+    -moz-box-shadow: 0px 0px 28px -3px $anime-card-shadow;
+    box-shadow: 0px 0px 28px -3px $anime-card-shadow;
+  }
+
+  &:not(:hover) {
+    transition: $transition;
+    transform: scale(1); 
+  }
+  
+  .title {
+    position: absolute;
+    display: flex;
+    align-items: center;
+    top: 0;
+    left: 50%;
+    height: 47px;
+  }
+  
+  .body {
+    padding: 10px;
+  }
+
+  .top {
+    background: $anime-card-background;
+    width: 100%;
+    height: 15%;
+    
+    p {
+      color: $anime-card-text-color;
+    }
+  }
+
+  .bottom {
+    background: $anime-card-background;
+    width: 100%;
+    height: 15%;
+    display: flex;
+    align-items: center;
+    justify-content: center;
+
+    .btn {
+      text-decoration: none;
+      color: $anime-card-text-color;
+    }
+  }
+
+  .top,
+  .bottom,
+  .btn {
+    position: relative;
+    z-index: 2;
+  }
+
+  .top {
+  display: flex;
+  justify-content: space-between;
+  padding: 10px;
+}
+}
