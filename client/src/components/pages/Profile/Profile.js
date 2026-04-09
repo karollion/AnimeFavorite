@@ -1,5 +1,6 @@
 import styles from './Profile.module.scss'
 import noImage from '../../../assets/no-image.png'
+import { motion, AnimatePresence } from 'framer-motion';
 import { Col } from 'react-bootstrap'
 import Container from '../../common/container/Container';
 import Button from '../../common/Button/Button';
@@ -22,17 +23,20 @@ const Profile = () => {
     <div className={styles.root}>
       <Container>
         <h1>User Profile</h1>
-        <img
-          src={user.avatar || noImage}
-          alt={user.login}
-          className={styles.img}
-        />
-        <p>Login: {user.login}</p>
-        <p>Role: {user.role}</p>
-        <p>Email: {user.email}</p>
-        <p>Birth year: {user.birth_year}</p>
-        <p>Description: {user.description}</p>
-
+        <div className={styles.about}>
+          <img
+            src={user.avatar || noImage}
+            alt={user.login}
+            className={styles.img}
+          />
+          <div>
+            <p>Login: {user.login}</p>
+            <p>Role: {user.role}</p>
+            <p>Email: {user.email}</p>
+            <p>Birth year: {user.birth_year}</p>
+            <p>Description: {user.description}</p>
+          </div>
+        </div>
         <p>Favorite characters:</p>
         <div className={styles.characters}>
           {user.favorite_characters?.map(c => (
@@ -75,29 +79,41 @@ const Profile = () => {
           </Button>
         </div>
 
-        {activeTab === 'favorites' && (
-          <><StatsList stats={stats?.favoriteAnime || []} /></>
-        )}
+        <AnimatePresence mode="wait">
+          <motion.div
+            key={activeTab}
+            initial={{ opacity: 0, y: 10 }}
+            animate={{ opacity: 1, y: 0 }}
+            exit={{ opacity: 0, y: -10 }}
+            transition={{ duration: 0.3 }}
+          >
 
-        {activeTab === 'watching' && (
-          <><StatsList stats={stats?.statuses?.watching?.anime || []} /></>
-        )}
+            {activeTab === 'favorites' && (
+              <><StatsList stats={stats?.favoriteAnime || []} /></>
+            )}
 
-        {activeTab === 'completed' && (
-          <><StatsList stats={stats?.statuses?.completed?.anime || []} /></>
-        )}
+            {activeTab === 'watching' && (
+              <><StatsList stats={stats?.statuses?.watching?.anime || []} /></>
+            )}
 
-        {activeTab === 'planned' && (
-          <><StatsList stats={stats?.statuses?.planned?.anime || []} /></>
-        )}
+            {activeTab === 'completed' && (
+              <><StatsList stats={stats?.statuses?.completed?.anime || []} /></>
+            )}
 
-        {activeTab === 'suspended' && (
-          <><StatsList stats={stats?.statuses?.suspended?.anime || []} /></>
-        )}
+            {activeTab === 'planned' && (
+              <><StatsList stats={stats?.statuses?.planned?.anime || []} /></>
+            )}
 
-        {activeTab === 'abandoned' && (
-          <><StatsList stats={stats?.statuses?.abandoned?.anime || []} /></>
-        )}
+            {activeTab === 'suspended' && (
+              <><StatsList stats={stats?.statuses?.suspended?.anime || []} /></>
+            )}
+
+            {activeTab === 'abandoned' && (
+              <><StatsList stats={stats?.statuses?.abandoned?.anime || []} /></>
+            )}
+
+          </motion.div>
+        </AnimatePresence>
         
         <Col xs="12" className="d-flex justify-content-center my-3">
           <Button to="/">Back to home</Button>

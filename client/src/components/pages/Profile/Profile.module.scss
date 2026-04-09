@@ -16,6 +16,11 @@
   		width: $anime-card-width;
 	}
 
+  .about {
+    display: flex;
+    justify-content: space-between;
+  }
+
   .characters {
     display: flex;
     gap: 20px;

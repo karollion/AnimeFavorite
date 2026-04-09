@@ -14,9 +14,12 @@ const api = axios.create({
    (auto token attach later)
    ===================================================== */
 
-api.interceptors.request.use(
-  config => {
+api.interceptors.request.use(async config => {
     const token = localStorage.getItem("token");
+
+    if (process.env.NODE_ENV === 'development') {
+      await new Promise(res => setTimeout(res, 1000));
+    }
 
     if (token) {
       config.headers.Authorization = `Bearer ${token}`;
