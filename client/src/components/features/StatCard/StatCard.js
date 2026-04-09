@@ -10,7 +10,7 @@ const StatCard = ({ anime }) => {
       <div
         className={styles.card}
         style={{
-          backgroundImage: `url(${anime.anime_cover || noImage})`,
+          backgroundImage: `url(${anime?.anime_cover || noImage})`,
         }}
       >
         <div className={styles.top}>

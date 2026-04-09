@@ -3,7 +3,7 @@ import StatCard from '../StatCard/StatCard';
 import PropTypes from 'prop-types'
 
 
-const StatsList = ({ stats }) => {
+const StatsList = ({ stats = [] }) => {
   
   return (
     <div className={styles.root}>
@@ -18,7 +18,7 @@ const StatsList = ({ stats }) => {
 };
 
 StatsList.propTypes = {
-  stats: PropTypes.array.isRequired,
+  stats: PropTypes.array,
 };
 
 export default StatsList;
