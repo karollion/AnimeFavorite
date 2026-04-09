@@ -19,7 +19,7 @@ const ProtectedRoute = ({ children, role }) => {
 
   // not logged
   if (!user) {
-    return <Navigate to="/Login" replace />
+    return <Navigate to="/" replace />
   }
 
   // role protection (optional)
