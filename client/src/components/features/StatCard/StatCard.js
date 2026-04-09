@@ -1,36 +1,37 @@
-import styles from './StatCard.module.scss'
-import { Col } from 'react-bootstrap'
-import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
-import noImage from '../../../assets/no-image.png'
+import styles from './StatCard.module.scss';
+import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+import noImage from '../../../assets/no-image.png';
 
 const StatCard = ({ anime }) => {
   return (
-    <Col xs="12" sm="6" md="4" lg="3" className="mb-4">
-      <div
-        className={styles.card}
-        style={{
-          backgroundImage: `url(${anime?.anime_cover || noImage})`,
-        }}
-      >
-        <div className={styles.top}>
+    <div>
+      <div className={styles.card}>
+        <img
+          src={anime?.anime_cover || noImage}
+          alt={anime.title}
+          className={styles.img}
+        />
+        
+        <div className={styles.title}>
+          <Link to={`/anime/${anime.slug}`} className={styles.btn}>
+            {anime.title}
+          </Link>
+        </div>
+
+        <div className={styles.info}>
           <p>{anime.age_rating}+</p>
           <p>{anime.type}</p>
           <p>{anime.rating_avg}</p>
         </div>
 
-        <div className={styles.bottom}>
-          <Link to={`/anime/${anime.slug}`} className={styles.btn}>
-            {anime.title}
-          </Link>
-        </div>
       </div>
-    </Col>
+    </div>
   )
-}
+};
 
 StatCard.propTypes = {
   anime: PropTypes.object.isRequired,
-}
+};
 
 export default StatCard;

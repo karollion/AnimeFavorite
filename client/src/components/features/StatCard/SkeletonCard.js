@@ -5,7 +5,7 @@ const SkeletonCard = () => {
     <div className={styles.card}>
       <div
         style={{
-          height: '200px',
+          height: '110px',
           background: '#2a2a2a',
           borderRadius: '12px',
           animation: 'pulse 1.5s infinite',
