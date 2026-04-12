@@ -1,8 +1,8 @@
-import styles from './AnimeCard.module.scss'
-import { Col } from 'react-bootstrap'
-import PropTypes from 'prop-types'
-import { Link } from 'react-router-dom'
-import noImage from '../../../assets/no-image.png'
+import styles from './AnimeCard.module.scss';
+import { Col } from 'react-bootstrap';
+import PropTypes from 'prop-types';
+import { Link } from 'react-router-dom';
+import noImage from '../../../assets/no-image.png';
 
 const AnimeCard = ({ anime }) => {
   return (
@@ -31,6 +31,6 @@ const AnimeCard = ({ anime }) => {
 
 AnimeCard.propTypes = {
   anime: PropTypes.object.isRequired,
-}
+};
 
 export default AnimeCard;

@@ -1,0 +1,20 @@
+@import '../../../styles/settings.scss';
+
+.card {
+  position: relative;
+  border-radius: 10px;
+  height: $anime-card-height;
+  width: $anime-card-width;
+
+  background-color: aqua;
+  animation: 'pulse 1.5s infinite';
+
+
+
+  color: $color-black;
+
+  box-shadow: 0px 0px 24px -6px $anime-card-shadow;
+  cursor: pointer;
+ 
+  
+}

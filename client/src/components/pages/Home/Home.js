@@ -25,7 +25,7 @@ const Home = () => {
     dispatch(fetchHome());
   }, [dispatch]);
 
-  if (loading) return <p>Loading...</p>;
+ // if (loading) return <p>Loading...</p>;
 
   return (
     <div className={styles.root}>
