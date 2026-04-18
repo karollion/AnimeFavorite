@@ -283,7 +283,7 @@ exports.getBySlug = asyncHandler(async (req, res) => {
   if (!result.length) {
     return res.status(404).json({ message: "Anime not found" });
   }
-
+  //console.log (result[0])
   res.json(result[0]);
 });
 

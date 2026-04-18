@@ -1,4 +1,3 @@
-import { API_URL } from '../../config'
 import api from "../../utils/axios";
 
 /* =====================================================
@@ -65,11 +64,10 @@ export const fetchAnimes = (page = 1) => async dispatch => {
 
   try {
     const res = await api.get('/animes?page=' + page);
-    const data = await res.json()
 
-    dispatch(fetchSuccess(data))
+    dispatch(fetchSuccess(res.data))
   } catch (err) {
-    dispatch(fetchError(err.message))
+    dispatch(fetchError(err.response?.data?.message || err.message))
   }
 }
 
@@ -79,55 +77,36 @@ export const fetchAnimeBySlug = slug => async dispatch => {
   try {
     const res = await api.get('/animes/slug/' + slug)
 
-    if (!res.ok) {
-      throw new Error(`HTTP ${res.status}`)
-    }
-
-    const data = await res.json()
-    dispatch({ type: FETCH_ONE_SUCCESS, payload: data })
+    dispatch({ type: FETCH_ONE_SUCCESS, payload: res.data }) 
   } catch (err) {
-    dispatch(fetchError(err.message))
+    dispatch(fetchError(err.response?.data?.message || err.message))
   }
 }
 
 export const addAnimeRequest = anime => async dispatch => {
   try {
-    const res = await fetch(`${API_URL}/animes`, {
-      method: 'POST',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(anime),
-      credentials: 'include'
-    })
-    const data = await res.json()
-    dispatch(addAnime(data))
+    const res = await api.post('/animes', anime)
+    dispatch(addAnime(res.data))
   } catch (err) {
-    dispatch(fetchError(err.message))
+    dispatch(fetchError(err.response?.data?.message || err.message))
   }
 }
 
 export const updateAnimeRequest = anime => async dispatch => {
   try {
-    await fetch(`${API_URL}/animes/${anime._id}`, {
-      method: 'PUT',
-      headers: { 'Content-Type': 'application/json' },
-      body: JSON.stringify(anime),
-      credentials: 'include'
-    })
-    dispatch(updateAnime(anime))
+    const res = await api.put(`/animes/${anime._id}`, anime)
+    dispatch(updateAnime(res.data))
   } catch (err) {
-    dispatch(fetchError(err.message))
+    dispatch(fetchError(err.response?.data?.message || err.message))
   }
 }
 
-export const removeAnimeRequest = id => async dispatch => {
+export const removeAnimeRequest = anime => async dispatch => {
   try {
-    await fetch(`${API_URL}/animes/${id}`, {
-      method: 'DELETE',
-      credentials: 'include'
-    })
-    dispatch(removeAnime(id))
+    const res = await api.delete(`/animes/${anime._id}`)
+    dispatch(removeAnime(res.data))
   } catch (err) {
-    dispatch(fetchError(err.message))
+    dispatch(fetchError(err.response?.data?.message || err.message))
   }
 }
 

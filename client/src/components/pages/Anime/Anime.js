@@ -5,7 +5,8 @@ import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchAnimeBySlug,
   getSelectedAnime,
-  getAnimesLoading
+  getAnimesLoading, 
+  getAnimesError
 } from '../../../redux/reducers/animesRedux'
 import noImage from '../../../assets/no-image.png'
 import CharacterCard from '../../features/CharacterCard/CharacterCard'
@@ -17,16 +18,17 @@ import Button from '../../common/Button/Button'
 const Anime = () => {
   const { slug } = useParams()
   const dispatch = useDispatch()
-
   const loading = useSelector(getAnimesLoading)
-  
   const anime = useSelector(getSelectedAnime)
+  const error = useSelector(getAnimesError)
 
   useEffect(() => {
     if (!slug) return
     dispatch(fetchAnimeBySlug(slug))
   }, [dispatch, slug])
+  
   if (loading || !anime) return <p>Loading...</p>
+  if (error) return <p>Error: {error}</p>
 
   return (
     <div className={styles.root}>
