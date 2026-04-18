@@ -15,6 +15,7 @@ import { fetchProfile, getUser } from './redux/reducers/userRedux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
+import Character from './components/pages/Character/Character';
 
 function App() {
   const dispatch = useDispatch()
@@ -34,6 +35,8 @@ function App() {
         <Routes>
           <Route path="/" element={<Home/>} />
           <Route path='/anime/:slug' element={<Anime/>} />
+
+          <Route path='/character/:id' element={<Character/>} />
 
           <Route path='/Signup' element={<Signup/>} />
           <Route path='/Login' element={<Login/>} />
