@@ -2,32 +2,32 @@ import styles from './Character.module.scss'
 import { useParams } from 'react-router-dom'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
-//import {
-//  fetchcharacterBySlug,
-//  getSelectedcharacter,
-//  getcharactersLoading, 
-//  getcharactersError
-//} from '../../../redux/reducers/charactersRedux'
 import noImage from '../../../assets/no-image.png'
-import CharacterCard from '../../features/CharacterCard/CharacterCard'
-import SeasonCard from '../../features/SeasonCard/SeasonCard'
-import ReviewCard from '../../features/ReviewCard/ReviewCard'
 import Container from '../../common/container/Container'
 import Button from '../../common/Button/Button'
+import { 
+  fetchCharacterById,
+  getCharactersError, 
+  getCharactersLoading, 
+  getSelectedCharacter 
+} from '../../../redux/reducers/charactersRedux'
 
 const Character = () => {
-  const { slug } = useParams()
+  const { id } = useParams()
   const dispatch = useDispatch()
 
-  /** 
-  const loading = useSelector(getcharactersLoading)
-  const character = useSelector(getSelectedcharacter)
-  const error = useSelector(getcharactersError)
+  const loading = useSelector(getCharactersLoading)
+  const character = useSelector(getSelectedCharacter)
+  const error = useSelector(getCharactersError)
 
+  console.log("CHAR:", character);
+  console.log("LOADING:", loading);
+  console.log("ERROR:", error);
+  
   useEffect(() => {
-    if (!slug) return
-    dispatch(fetchcharacterBySlug(slug))
-  }, [dispatch, slug])
+    if (!id) return
+    dispatch(fetchCharacterById(id))
+  }, [dispatch, id])
   
   if (loading || !character) return <p>Loading...</p>
   if (error) return <p>Error: {error}</p>
@@ -35,7 +35,7 @@ const Character = () => {
   return (
     <div className={styles.root}>
       <Container>
-        <h1>{character.anime.title}</h1>
+        <h1>{character.anime?.title}</h1>
 
         <img
           src={character.photo || noImage}
@@ -57,16 +57,6 @@ const Character = () => {
     </div>
   )
   
-  */
-
-  return (
-    <div className={styles.root}>
-      <Container>
-        <h1>character</h1>
-        <Button to="/">Back to home</Button>
-      </Container>
-    </div>
-  )
 }
 
 export default Character;

@@ -1,12 +1,14 @@
 import { createStore, combineReducers, applyMiddleware, compose } from 'redux'
-import { thunk } from 'redux-thunk'
-import homeReducer from "./reducers/homeSliceRedux";
-import animesReducer from './reducers/animesRedux'
-import userReducer from './reducers/userRedux'
+import { thunk } from 'redux-thunk';
+import homeReducer from './reducers/homeSliceRedux';
+import animesReducer from './reducers/animesRedux';
+import charactersReducer from './reducers/charactersRedux';
+import userReducer from './reducers/userRedux';
 
 const reducer = combineReducers({
   home: homeReducer,
   animes: animesReducer,
+  characters: charactersReducer,
   user: userReducer
 })
 
