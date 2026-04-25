@@ -18,7 +18,7 @@ const softDelete = require("../utils/softDelete.plugin");
 const UserSchema = new mongoose.Schema(
   {
     /** Unique login of the user */
-    login: { type: String, required: true, unique: true, trim: true },
+    login: { type: String, required: true, unique: true, trim: true, lowercase: true },
 
     /** Hashed password (excluded by default in queries) */
     password: { type: String, required: true, select: false },
@@ -30,10 +30,38 @@ const UserSchema = new mongoose.Schema(
     description: { type: String, trim: true },
 
     /** Unique email of the user */
-    email: { type: String, required: true, unique: true, trim: true },
+    email: { type: String, required: true, unique: true, trim: true, lowercase: true, match: [/^\S+@\S+\.\S+$/, 'Please use a valid email address'] },
 
     /** Birth year of the user */
     birth_year: { type: Number },
+
+    /** Preferred user settings */
+    preferences: {
+      version: { type: Number, default: 1 },
+    
+      ui: {
+        theme: { type: String, enum: ['light', 'dark'], default: 'light' },
+        language: { type: String, enum: ['en', 'pl'], default: 'en' },
+        defaultView: { type: String, enum: ['grid', 'list'], default: 'grid' },
+        autoPlay: { type: Boolean, default: false },
+      },
+    
+      content: {
+        showNsfw: { type: Boolean, default: false },
+        hideSpoilers: { type: Boolean, default: true },
+        preferredGenres: [{ type: String }],
+      },
+    
+      behavior: {
+        defaultSort: { type: String, enum: ['rating', 'newest'], default: 'rating' },
+      },
+    
+      notifications: {
+        email: { type: Boolean, default: false },
+        inApp: { type: Boolean, default: false },
+        push: { type: Boolean, default: false },
+      },
+    },
 
     /** URL to avatar image */
     avatar: { type: String, trim: true },
@@ -96,6 +124,16 @@ UserSchema.pre("save", async function (next) {
 UserSchema.index(
   { slug: 1 },
   { partialFilterExpression: { is_deleted: { $ne: true } } }
+);
+
+UserSchema.index(
+  { email: 1 },
+  { unique: true, partialFilterExpression: { is_deleted: { $ne: true } } }
+);
+
+UserSchema.index(
+  { login: 1 },
+  { unique: true, partialFilterExpression: { is_deleted: { $ne: true } } }
 );
 
 /* =====================================================

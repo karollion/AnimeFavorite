@@ -20,10 +20,6 @@ const Character = () => {
   const character = useSelector(getSelectedCharacter)
   const error = useSelector(getCharactersError)
 
-  console.log("CHAR:", character);
-  console.log("LOADING:", loading);
-  console.log("ERROR:", error);
-  
   useEffect(() => {
     if (!id) return
     dispatch(fetchCharacterById(id))

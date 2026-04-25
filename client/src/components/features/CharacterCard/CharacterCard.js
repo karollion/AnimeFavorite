@@ -6,7 +6,6 @@ import { Link } from 'react-router-dom'
 
 const CharacterCard = ({ character }) => {
 
-  console.log (character)
   return (
     <Col xs="12" sm="6" md="3" lg="2" className="mb-4">
       <div
