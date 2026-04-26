@@ -11,11 +11,13 @@ import Logout from './components/pages/Logout/Logout';
 import Signup from './components/pages/Signup/Signup';
 import Profile from './components/pages/Profile/Profile';
 import ProtectedRoute from './components/routing/ProtectedRoute';
+import Character from './components/pages/Character/Character';
+import Settings from './components/pages/Settings/Settings';
+
 import { fetchProfile, getUser } from './redux/reducers/userRedux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import { useSelector } from 'react-redux';
-import Character from './components/pages/Character/Character';
 
 function App() {
   const dispatch = useDispatch()
@@ -40,6 +42,8 @@ function App() {
 
           <Route path='/Signup' element={<Signup/>} />
           <Route path='/Login' element={<Login/>} />
+
+          <Route path='/Settings' element={<Settings/>} />
 
           <Route
             path='/Logout'
