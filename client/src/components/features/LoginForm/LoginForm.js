@@ -1,5 +1,5 @@
 import styles from './LoginForm.module.scss';
-import { Form, Row, Col } from 'react-bootstrap';
+import { Form } from 'react-bootstrap';
 import Button from '../../common/Button/Button';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
@@ -46,15 +46,12 @@ const LoginForm = ({ actionText = 'Login' }) => {
       </Form.Group>
 
       {/* ACTIONS */}
-      <Row className="mt-4">
-        <Col className="d-flex gap-3">
-          <Button to="/">Back to home</Button>
-        </Col>
-
-        <Col className="text-end">
-          <Button type="submit">{actionText}</Button>
-        </Col>
-      </Row>
+      <div className={styles.buttons}>
+        <Button type="submit">{actionText}</Button>
+        <p>Don't have an account?</p>
+        <Button to="/Signup">Signup</Button>
+        <Button to="/">Home</Button>
+      </div>
 
     </Form>
   );
