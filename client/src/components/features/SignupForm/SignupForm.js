@@ -4,6 +4,7 @@ import Button from '../../common/Button/Button';
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
+import { registerRequest } from '../../../redux/reducers/userRedux';
 
 const SignupForm = ({ actionText = 'Signup' }) => {
   const dispatch = useDispatch();
@@ -17,8 +18,18 @@ const SignupForm = ({ actionText = 'Signup' }) => {
   } = useForm({});
 
   const onSubmit = async data => {
-  
-    navigate('/');
+    try {
+      await dispatch(registerRequest({
+        login: data.login,
+        password: data.password,
+        email: data.email,
+        birth_year: Number(data.birth_year),
+      }));
+
+      navigate('/Login');
+    } catch (err) {
+      // tutaj komunikat
+    }
   };
 
 
@@ -114,7 +125,7 @@ const SignupForm = ({ actionText = 'Signup' }) => {
       <Form.Group className="mb-3">
         <Form.Label>Birth year</Form.Label>
         <Form.Select
-          {...register('birthyear', { required: true })}
+          {...register('birth_year', { required: true })}
         >
           <option value="">Select birth year</option>
 
@@ -131,7 +142,7 @@ const SignupForm = ({ actionText = 'Signup' }) => {
           )}
         </Form.Select>
         
-        {errors.birthyear && (
+        {errors.birth_year && (
           <small className="text-danger">Birth year is required</small>
         )}
       </Form.Group>

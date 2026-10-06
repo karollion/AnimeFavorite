@@ -102,6 +102,27 @@ export const loginRequest = credentials => async dispatch => {
 };
 
 /**
+ * Register user
+ */
+export const registerRequest = userData => async dispatch => {
+  dispatch(fetchStart());
+
+  try {
+    const res = await api.post('/auth/register', userData);
+
+    return res.data;
+  } catch (err) {
+    dispatch(
+      fetchError(
+        err.response?.data?.message || 'Registration failed'
+      )
+    );
+
+    throw err;
+  }
+};
+
+/**
  * Logout user
  * POST /api/auth/logout
  */

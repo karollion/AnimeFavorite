@@ -31,6 +31,8 @@ const asyncHandler = require("../utils/asyncHandler");
  */
 exports.register = asyncHandler(async (req, res) => {
   const { login, password, description, email, birth_year } = req.body;
+  const cleanLogin = login.trim().toLowerCase();
+  const cleanEmail = email.trim().toLowerCase();
 
   /* ---------- VALIDATION ---------- */
 
@@ -51,12 +53,20 @@ exports.register = asyncHandler(async (req, res) => {
 
   /* ---------- UNIQUE CHECK ---------- */
 
-  const existingUser = await User.findOne({ login });
+  const existingUser = await User.findOne({
+    login: cleanLogin,
+    is_deleted: { $ne: true },
+  });
+
   if (existingUser) {
     return res.status(409).json({ message: "Login already exists" });
   }
 
-  const existingEmail = await User.findOne({ email });
+  const existingEmail = await User.findOne({
+    email: cleanEmail,
+    is_deleted: { $ne: true },
+  });
+
   if (existingEmail) {
     return res.status(409).json({ message: "Email already exists" });
   }
@@ -64,13 +74,13 @@ exports.register = asyncHandler(async (req, res) => {
   /* ---------- CREATE USER ---------- */
 
   const user = await User.create({
-    login: login.trim(),
+    login: cleanLogin,
     password: await bcrypt.hash(
       password,
       Number(process.env.BCRYPT_ROUNDS)
     ),
     description,
-    email,
+    email: cleanEmail,
     birth_year: Number(birth_year),
   });
 
