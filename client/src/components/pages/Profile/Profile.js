@@ -30,6 +30,7 @@ const Profile = () => {
             className={styles.img}
           />
           <div>
+            <Button to="/Profile">Edit</Button>
             <p>Login: {user.login}</p>
             <p>Role: {user.role}</p>
             <p>Email: {user.email}</p>

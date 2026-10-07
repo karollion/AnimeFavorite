@@ -36,7 +36,7 @@ const NavBar = () => {
                 
                 {user?.role === 'admin' && (<Button to="/anime/AddAnime">Add New</Button>)}
                 
-                <Button to="/Settings">Settings</Button>
+                {user ? (<Button to="/Settings">Settings</Button>) : null }
                 
               </Nav>
             </Navbar.Collapse>
