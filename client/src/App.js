@@ -14,21 +14,19 @@ import ProtectedRoute from './components/routing/ProtectedRoute';
 import Character from './components/pages/Character/Character';
 import Settings from './components/pages/Settings/Settings';
 
-import { fetchProfile, getUser } from './redux/reducers/userRedux';
+import { fetchProfile } from './redux/reducers/userRedux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import { useSelector } from 'react-redux';
+//import { useSelector } from 'react-redux';
 
 function App() {
   const dispatch = useDispatch()
 
-  const user = useSelector(getUser);
+  //const user = useSelector(getUser);
 
   useEffect(() => {
-    if (user?.id) {
-      dispatch(fetchProfile());
-    }
-  }, [user?.id]);
+    dispatch(fetchProfile());
+  }, [dispatch]);
 
   return (
     <div>

@@ -15,15 +15,15 @@ const api = axios.create({
    ===================================================== */
 
 api.interceptors.request.use(async config => {
-    const token = localStorage.getItem("token");
+    //const token = localStorage.getItem("token");
 
     if (process.env.NODE_ENV === 'development') {
       await new Promise(res => setTimeout(res, 1000));
     }
 
-    if (token) {
-      config.headers.Authorization = `Bearer ${token}`;
-    }
+    //if (token) {
+    //  config.headers.Authorization = `Bearer ${token}`;
+    //}
 
     return config;
   },
