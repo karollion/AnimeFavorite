@@ -55,7 +55,7 @@ const Settings = () => {
               <div className={styles.row}>
                 <span>Auto Play</span>
         
-                <Form.Switch />
+                <Form.Switch className={styles.switch} />
               </div>
         
               <div className={styles.row}>
@@ -78,13 +78,13 @@ const Settings = () => {
               <div className={styles.row}>
                 <span>Show NSFW</span>
         
-                <Form.Switch />
+                <Form.Switch className={styles.switch} />
               </div>
         
               <div className={styles.row}>
                 <span>Hide Spoilers</span>
         
-                <Form.Switch defaultChecked />
+                <Form.Switch className={styles.switch} defaultChecked />
               </div>
         
               <div className={`${styles.row} ${styles.genresRow}`}>
@@ -114,19 +114,19 @@ const Settings = () => {
               <div className={styles.row}>
                 <span>Email</span>
         
-                <Form.Switch />
+                <Form.Switch className={styles.switch} />
               </div>
         
               <div className={styles.row}>
                 <span>In App</span>
         
-                <Form.Switch defaultChecked />
+                <Form.Switch className={styles.switch} defaultChecked />
               </div>
         
               <div className={styles.row}>
                 <span>Push</span>
         
-                <Form.Switch />
+                <Form.Switch className={styles.switch} />
               </div>
             </div>
         
