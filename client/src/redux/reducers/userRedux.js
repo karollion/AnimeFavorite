@@ -169,8 +169,14 @@ export const updateProfileRequest = updates => async dispatch => {
   try {
     const res = await api.put('/auth/me', updates);
     dispatch(updateProfileSuccess(res.data));
+
+    return res.data;
   } catch (err) {
-    dispatch(fetchError(err.message));
+    dispatch(fetchError(
+      err.response?.data?.message || err.message
+    ));
+
+    throw err;
   }
 };
 

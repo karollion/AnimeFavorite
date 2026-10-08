@@ -145,6 +145,7 @@ exports.login = asyncHandler(async (req, res) => {
         login: user.login,
         role: user.role,
         avatar: user.avatar,
+        preferences: user.preferences
       });
     });
 
@@ -189,6 +190,7 @@ exports.getProfile = asyncHandler(async (req, res) => {
   birth_year: user.birth_year,
   avatar: user.avatar,
   favorite_characters: user.favorite_characters,
+  preferences: user.preferences,
 });
 });
 
@@ -380,6 +382,7 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     "description",
     "email",
     "birth_year",
+    "preferences",
   ];
 
   const filteredUpdates = pick(req.body, allowedFields);
@@ -421,6 +424,39 @@ exports.updateProfile = asyncHandler(async (req, res) => {
         .json({ message: "Email already in use" });
     }
   }
+
+  if (filteredUpdates.preferences) {
+  const p = filteredUpdates.preferences;
+
+  filteredUpdates.preferences = {
+    version: 1,
+
+    ui: {
+      theme: p.ui?.theme,
+      language: p.ui?.language,
+      defaultView: p.ui?.defaultView,
+      autoPlay: Boolean(p.ui?.autoPlay),
+    },
+
+    content: {
+      showNsfw: Boolean(p.content?.showNsfw),
+      hideSpoilers: Boolean(p.content?.hideSpoilers),
+      preferredGenres: Array.isArray(p.content?.preferredGenres)
+        ? p.content.preferredGenres
+        : [],
+    },
+
+    behavior: {
+      defaultSort: p.behavior?.defaultSort,
+    },
+
+    notifications: {
+      email: Boolean(p.notifications?.email),
+      inApp: Boolean(p.notifications?.inApp),
+      push: Boolean(p.notifications?.push),
+    },
+  };
+}
 
   /* ---------- UPDATE ---------- */
 
