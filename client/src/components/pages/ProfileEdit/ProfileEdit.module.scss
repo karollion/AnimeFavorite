@@ -1,0 +1,97 @@
+@import '../../../styles/settings.scss';
+
+.root {
+  min-height: 100vh;
+  display: flex;
+  flex-direction: column;
+
+  justify-content: center;
+  align-items: center;
+
+  background-color: $homePage-bg-color;
+  color: $color-light;
+
+  .container {
+    max-width: 1100px;
+    padding: 30px 20px;
+  }
+  
+  .title {
+    text-align: center;
+    margin-bottom: 35px;
+  }
+  
+  .grid {
+    row-gap: 25px;
+  }
+  
+  .section {
+    background: $homePage-bg-color;
+    border: 1px solid #ddd;
+    border-radius: 10px;
+    padding: 20px;
+    margin-bottom: 25px;
+    box-shadow: 0 2px 8px rgba(0, 0, 0, 0.08);
+  
+    h2 {
+      font-size: 20px;
+      margin: 0 0 15px;
+      padding-bottom: 12px;
+      border-bottom: 1px solid #ddd;
+    }
+  }
+  
+  .row {
+    display: grid;
+    grid-template-columns: 1fr 180px;
+    align-items: center;
+    min-height: 55px;
+    border-bottom: 1px solid #eee;
+  
+    &:last-child {
+      border-bottom: none;
+    }
+  
+    > span {
+      font-size: 15px;
+    }
+  
+    .form-select {
+      width: 180px;
+      justify-self: end;
+    }
+  
+    .form-check {
+      justify-self: end;
+      margin: 0;
+    }
+  }
+  
+  .genresRow {
+    align-items: start;
+    padding-top: 15px;
+    padding-bottom: 15px;
+  }
+  
+  .genresList {
+    display: grid;
+    grid-template-columns: 1fr 1fr;
+    gap: 8px 15px;
+  
+    .form-check {
+      justify-self: start;
+      margin: 0;
+    }
+  }
+  
+  .actions {
+    display: flex;
+    justify-content: center;
+    gap: 15px;
+    margin-top: 10px;
+  }
+
+  .switch {
+    justify-self: end;
+  }
+}

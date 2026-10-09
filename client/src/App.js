@@ -17,6 +17,7 @@ import Settings from './components/pages/Settings/Settings';
 import { fetchProfile } from './redux/reducers/userRedux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import ProfileEdit from './components/pages/ProfileEdit/ProfileEdit';
 //import { useSelector } from 'react-redux';
 
 function App() {
@@ -57,6 +58,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path='/ProfileEdit'
+            element={
+              <ProtectedRoute>
+                <ProfileEdit />
               </ProtectedRoute>
             }
           />
