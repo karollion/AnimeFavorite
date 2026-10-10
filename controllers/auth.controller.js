@@ -398,16 +398,22 @@ exports.updateProfile = asyncHandler(async (req, res) => {
     filteredUpdates.email = filteredUpdates.email.trim();
   }
 
-  if (filteredUpdates.birth_year !== undefined) {
-    if (!Number.isInteger(Number(filteredUpdates.birth_year))) {
-      return res
-        .status(400)
-        .json({ message: "Invalid birth_year" });
+  if (filteredUpdates.birth_year === null || filteredUpdates.birth_year === '') {
+    filteredUpdates.birth_year = undefined;
+  } else if (filteredUpdates.birth_year !== undefined) {
+    const year = Number(filteredUpdates.birth_year);
+  
+    if (
+      !Number.isInteger(year) ||
+      year < 1900 ||
+      year > new Date().getFullYear()
+    ) {
+      return res.status(400).json({
+        message: 'Invalid birth_year',
+      });
     }
-
-    filteredUpdates.birth_year = Number(
-      filteredUpdates.birth_year
-    );
+  
+    filteredUpdates.birth_year = year;
   }
 
   /* ---------- EMAIL UNIQUENESS ---------- */
