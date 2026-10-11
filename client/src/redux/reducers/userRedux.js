@@ -84,20 +84,31 @@ export const setStats = payload => ({
  * Login user
  * POST /api/auth/login
  */
+
 export const loginRequest = credentials => async dispatch => {
   dispatch(fetchStart());
 
   try {
-    const res = await api.post('/auth/login', credentials);
+    const loginRes = await api.post('/auth/login', credentials);
 
-    dispatch(loginSuccess(res.data));
+    // Save the basic login response.
+    dispatch(loginSuccess(loginRes.data));
 
-    // 🔥 AUTOMATYCZNIE pobierz stats po loginie
+    // Immediately load the complete user profile.
+    const profileRes = await api.get('/auth/me');
+    dispatch(profileSuccess(profileRes.data));
+
+    // Load user statistics.
     const statsRes = await api.get('/auth/me/stats');
     dispatch(setStats(statsRes.data));
 
+    return profileRes.data;
   } catch (err) {
-    dispatch(fetchError(err.response?.data?.message || 'Login failed'));
+    dispatch(fetchError(
+      err.response?.data?.message || 'Login failed'
+    ));
+
+    throw err;
   }
 };
 
