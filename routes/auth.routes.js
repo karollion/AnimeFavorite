@@ -83,6 +83,14 @@ router.put(
  */
 router.put('/me', authMiddleware, auth.updateProfile);
 
+/**
+ * @route   PUT /api/auth/me/password
+ * @desc    Update user's password 
+ * @access  Private
+ * @middleware authMiddleware
+ */
+router.put('/me/password', authMiddleware, auth.changePassword);
+
 /* =====================================================
    EXPORT ROUTER
    ===================================================== */

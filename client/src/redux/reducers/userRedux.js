@@ -192,6 +192,20 @@ export const updateProfileRequest = updates => async dispatch => {
 };
 
 /**
+ * Update Password
+ * PUT /api/auth/me/password
+ */
+export const updatePasswordRequest = credentials => async () => {
+  try {
+    const res = await api.put('/auth/me/password', credentials);
+    return res.data;
+  } catch (err) {
+    // Pozwalamy komponentowi wyświetlić komunikat błędu.
+    throw err;
+  }
+};
+
+/**
  * Upload avatar
  * PUT /api/auth/me/avatar
  */

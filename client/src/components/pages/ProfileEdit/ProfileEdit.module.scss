@@ -120,4 +120,20 @@
     margin-top: 1rem;
     color: #dc3545;
   }
+  
+  .passwordSection {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--border-color, #ccc);
+  }
+
+  .success {
+    color: #198754;
+    margin: 1rem 0;
+  }
+
+  .error {
+    color: #dc3545;
+    margin: 1rem 0;
+  }
 }

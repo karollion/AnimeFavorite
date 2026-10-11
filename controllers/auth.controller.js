@@ -474,3 +474,85 @@ exports.updateProfile = asyncHandler(async (req, res) => {
 
   res.json(user);
 });
+
+/* =====================================================
+   UPDATE USER PASSWORD
+   ===================================================== */
+
+/**
+ * Update user password
+ * @route   PUT /api/auth/me/password
+ * @access  Private
+ */
+exports.changePassword = async (req, res) => {
+  try {
+    const { currentPassword, newPassword } = req.body;
+    const userId = req.session?.user?.id;
+
+    if (!userId) {
+      return res.status(401).json({
+        message: 'Musisz być zalogowany.',
+      });
+    }
+
+    if (
+      typeof currentPassword !== 'string' ||
+      typeof newPassword !== 'string'
+    ) {
+      return res.status(400).json({
+        message: 'Podaj aktualne i nowe hasło.',
+      });
+    }
+
+    if (newPassword.length < 8) {
+      return res.status(400).json({
+        message: 'Nowe hasło musi mieć co najmniej 8 znaków.',
+      });
+    }
+
+    if (newPassword.length > 128) {
+      return res.status(400).json({
+        message: 'Nowe hasło jest zbyt długie.',
+      });
+    }
+
+    if (currentPassword === newPassword) {
+      return res.status(400).json({
+        message: 'Nowe hasło musi różnić się od aktualnego.',
+      });
+    }
+
+    // Pole password może mieć w schemacie select: false.
+    const user = await User.findById(userId).select('+password');
+
+    if (!user) {
+      return res.status(404).json({
+        message: 'Nie znaleziono użytkownika.',
+      });
+    }
+
+    const passwordMatches = await bcrypt.compare(
+      currentPassword,
+      user.password
+    );
+
+    if (!passwordMatches) {
+      return res.status(400).json({
+        message: 'Aktualne hasło jest nieprawidłowe.',
+      });
+    }
+
+    user.password = await bcrypt.hash(newPassword, 12);
+    await user.save();
+
+    return res.status(200).json({
+      message: 'Hasło zostało zmienione.',
+    });
+  } catch (error) {
+    console.error('changePassword error:', error);
+
+    return res.status(500).json({
+      message: 'Wystąpił błąd podczas zmiany hasła.',
+    });
+  }
+};

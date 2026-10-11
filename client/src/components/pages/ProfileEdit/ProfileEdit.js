@@ -13,6 +13,7 @@ import {
   getUser,
   updateProfileRequest,
   updateAvatarRequest,
+  updatePasswordRequest,
 } from '../../../redux/reducers/userRedux';
 
 const ProfileEdit = () => {
@@ -23,6 +24,7 @@ const ProfileEdit = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [avatarFile, setAvatarFile] = useState(null);
   const [avatarError, setAvatarError] = useState('');
+  const [passwordStatus, setPasswordStatus] = useState(null);
 
   const currentYear = new Date().getFullYear();
 
@@ -30,7 +32,10 @@ const ProfileEdit = () => {
     register,
     handleSubmit,
     reset,
-    formState: { errors, isDirty },
+    formState: {
+      errors,
+      isDirty,
+    },
   } = useForm({
     defaultValues: {
       email: '',
@@ -38,6 +43,47 @@ const ProfileEdit = () => {
       description: '',
     },
   });
+
+  const {
+    register: registerPassword,
+    handleSubmit: handlePasswordSubmit,
+    watch: watchPassword,
+    reset: resetPassword,
+    formState: {
+      errors: passwordErrors,
+      isSubmitting: isChangingPassword,
+    },
+  } = useForm({
+    defaultValues: {
+      currentPassword: '',
+      newPassword: '',
+      confirmPassword: '',
+    },
+  });
+
+  const onPasswordSubmit = async data => {
+    setPasswordStatus(null);
+    
+    try {
+      await dispatch(updatePasswordRequest({
+        currentPassword: data.currentPassword,
+        newPassword: data.newPassword,
+      }));
+    
+      resetPassword();
+      setPasswordStatus({
+        type: 'success',
+        message: 'Hasło zostało zmienione.',
+      });
+    } catch (error) {
+      setPasswordStatus({
+        type: 'error',
+        message:
+          error.response?.data?.message ||
+          'Nie udało się zmienić hasła.',
+      });
+    }
+  };
 
   useEffect(() => {
     if (!user) return;
@@ -270,12 +316,8 @@ const ProfileEdit = () => {
           </Row>
 
           <div className={styles.actions}>
-            <Button type="submit" disabled={isSaving}>
+            <Button type="submit" active={!isSaving}>
               {isSaving ? 'Saving...' : 'Save changes'}
-            </Button>
-
-            <Button to="/">
-              Back to home
             </Button>
           </div>
 
@@ -292,6 +334,92 @@ const ProfileEdit = () => {
           )}
         </Container>
       </Form>
+      <section className={styles.passwordSection}>
+         <h2>Change Password</h2>
+         <Form onSubmit={handlePasswordSubmit(onPasswordSubmit)}>
+           <Form.Group className="mb-3">
+             <Form.Label>Current password</Form.Label>
+             <Form.Control
+               type="password"
+               autoComplete="current-password"
+               {...registerPassword('currentPassword', {
+                 required: 'Podaj aktualne hasło.',
+               })}
+               isInvalid={!!passwordErrors.currentPassword}
+             />
+             <Form.Control.Feedback type="invalid">
+               {passwordErrors.currentPassword?.message}
+             </Form.Control.Feedback>
+           </Form.Group>
+             
+           <Form.Group className="mb-3">
+             <Form.Label>New password</Form.Label>
+             
+             <Form.Control
+               type="password"
+               autoComplete="new-password"
+               {...registerPassword('newPassword', {
+                 required: 'Podaj nowe hasło.',
+                 minLength: {
+                   value: 8,
+                   message: 'Hasło musi mieć co najmniej 8 znaków.',
+                 },
+                 validate: value =>
+                   value !== watchPassword('currentPassword') ||
+                   'Nowe hasło musi różnić się od aktualnego.',
+               })}
+               isInvalid={!!passwordErrors.newPassword}
+             />
+             <Form.Control.Feedback type="invalid">
+               {passwordErrors.newPassword?.message}
+             </Form.Control.Feedback>
+           </Form.Group>
+             
+           <Form.Group className="mb-3">
+             <Form.Label>Confirm new password</Form.Label>
+             
+             <Form.Control
+               type="password"
+               autoComplete="new-password"
+               {...registerPassword('confirmPassword', {
+                 required: 'Potwierdź nowe hasło.',
+                 validate: value =>
+                   value === watchPassword('newPassword') ||
+                   'Hasła nie są identyczne.',
+               })}
+               isInvalid={!!passwordErrors.confirmPassword}
+             />
+             <Form.Control.Feedback type="invalid">
+               {passwordErrors.confirmPassword?.message}
+             </Form.Control.Feedback>
+           </Form.Group>
+             
+           {passwordStatus && (
+             <p
+               className={
+                 passwordStatus.type === 'success'
+                   ? styles.success
+                   : styles.error
+               }
+               role="status"
+             >
+               {passwordStatus.message}
+             </p>
+           )}
+           <Button
+             type="submit"
+             active={!isChangingPassword}
+           >
+             {isChangingPassword ? 'Changing...' : 'Change Password'}
+           </Button>
+         </Form>
+       </section>
+
+       <div className={styles.actions}>
+         <Button to="/">
+           Back to home
+         </Button>
+       </div>
     </div>
   );
 };
