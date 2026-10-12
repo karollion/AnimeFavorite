@@ -8,6 +8,9 @@ import {
   getAnimesLoading, 
   getAnimesError
 } from '../../../redux/reducers/animesRedux'
+import {
+  getUser
+} from '../../../redux/reducers/userRedux';
 import noImage from '../../../assets/no-image.png'
 import CharacterCard from '../../features/CharacterCard/CharacterCard'
 import SeasonCard from '../../features/SeasonCard/SeasonCard'
@@ -21,6 +24,7 @@ const Anime = () => {
   const loading = useSelector(getAnimesLoading)
   const anime = useSelector(getSelectedAnime)
   const error = useSelector(getAnimesError)
+  const user = useSelector(getUser);
 
   useEffect(() => {
     if (!slug) return
@@ -51,6 +55,8 @@ const Anime = () => {
         <p>Rating avg: {anime.rating_avg}</p>
         <p>Rating count: {anime.rating_count}</p>
         <p>Description: {anime.description_short}</p>
+
+        {user?.role === 'admin' && (<Button to={"/animes/AnimeEdit/" + anime._id}>Edit</Button>)}
 
         <p>Characters:</p>
         <div className={styles.characters}>
