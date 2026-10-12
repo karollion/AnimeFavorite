@@ -18,6 +18,7 @@ import { fetchProfile } from './redux/reducers/userRedux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import ProfileEdit from './components/pages/ProfileEdit/ProfileEdit';
+import EditAnime from './components/pages/EditAnime/EditAnime';
 //import { useSelector } from 'react-redux';
 
 function App() {
@@ -76,6 +77,15 @@ function App() {
             element={
               <ProtectedRoute role="admin">
                 <AddAnime />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path='/anime/EditAnime/:slug'
+            element={
+              <ProtectedRoute role="admin">
+                <EditAnime />
               </ProtectedRoute>
             }
           />

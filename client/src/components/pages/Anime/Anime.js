@@ -56,7 +56,7 @@ const Anime = () => {
         <p>Rating count: {anime.rating_count}</p>
         <p>Description: {anime.description_short}</p>
 
-        {user?.role === 'admin' && (<Button to={"/animes/AnimeEdit/" + anime._id}>Edit</Button>)}
+        {user?.role === 'admin' && (<Button to={"/anime/EditAnime/" + anime.slug}>Edit</Button>)}
 
         <p>Characters:</p>
         <div className={styles.characters}>
