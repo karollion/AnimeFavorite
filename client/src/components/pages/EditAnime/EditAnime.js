@@ -17,7 +17,7 @@ import styles from './EditAnime.module.scss'
    ===================================================== */
 
 import { useParams } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useState, useEffect } from 'react';
 
 /* =====================================================
    REDUX STATE MANAGEMENT
@@ -28,8 +28,10 @@ import {
   fetchAnimeBySlug,
   getSelectedAnime,
   getAnimesLoading,
-  getAnimesError
-} from '../../../redux/reducers/animesRedux'
+  getAnimesError,
+  updateAnimeRequest,
+  updateAnimeCoverRequest,
+} from '../../../redux/reducers/animesRedux';
 
 /* =====================================================
    COMPONENTS
@@ -52,88 +54,92 @@ import Container from '../../common/container/Container'
  * @returns {JSX.Element} The edit anime page.
  */
 const EditAnime = () => {
+   const [isSaving, setIsSaving] = useState(false);
+   const [saveError, setSaveError] = useState('');
 
-  /* =====================================================
-     ROUTE PARAMETERS
-     ===================================================== */
 
-  /**
-   * Slug identifying the anime to be edited.
-   * @type {string | undefined}
-   */
-  const { slug } = useParams()
+   const { slug } = useParams()
+   const dispatch = useDispatch()
 
-  /* =====================================================
-     REDUX STATE AND DISPATCH
-     ===================================================== */
+   const loading = useSelector(getAnimesLoading)
+   const anime = useSelector(getSelectedAnime)
+   const error = useSelector(getAnimesError)
 
-  /**
-   * Redux dispatch function used to trigger anime data requests.
-   */
-  const dispatch = useDispatch()
+   /* =====================================================
+      DATA FETCHING
+      ===================================================== */
 
-  /**
-   * Indicates whether anime data is currently being loaded.
-   */
-  const loading = useSelector(getAnimesLoading)
+   /**
+    * Fetches anime details whenever the URL slug changes.
+    * Skips the request if no slug is available.
+    *
+    * @dependency dispatch - Redux dispatch function.
+    * @dependency slug - Identifier of the anime to be edited.
+    */
+   useEffect(() => {
+     if (!slug) return
+     dispatch(fetchAnimeBySlug(slug))
+   }, [dispatch, slug])
 
-  /**
-   * Anime entity currently selected in the Redux store.
-   */
-  const anime = useSelector(getSelectedAnime)
+   /* =====================================================
+      LOADING AND ERROR HANDLING
+      ===================================================== */
 
-  /**
-   * Error returned by the anime data fetching process, if any.
-   */
-  const error = useSelector(getAnimesError)
+   if (loading) return <p>Loading...</p>;
 
-  /* =====================================================
-     DATA FETCHING
-     ===================================================== */
+   if (error) return <p>Error: {error}</p>;
 
-  /**
-   * Fetches anime details whenever the URL slug changes.
-   * Skips the request if no slug is available.
-   *
-   * @dependency dispatch - Redux dispatch function.
-   * @dependency slug - Identifier of the anime to be edited.
-   */
-  useEffect(() => {
-    if (!slug) return
-    dispatch(fetchAnimeBySlug(slug))
-  }, [dispatch, slug])
+   if (!anime) return <p>Anime not found.</p>;
 
-  /* =====================================================
-     LOADING AND ERROR HANDLING
-     ===================================================== */
+   const handleEditAnime = async (data, cover) => {
+      setIsSaving(true);
+      setSaveError('');
 
-  /**
-   * Displays a loading message while the request is in progress
-   * or while the selected anime data is not yet available.
-   */
-  if (loading || !anime) return <p>Loading...</p>
+      try {
+        await dispatch(updateAnimeRequest({
+          ...data,
+          _id: anime._id,
+        }));
 
-  /**
-   * Displays an error message if the anime request has failed.
-   */
-  if (error) return <p>Error: {error}</p>
+        if (cover) {
+          await dispatch(updateAnimeCoverRequest(anime._id, cover));
+        }
 
-  /* =====================================================
-     EDIT ANIME FORM
-     ===================================================== */
+        // Ponownie pobierz dane, w tym aktualną okładkę.
+        await dispatch(fetchAnimeBySlug(slug));
+      } catch (err) {
+        setSaveError(
+          err.response?.data?.message ||
+          'Failed to update anime.'
+        );
+      } finally {
+        setIsSaving(false);
+      }
+    };
 
-  return (
-    <div className={styles.root}>
-      <Container>
+   /* =====================================================
+      EDIT ANIME FORM
+      ===================================================== */
 
-        {/* Page heading */}
+   return (
+     <div className={styles.root}>
+       <Container>
+
+         {/* Page heading */}
         <h1>Edit anime</h1>
 
         {/* Title of the anime currently being edited */}
         <h3>{anime.title}</h3>
 
         {/* Form initialized with the selected anime's data */}
-        <AnimeForm anime={anime} />
+        {saveError && <p className="text-danger">{saveError}</p>}
+
+         <AnimeForm
+           anime={anime}
+           onSubmit={handleEditAnime}
+           submitText="Save changes"
+           isSaving={isSaving}
+         />
 
       </Container>
     </div>

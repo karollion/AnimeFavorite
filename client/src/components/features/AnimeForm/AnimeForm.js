@@ -1,45 +1,64 @@
 import styles from './AnimeForm.module.scss';
+import { useEffect } from 'react';
 import { Form, Row, Col } from 'react-bootstrap';
 import Button from '../../common/Button/Button';
 import { useForm } from 'react-hook-form';
 
-const AnimeForm = ({ action, actionText = 'Save', defaultValues = {} }) => {
-
+const AnimeForm = ({
+  anime = null,
+  onSubmit,
+  submitText = 'Save',
+  isSaving = false,
+}) => {
   const {
     register,
     handleSubmit,
+    reset,
     formState: { errors },
   } = useForm({
     defaultValues: {
-      title: defaultValues.title || '',
-      original_title: defaultValues.original_title || '',
-      age_rating: defaultValues.age_rating || 0,
-      type: defaultValues.type || '',
-      world: defaultValues.world || '',
-      genres: defaultValues.genres?.join(', ') || '',
-      categories: defaultValues.categories?.join(', ') || '',
-      description_short: defaultValues.description_short || '',
-      status: defaultValues.status || 'not watched',
+      title: '',
+      original_title: '',
+      age_rating: 0,
+      type: '',
+      world: '',
+      genres: '',
+      categories: '',
+      description_short: '',
     },
   });
 
-  const onSubmit = data => {
+  useEffect(() => {
+    reset({
+      title: anime?.title || '',
+      original_title: anime?.original_title || '',
+      age_rating: anime?.age_rating ?? 0,
+      type: anime?.type || '',
+      world: anime?.world || '',
+      genres: anime?.genres?.join(', ') || '',
+      categories: anime?.categories?.join(', ') || '',
+      description_short: anime?.description_short || '',
+    });
+  }, [anime, reset]);
+
+  const handleFormSubmit = async data => {
     const payload = {
       ...data,
       age_rating: Number(data.age_rating),
-      genres: data.genres.split(',').map(g => g.trim()),
-      categories: data.categories.split(',').map(c => c.trim()),
+      genres: data.genres
+        .split(',')
+        .map(value => value.trim())
+        .filter(Boolean),
+      categories: data.categories
+        .split(',')
+        .map(value => value.trim())
+        .filter(Boolean),
     };
 
-    if (data.anime_cover?.length) {
-      payload.anime_cover = data.anime_cover[0];
-    }
-
-    action(payload);
-  };
+    const cover = data.anime_cover?.[0] || null;
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} className={styles.root}>
+    <Form onSubmit={handleSubmit(handleFormSubmit)} className={styles.root}>
 
       {/* TITLE */}
       <Form.Group className="mb-3">
@@ -124,14 +143,29 @@ const AnimeForm = ({ action, actionText = 'Save', defaultValues = {} }) => {
 
       {/* COVER */}
       <Form.Group className="mb-4">
-        <Form.Label>Anime cover *</Form.Label>
+        <Form.Label>
+          Anime cover {anime ? '(optional)' : '*'}
+        </Form.Label>
+                
         <Form.Control
           type="file"
-          accept="image/*"
+          accept="image/jpeg,image/png,image/webp"
           {...register('anime_cover', {
-            validate: files =>
-              !files?.length ||
-              ['image/jpeg', 'image/png', 'image/webp'].includes(files[0]?.type),
+            validate: files => {
+              if (!files?.length) return true;
+            
+              const file = files[0];
+            
+              if (!['image/jpeg', 'image/png', 'image/webp'].includes(file.type)) {
+                return 'Choose a JPG, PNG or WebP image.';
+              }
+            
+              if (file.size > 5 * 1024 * 1024) {
+                return 'The image must not exceed 5 MB.';
+              }
+            
+              return true;
+            },
           })}
         />
       </Form.Group>
@@ -143,7 +177,9 @@ const AnimeForm = ({ action, actionText = 'Save', defaultValues = {} }) => {
         </Col>
 
         <Col className="text-end">
-          <Button type="submit">{actionText}</Button>
+          <Button type="submit" active={!isSaving}>
+            {isSaving ? 'Saving...' : submitText}
+          </Button>
         </Col>
       </Row>
 
