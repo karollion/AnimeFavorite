@@ -39,13 +39,14 @@ const AddAnime = () => {
   const [isSaving, setIsSaving] = useState(false);
   const [error, setError] = useState('');
 
-  const handleAddAnime = async (data, cover) => {
+  const handleAddAnime = async ( data ) => {
+    //console.log(data)
     setIsSaving(true);
     setError('');
 
     try {
       const createdAnime = await dispatch(
-        addAnimeRequest(data, cover)
+        addAnimeRequest( data )
       );
 
       navigate(`/anime/${createdAnime.slug}`);

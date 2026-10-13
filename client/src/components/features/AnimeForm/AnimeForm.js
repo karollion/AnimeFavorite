@@ -1,3 +1,12 @@
+/* =====================================================
+   ANIME FORM
+   ===================================================== */
+
+/**
+ * @file AnimeForm.js
+ * @description Reusable form for creating and editing anime information.
+ *              Cover uploads are handled separately by AnimeCoverUpload.
+ */
 
 import styles from './AnimeForm.module.scss';
 import { useEffect } from 'react';
@@ -5,12 +14,32 @@ import { Form, Row, Col } from 'react-bootstrap';
 import Button from '../../common/Button/Button';
 import { useForm } from 'react-hook-form';
 
+/**
+ * @component
+ * @description Renders the anime information form.
+ *
+ * @param {Object} props
+ * @param {Object|null} props.anime - Anime data used to populate edit fields.
+ * @param {Function} props.onSubmit - Callback receiving the anime payload.
+ * @param {string} props.submitText - Submit button label.
+ * @param {boolean} props.isSaving - Indicates whether the form is saving.
+ * @param {boolean} props.showCoverUpload - Reserved for controlling
+ *        cover-related UI in the parent. Cover uploads are intentionally
+ *        handled by a separate component.
+ *
+ * @returns {JSX.Element}
+ */
 const AnimeForm = ({
   anime = null,
   onSubmit,
   submitText = 'Save',
   isSaving = false,
 }) => {
+
+  /* =====================================================
+     FORM INITIALIZATION
+     ===================================================== */
+
   const {
     register,
     handleSubmit,
@@ -29,6 +58,10 @@ const AnimeForm = ({
     },
   });
 
+  /* =====================================================
+     FORM DATA SYNCHRONIZATION
+     ===================================================== */
+
   useEffect(() => {
     reset({
       title: anime?.title || '',
@@ -42,6 +75,14 @@ const AnimeForm = ({
     });
   }, [anime, reset]);
 
+  /* =====================================================
+     FORM SUBMISSION
+     ===================================================== */
+
+  /**
+   * Converts form values into the payload expected by the API.
+   * No image file is included in this request.
+   */
   const handleFormSubmit = async data => {
     const payload = {
       ...data,
@@ -56,15 +97,17 @@ const AnimeForm = ({
         .filter(Boolean),
     };
 
-    const cover = data.anime_cover?.[0] || null;
-
     if (typeof onSubmit !== 'function') {
       console.error('AnimeForm requires an onSubmit function.');
       return;
     }
 
-    await onSubmit(payload, cover);
+    await onSubmit(payload);
   };
+
+  /* =====================================================
+     FORM RENDERING
+     ===================================================== */
 
   return (
     <Form
@@ -74,6 +117,7 @@ const AnimeForm = ({
       {/* TITLE */}
       <Form.Group className="mb-3">
         <Form.Label>Title *</Form.Label>
+
         <Form.Control
           {...register('title', {
             required: 'Title is required.',
@@ -89,6 +133,7 @@ const AnimeForm = ({
           isInvalid={!!errors.title}
           placeholder="Enter title"
         />
+
         <Form.Control.Feedback type="invalid">
           {errors.title?.message}
         </Form.Control.Feedback>
@@ -97,6 +142,7 @@ const AnimeForm = ({
       {/* ORIGINAL TITLE */}
       <Form.Group className="mb-3">
         <Form.Label>Original title</Form.Label>
+
         <Form.Control
           {...register('original_title', {
             minLength: {
@@ -111,6 +157,7 @@ const AnimeForm = ({
           isInvalid={!!errors.original_title}
           placeholder="Original title"
         />
+
         <Form.Control.Feedback type="invalid">
           {errors.original_title?.message}
         </Form.Control.Feedback>
@@ -119,18 +166,26 @@ const AnimeForm = ({
       {/* AGE RATING */}
       <Form.Group className="mb-3">
         <Form.Label>Age rating *</Form.Label>
+
         <Form.Control
           type="number"
           {...register('age_rating', {
             required: 'Age rating is required.',
             valueAsNumber: true,
-            min: { value: 0, message: 'Minimum age rating is 0.' },
-            max: { value: 21, message: 'Maximum age rating is 21.' },
+            min: {
+              value: 0,
+              message: 'Minimum age rating is 0.',
+            },
+            max: {
+              value: 21,
+              message: 'Maximum age rating is 21.',
+            },
             validate: value =>
               Number.isInteger(value) || 'Enter a whole number.',
           })}
           isInvalid={!!errors.age_rating}
         />
+
         <Form.Control.Feedback type="invalid">
           {errors.age_rating?.message}
         </Form.Control.Feedback>
@@ -139,8 +194,11 @@ const AnimeForm = ({
       {/* TYPE */}
       <Form.Group className="mb-3">
         <Form.Label>Type *</Form.Label>
+
         <Form.Select
-          {...register('type', { required: 'Choose an anime type.' })}
+          {...register('type', {
+            required: 'Choose an anime type.',
+          })}
           isInvalid={!!errors.type}
         >
           <option value="">-- choose --</option>
@@ -149,6 +207,7 @@ const AnimeForm = ({
           <option value="OVA">OVA</option>
           <option value="ONA">ONA</option>
         </Form.Select>
+
         <Form.Control.Feedback type="invalid">
           {errors.type?.message}
         </Form.Control.Feedback>
@@ -157,6 +216,7 @@ const AnimeForm = ({
       {/* WORLD */}
       <Form.Group className="mb-3">
         <Form.Label>World</Form.Label>
+
         <Form.Control
           {...register('world', {
             maxLength: {
@@ -166,6 +226,7 @@ const AnimeForm = ({
           })}
           isInvalid={!!errors.world}
         />
+
         <Form.Control.Feedback type="invalid">
           {errors.world?.message}
         </Form.Control.Feedback>
@@ -174,6 +235,7 @@ const AnimeForm = ({
       {/* GENRES */}
       <Form.Group className="mb-3">
         <Form.Label>Genres *</Form.Label>
+
         <Form.Control
           {...register('genres', {
             required: 'Enter at least one genre.',
@@ -184,6 +246,7 @@ const AnimeForm = ({
           isInvalid={!!errors.genres}
           placeholder="action, fantasy, drama"
         />
+
         <Form.Control.Feedback type="invalid">
           {errors.genres?.message}
         </Form.Control.Feedback>
@@ -192,6 +255,7 @@ const AnimeForm = ({
       {/* CATEGORIES */}
       <Form.Group className="mb-3">
         <Form.Label>Categories *</Form.Label>
+
         <Form.Control
           {...register('categories', {
             required: 'Enter at least one category.',
@@ -202,14 +266,16 @@ const AnimeForm = ({
           isInvalid={!!errors.categories}
           placeholder="shounen, seinen"
         />
+
         <Form.Control.Feedback type="invalid">
           {errors.categories?.message}
         </Form.Control.Feedback>
       </Form.Group>
 
-      {/* DESCRIPTION */}
+      {/* SHORT DESCRIPTION */}
       <Form.Group className="mb-3">
         <Form.Label>Short description *</Form.Label>
+
         <Form.Control
           as="textarea"
           rows={4}
@@ -222,59 +288,13 @@ const AnimeForm = ({
           })}
           isInvalid={!!errors.description_short}
         />
+
         <Form.Control.Feedback type="invalid">
           {errors.description_short?.message}
         </Form.Control.Feedback>
       </Form.Group>
 
-      {/* COVER */}
-      <Form.Group className="mb-4">
-        <Form.Label>
-          Anime cover {anime ? '(optional)' : '*'}
-        </Form.Label>
-
-        <Form.Control
-          type="file"
-          accept="image/jpeg,image/png,image/webp"
-          {...register('anime_cover', {
-            validate: files => {
-              if (!files?.length) {
-                return anime
-                  ? true
-                  : 'Choose an anime cover.';
-              }
-
-              const file = files[0];
-
-              if (
-                !['image/jpeg', 'image/png', 'image/webp'].includes(file.type)
-              ) {
-                return 'Choose a JPG, PNG or WebP image.';
-              }
-
-              if (file.size > 2 * 1024 * 1024) {
-                return 'The image must not exceed 2 MB.';
-              }
-
-              return true;
-            },
-          })}
-          isInvalid={!!errors.anime_cover}
-        />
-
-        <Form.Control.Feedback type="invalid">
-          {errors.anime_cover?.message}
-        </Form.Control.Feedback>
-
-        {anime?.anime_cover && (
-          <div className={styles.coverPreview}>
-            <p>Current cover:</p>
-            <img src={anime.anime_cover} alt={`${anime.title} cover`} />
-          </div>
-        )}
-      </Form.Group>
-
-      {/* ACTIONS */}
+      {/* FORM ACTIONS */}
       <Row className="mt-4">
         <Col className="d-flex gap-3">
           <Button to="/">Back to home</Button>

@@ -58,7 +58,8 @@ const AnimeSchema = new mongoose.Schema(
     rating_avg: { type: Number, default: 0 },
 
     /** URL-friendly slug, generated automatically from title */
-    slug: { type: String, required: true },
+    /**slug: { type: String, required: true },*/
+    slug: { type: String, unique: true, index: true },
   },
   { timestamps: true }
 );

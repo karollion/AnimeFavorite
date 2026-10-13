@@ -101,10 +101,10 @@ const createAnimeFormData = (anime, cover) => {
   return formData;
 };
 
-export const addAnimeRequest = (anime, cover) => async dispatch => {
+export const addAnimeRequest = (anime) => async dispatch => {
   try {
-    const formData = createAnimeFormData(anime, cover);
-
+    //const formData = createAnimeFormData(anime);
+    const formData = anime;
     const res = await api.post('/animes', formData);
 
     dispatch(addAnime(res.data));

@@ -39,6 +39,7 @@ import {
 
 import AnimeForm from '../../features/AnimeForm/AnimeForm'
 import Container from '../../common/container/Container'
+import AnimeCoverUpload from '../../features/AnimeForm/AnimeCoverUpload';
 
 /* =====================================================
    EDIT ANIME COMPONENT
@@ -140,6 +141,12 @@ const EditAnime = () => {
            submitText="Save changes"
            isSaving={isSaving}
          />
+
+         {/*<AnimeCoverUpload
+           anime={anime}
+           onUpload={handleUploadCover}
+           isUploading={isUploadingCover}
+         />*/}
 
       </Container>
     </div>

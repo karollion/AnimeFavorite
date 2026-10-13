@@ -56,7 +56,6 @@ router.post(
   '/',
   auth,
   admin,
-  upload("anime_covers").single("cover"),
   AnimeController.create
 );
 
