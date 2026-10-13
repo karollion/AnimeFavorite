@@ -4,4 +4,16 @@
   background-color: $homePage-bg-color;
   color: $color-light;
   width: 500px;
+
+  .coverPreview {
+    margin-top: 1rem;
+    
+    img {
+      display: block;
+      max-width: 200px;
+      max-height: 280px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+  }
 }

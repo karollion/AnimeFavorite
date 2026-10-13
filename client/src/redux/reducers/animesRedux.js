@@ -83,23 +83,69 @@ export const fetchAnimeBySlug = slug => async dispatch => {
   }
 }
 
-export const addAnimeRequest = anime => async dispatch => {
-  try {
-    const res = await api.post('/animes', anime)
-    dispatch(addAnime(res.data))
-  } catch (err) {
-    dispatch(fetchError(err.response?.data?.message || err.message))
+const createAnimeFormData = (anime, cover) => {
+  const formData = new FormData();
+
+  Object.entries(anime).forEach(([key, value]) => {
+    if (Array.isArray(value)) {
+      formData.append(key, JSON.stringify(value));
+    } else if (value !== undefined && value !== null) {
+      formData.append(key, String(value));
+    }
+  });
+
+  if (cover) {
+    formData.append('anime_cover', cover);
   }
-}
+
+  return formData;
+};
+
+export const addAnimeRequest = (anime, cover) => async dispatch => {
+  try {
+    const formData = createAnimeFormData(anime, cover);
+
+    const res = await api.post('/animes', formData);
+
+    dispatch(addAnime(res.data));
+    return res.data;
+  } catch (err) {
+    dispatch(fetchError(err.response?.data?.message || err.message));
+    throw err;
+  }
+};
 
 export const updateAnimeRequest = anime => async dispatch => {
   try {
-    const res = await api.put(`/animes/${anime._id}`, anime)
-    dispatch(updateAnime(res.data))
+    const { _id, ...updates } = anime;
+
+    const res = await api.put(`/animes/${_id}`, updates);
+
+    dispatch(updateAnime(res.data));
+    return res.data;
   } catch (err) {
-    dispatch(fetchError(err.response?.data?.message || err.message))
+    dispatch(fetchError(err.response?.data?.message || err.message));
+    throw err;
   }
-}
+};
+
+export const updateAnimeCoverRequest = (id, cover) => async dispatch => {
+  try {
+    const formData = new FormData();
+    formData.append('anime_cover', cover);
+
+    const res = await api.put(
+      `/animes/${id}/cover`,
+      formData
+    );
+
+    dispatch(updateAnime(res.data));
+    return res.data;
+  } catch (err) {
+    dispatch(fetchError(err.response?.data?.message || err.message));
+    throw err;
+  }
+};
 
 export const removeAnimeRequest = anime => async dispatch => {
   try {

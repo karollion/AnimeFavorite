@@ -5,6 +5,7 @@ const Character = require("../models/character.model");
 const cloudinary = require("../utils/cloudinary");
 const pick = require("../utils/pickAllowedFields");
 const asyncHandler = require("../utils/asyncHandler");
+const parseArrayField = require("../utils/parseArrayField");
 
 /* =====================================================
    GET ALL ANIME
@@ -310,6 +311,8 @@ exports.create = asyncHandler(async (req, res) => {
   ];
 
   const animeData = pick(req.body, allowed);
+  animeData.genres = parseArrayField(animeData.genres);
+  animeData.categories = parseArrayField(animeData.categories);
 
   const existing = await Anime.findOne({ title: animeData.title });
   if (existing) {
