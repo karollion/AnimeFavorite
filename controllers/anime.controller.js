@@ -299,6 +299,10 @@ exports.getBySlug = asyncHandler(async (req, res) => {
  * @access  Admin
  */
 exports.create = asyncHandler(async (req, res) => {
+
+  console.log('req.body:', req.body);
+console.log('req.file:', req.file);
+
   const allowed = [
     "title",
     "original_title",

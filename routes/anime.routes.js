@@ -52,7 +52,13 @@ router.get('/:id', AnimeController.getOne);
  * @access  Admin
  * @middleware auth, admin
  */
-router.post('/', auth, admin, AnimeController.create);
+router.post(
+  '/',
+  auth,
+  admin,
+  upload("anime_covers").single("cover"),
+  AnimeController.create
+);
 
 /**
  * @route   PUT /api/animes/:id/cover

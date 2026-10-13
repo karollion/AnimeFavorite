@@ -252,8 +252,8 @@ const AnimeForm = ({
                 return 'Choose a JPG, PNG or WebP image.';
               }
 
-              if (file.size > 5 * 1024 * 1024) {
-                return 'The image must not exceed 5 MB.';
+              if (file.size > 2 * 1024 * 1024) {
+                return 'The image must not exceed 2 MB.';
               }
 
               return true;
