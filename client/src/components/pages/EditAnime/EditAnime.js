@@ -57,7 +57,7 @@ import AnimeCoverUpload from '../../features/AnimeForm/AnimeCoverUpload';
 const EditAnime = () => {
    const [isSaving, setIsSaving] = useState(false);
    const [saveError, setSaveError] = useState('');
-
+   const [isUploadingCover, setIsUploadingCover] = useState(false);
 
    const { slug } = useParams()
    const dispatch = useDispatch()
@@ -118,6 +118,34 @@ const EditAnime = () => {
       }
     };
 
+    /* =====================================================
+   ANIME COVER UPLOAD HANDLER
+   ===================================================== */
+
+  /**
+   * Uploads a replacement cover image through the dedicated
+   * Redux request and refreshes the selected anime data.
+   *
+   * @param {File} cover - Selected image file.
+   * @returns {Promise<void>}
+   */
+  const handleUploadCover = async cover => {
+    if (!anime?._id || !cover) return;
+
+    setIsUploadingCover(true);
+console.log(cover)
+    try {
+      // Upload the new cover image.
+      await dispatch(updateAnimeCoverRequest(anime._id, cover));
+
+      // Refresh the anime to display the updated cover.
+      await dispatch(fetchAnimeBySlug(slug));
+    } finally {
+      // Always reset the upload indicator.
+      setIsUploadingCover(false);
+    }
+  };
+
    /* =====================================================
       EDIT ANIME FORM
       ===================================================== */
@@ -135,18 +163,18 @@ const EditAnime = () => {
         {/* Form initialized with the selected anime's data */}
         {saveError && <p className="text-danger">{saveError}</p>}
 
-         <AnimeForm
-           anime={anime}
-           onSubmit={handleEditAnime}
-           submitText="Save changes"
-           isSaving={isSaving}
-         />
+          <AnimeForm
+            anime={anime}
+            onSubmit={handleEditAnime}
+            submitText="Save changes"
+            isSaving={isSaving}
+          />
 
-         {/*<AnimeCoverUpload
-           anime={anime}
-           onUpload={handleUploadCover}
-           isUploading={isUploadingCover}
-         />*/}
+          <AnimeCoverUpload
+            anime={anime}
+            onUpload={handleUploadCover}
+            isUploading={isUploadingCover}
+          />
 
       </Container>
     </div>

@@ -83,29 +83,9 @@ export const fetchAnimeBySlug = slug => async dispatch => {
   }
 }
 
-const createAnimeFormData = (anime, cover) => {
-  const formData = new FormData();
-
-  Object.entries(anime).forEach(([key, value]) => {
-    if (Array.isArray(value)) {
-      formData.append(key, JSON.stringify(value));
-    } else if (value !== undefined && value !== null) {
-      formData.append(key, String(value));
-    }
-  });
-
-  if (cover) {
-    formData.append('anime_cover', cover);
-  }
-
-  return formData;
-};
-
 export const addAnimeRequest = (anime) => async dispatch => {
   try {
-    //const formData = createAnimeFormData(anime);
-    const formData = anime;
-    const res = await api.post('/animes', formData);
+    const res = await api.post('/animes', anime);
 
     dispatch(addAnime(res.data));
     return res.data;
@@ -132,7 +112,9 @@ export const updateAnimeRequest = anime => async dispatch => {
 export const updateAnimeCoverRequest = (id, cover) => async dispatch => {
   try {
     const formData = new FormData();
-    formData.append('anime_cover', cover);
+
+    // Nazwa musi odpowiadać upload("anime_covers").single("cover").
+    formData.append('cover', cover);
 
     const res = await api.put(
       `/animes/${id}/cover`,
@@ -140,9 +122,13 @@ export const updateAnimeCoverRequest = (id, cover) => async dispatch => {
     );
 
     dispatch(updateAnime(res.data));
+
     return res.data;
   } catch (err) {
-    dispatch(fetchError(err.response?.data?.message || err.message));
+    dispatch(fetchError(
+      err.response?.data?.message || err.message
+    ));
+
     throw err;
   }
 };

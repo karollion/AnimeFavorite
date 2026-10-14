@@ -93,6 +93,9 @@ const AnimeCoverUpload = ({
    * by EditAnime.
    */
   const handleUpload = async () => {
+     console.log('Kliknięto przycisk uploadu');
+  console.log('Wybrany plik:', coverFile);
+  console.log('onUpload:', onUpload);
     if (!coverFile || typeof onUpload !== 'function') return;
 
     setError('');

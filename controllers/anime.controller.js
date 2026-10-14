@@ -356,10 +356,12 @@ exports.updateCover = asyncHandler(async (req, res) => {
     return res.status(404).json({ message: "Anime not found" });
   }
 
+  /* ---------- REMOVE OLD IMAGE ---------- */
   if (anime.cover_public_id) {
     await cloudinary.uploader.destroy(anime.cover_public_id);
   }
 
+  /* ---------- SAVE NEW IMAGE ---------- */
   anime.anime_cover = req.file.path;
   anime.cover_public_id = req.file.filename;
 
