@@ -169,7 +169,7 @@ const AnimeCoverUpload = ({
       <Button
         type="button"
         active={!!coverFile && !isUploading}
-        onClick={handleUpload}
+        action={handleUpload}
       >
         {isUploading ? 'Uploading...' : 'Upload cover'}
       </Button>
