@@ -32,6 +32,7 @@ import { useForm } from 'react-hook-form'
 import { Row, Col, Form } from 'react-bootstrap'
 import Container from '../../common/container/Container'
 import Button from '../../common/Button/Button'
+import ImageUpload from '../../features/ImageUpload/ImageUpload';
 
 /* =====================================================
    REDUX STATE MANAGEMENT
@@ -76,37 +77,11 @@ const ProfileEdit = () => {
   /* =====================================================
      LOCAL COMPONENT STATE
      ===================================================== */
-
-  /**
-   * Result of the profile save operation.
-   * Possible values: null, 'success', or 'error'.
-   */
+     
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null)
-
-  /**
-   * Indicates whether the profile form is currently being saved.
-   */
   const [isSaving, setIsSaving] = useState(false)
-
-  /**
-   * Selected avatar file awaiting upload.
-   */
-  const [avatarFile, setAvatarFile] = useState(null)
-
-  /**
-   * Error message associated with avatar selection or upload.
-   */
-  const [avatarError, setAvatarError] = useState('')
-
-  /**
-   * Result of the password change operation.
-   * Stores the status type and the corresponding feedback message.
-   */
   const [passwordStatus, setPasswordStatus] = useState(null)
-
-  /**
-   * Current calendar year, used to validate the birth year field.
-   */
   const currentYear = new Date().getFullYear()
 
   /* =====================================================
@@ -231,8 +206,6 @@ const ProfileEdit = () => {
     })
 
     // Clear temporary avatar selection and previous feedback.
-    setAvatarFile(null)
-    setAvatarError('')
     setSaveStatus(null)
   }, [user, reset])
 
@@ -251,12 +224,10 @@ const ProfileEdit = () => {
    * @param {string} data.description - Updated profile description.
    */
   const onSubmit = async data => {
-    setSaveStatus(null)
-    setAvatarError('')
-    setIsSaving(true)
+    setSaveStatus(null);
+    setIsSaving(true);
 
     try {
-      /* Update profile fields only when they have changed. */
       if (isDirty) {
         await dispatch(updateProfileRequest({
           email: data.email.trim(),
@@ -264,62 +235,35 @@ const ProfileEdit = () => {
             ? null
             : Number(data.birth_year),
           description: data.description.trim(),
-        }))
+        }));
       }
 
-      /* Upload the selected avatar using its dedicated endpoint. */
-      if (avatarFile) {
-        await dispatch(updateAvatarRequest(avatarFile))
-      }
-
-      // Display a successful save status and clear temporary avatar state.
-      setSaveStatus('success')
-      setAvatarFile(null)
-      setAvatarError('')
+      setSaveStatus('success');
     } catch (error) {
-      // Indicate that at least one update operation failed.
-      setSaveStatus('error')
+      setSaveStatus('error');
     } finally {
-      // Always clear the saving indicator when processing finishes.
-      setIsSaving(false)
+      setIsSaving(false);
     }
-  }
+  };
 
   /* =====================================================
-     AVATAR VALIDATION
-     ===================================================== */
+   AVATAR UPLOAD HANDLER
+   ===================================================== */
 
   /**
-   * Registers the avatar file input with React Hook Form.
-   * Accepts JPEG, PNG, and WebP images up to 5 MB.
+   * Uploads a new avatar independently of profile information.
+   *
+   * @param {File} file - Selected avatar image.
    */
-  const avatarInput = register('avatar', {
-    validate: files => {
-      // Avatar selection is optional.
-      if (!files?.length) return true
+  const handleAvatarUpload = async file => {
+    setIsUploadingAvatar(true);
 
-      const file = files[0]
-
-      // Supported image MIME types.
-      const allowedTypes = [
-        'image/jpeg',
-        'image/png',
-        'image/webp',
-      ]
-
-      // Reject unsupported image formats.
-      if (!allowedTypes.includes(file.type)) {
-        return 'Choose a JPG, PNG or WebP image.'
-      }
-
-      // Reject files larger than 5 MB.
-      if (file.size > 5 * 1024 * 1024) {
-        return 'The image must be smaller than 5 MB.'
-      }
-
-      return true
-    },
-  })
+    try {
+      await dispatch(updateAvatarRequest(file));
+    } finally {
+      setIsUploadingAvatar(false);
+    }
+  };
 
   /* =====================================================
      AUTHENTICATION GUARD
@@ -362,58 +306,17 @@ const ProfileEdit = () => {
                   AVATAR MANAGEMENT
                   ===================================================== */}
 
-              {/* Displays the current avatar and allows selecting a replacement. */}
-              <Form.Group className="mb-4">
-                <Form.Label>Current avatar</Form.Label>
-
-                {/* Current avatar preview or an empty-state message */}
-                {user.avatar ? (
-                  <div className={styles.avatarPreview}>
-                    <img
-                      src={user.avatar}
-                      alt={`${user.login}'s avatar`}
-                    />
-                  </div>
-                ) : (
-                  <p>No avatar uploaded.</p>
-                )}
-
-                {/* Avatar file selection */}
-                <Form.Label className="mt-3">
-                  Change avatar
-                </Form.Label>
-
-                <Form.Control
-                  type="file"
-                  accept="image/jpeg,image/png,image/webp"
-                  name={avatarInput.name}
-                  ref={avatarInput.ref}
-                  onBlur={avatarInput.onBlur}
-                  onChange={event => {
-                    // Notify React Hook Form about the file input change.
-                    avatarInput.onChange(event)
-
-                    // Store the selected file for the upload request.
-                    setAvatarFile(event.target.files?.[0] || null)
-
-                    // Clear previous validation and save feedback.
-                    setAvatarError('')
-                    setSaveStatus(null)
-                  }}
-                />
-
-                {/* Avatar validation feedback */}
-                {errors.avatar && (
-                  <small className="text-danger">
-                    {errors.avatar.message}
-                  </small>
-                )}
-
-                {/* Supported formats and file size limit */}
-                <Form.Text>
-                  JPG, PNG or WebP. Maximum size: 5 MB.
-                </Form.Text>
-              </Form.Group>
+              <ImageUpload
+                title="Avatar"
+                label="Choose a new avatar"
+                currentImage={user.avatar}
+                currentImageAlt={`${user.login}'s avatar`}
+                onUpload={handleAvatarUpload}
+                isUploading={isUploadingAvatar}
+                maxSizeMB={5}
+                uploadButtonLabel="Upload avatar"
+                successMessage="Avatar updated successfully."
+              />
 
               {/* =====================================================
                   EMAIL FIELD

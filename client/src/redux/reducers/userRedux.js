@@ -231,7 +231,13 @@ export const fetchUserStats = () => async dispatch => {
     const res = await api.get('/auth/me/stats');
     dispatch(setStats(res.data));
   } catch (err) {
-    dispatch(fetchError(err.message));
+    dispatch(
+      fetchError(
+        err.response?.data?.message || err.message
+      )
+    );
+
+    throw err;
   }
 };
 
