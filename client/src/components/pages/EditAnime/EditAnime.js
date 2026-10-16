@@ -39,7 +39,7 @@ import {
 
 import AnimeForm from '../../features/AnimeForm/AnimeForm'
 import Container from '../../common/container/Container'
-import AnimeCoverUpload from '../../features/AnimeForm/AnimeCoverUpload';
+import ImageUpload from '../../features/ImageUpload/ImageUpload';
 
 /* =====================================================
    EDIT ANIME COMPONENT
@@ -170,10 +170,16 @@ console.log(cover)
             isSaving={isSaving}
           />
 
-          <AnimeCoverUpload
-            anime={anime}
+          <ImageUpload
+            title="Anime cover"
+            label="Choose a new cover"
+            currentImage={anime.anime_cover}
+            currentImageAlt={`${anime.title} cover`}
             onUpload={handleUploadCover}
             isUploading={isUploadingCover}
+            maxSizeMB={2}
+            uploadButtonLabel="Upload cover"
+            successMessage="Anime cover updated successfully."
           />
 
       </Container>
