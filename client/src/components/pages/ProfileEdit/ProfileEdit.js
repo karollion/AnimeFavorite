@@ -33,6 +33,7 @@ import { Row, Col, Form } from 'react-bootstrap'
 import Container from '../../common/container/Container'
 import Button from '../../common/Button/Button'
 import ImageUpload from '../../features/ImageUpload/ImageUpload';
+import PasswordChangeForm from '../../features/PasswordChangeForm/PasswordChangeForm';
 
 /* =====================================================
    REDUX STATE MANAGEMENT
@@ -43,7 +44,6 @@ import {
   getUser,
   updateProfileRequest,
   updateAvatarRequest,
-  updatePasswordRequest,
 } from '../../../redux/reducers/userRedux'
 
 /* =====================================================
@@ -81,7 +81,6 @@ const ProfileEdit = () => {
   const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
   const [saveStatus, setSaveStatus] = useState(null)
   const [isSaving, setIsSaving] = useState(false)
-  const [passwordStatus, setPasswordStatus] = useState(null)
   const currentYear = new Date().getFullYear()
 
   /* =====================================================
@@ -112,78 +111,6 @@ const ProfileEdit = () => {
       description: '',
     },
   })
-
-  /* =====================================================
-     PASSWORD FORM INITIALIZATION
-     ===================================================== */
-
-  /**
-   * React Hook Form configuration for changing the account password.
-   *
-   * @property {Function} registerPassword - Registers password fields.
-   * @property {Function} handlePasswordSubmit - Validates and submits the form.
-   * @property {Function} watchPassword - Retrieves current password field values.
-   * @property {Function} resetPassword - Clears the password form.
-   * @property {Object} passwordErrors - Validation errors for password fields.
-   * @property {boolean} isChangingPassword - Indicates whether submission is active.
-   */
-  const {
-    register: registerPassword,
-    handleSubmit: handlePasswordSubmit,
-    watch: watchPassword,
-    reset: resetPassword,
-    formState: {
-      errors: passwordErrors,
-      isSubmitting: isChangingPassword,
-    },
-  } = useForm({
-    defaultValues: {
-      currentPassword: '',
-      newPassword: '',
-      confirmPassword: '',
-    },
-  })
-
-  /* =====================================================
-     PASSWORD UPDATE HANDLER
-     ===================================================== */
-
-  /**
-   * Handles password change form submission.
-   * Dispatches the password update request, clears the form on success,
-   * and stores a success or error message for the user.
-   *
-   * @param {Object} data - Validated password form values.
-   * @param {string} data.currentPassword - Current account password.
-   * @param {string} data.newPassword - Requested new password.
-   */
-  const onPasswordSubmit = async data => {
-    setPasswordStatus(null)
-
-    try {
-      await dispatch(updatePasswordRequest({
-        currentPassword: data.currentPassword,
-        newPassword: data.newPassword,
-      }))
-
-      // Clear password fields after a successful update.
-      resetPassword()
-
-      // Display confirmation that the password was changed.
-      setPasswordStatus({
-        type: 'success',
-        message: 'Hasło zostało zmienione.',
-      })
-    } catch (error) {
-      // Display the server error message or a fallback message.
-      setPasswordStatus({
-        type: 'error',
-        message:
-          error.response?.data?.message ||
-          'Nie udało się zmienić hasła.',
-      })
-    }
-  }
 
   /* =====================================================
      PROFILE DATA SYNCHRONIZATION
@@ -462,101 +389,8 @@ const ProfileEdit = () => {
       {/* =====================================================
           PASSWORD CHANGE SECTION
           ===================================================== */}
-
-      <section className={styles.passwordSection}>
-        <h2>Change Password</h2>
-
-        {/* Separate form for updating account credentials */}
-        <Form onSubmit={handlePasswordSubmit(onPasswordSubmit)}>
-
-          {/* Current password field */}
-          <Form.Group className="mb-3">
-            <Form.Label>Current password</Form.Label>
-
-            <Form.Control
-              type="password"
-              autoComplete="current-password"
-              {...registerPassword('currentPassword', {
-                required: 'Podaj aktualne hasło.',
-              })}
-              isInvalid={!!passwordErrors.currentPassword}
-            />
-
-            <Form.Control.Feedback type="invalid">
-              {passwordErrors.currentPassword?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
-
-          {/* New password field with length and difference validation */}
-          <Form.Group className="mb-3">
-            <Form.Label>New password</Form.Label>
-
-            <Form.Control
-              type="password"
-              autoComplete="new-password"
-              {...registerPassword('newPassword', {
-                required: 'Podaj nowe hasło.',
-                minLength: {
-                  value: 8,
-                  message: 'Hasło musi mieć co najmniej 8 znaków.',
-                },
-                validate: value =>
-                  value !== watchPassword('currentPassword') ||
-                  'Nowe hasło musi różnić się od aktualnego.',
-              })}
-              isInvalid={!!passwordErrors.newPassword}
-            />
-
-            <Form.Control.Feedback type="invalid">
-              {passwordErrors.newPassword?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
-
-          {/* Confirms the new password and checks that both values match */}
-          <Form.Group className="mb-3">
-            <Form.Label>Confirm new password</Form.Label>
-
-            <Form.Control
-              type="password"
-              autoComplete="new-password"
-              {...registerPassword('confirmPassword', {
-                required: 'Potwierdź nowe hasło.',
-                validate: value =>
-                  value === watchPassword('newPassword') ||
-                  'Hasła nie są identyczne.',
-              })}
-              isInvalid={!!passwordErrors.confirmPassword}
-            />
-
-            <Form.Control.Feedback type="invalid">
-              {passwordErrors.confirmPassword?.message}
-            </Form.Control.Feedback>
-          </Form.Group>
-
-          {/* Password update success or error feedback */}
-          {passwordStatus && (
-            <p
-              className={
-                passwordStatus.type === 'success'
-                  ? styles.success
-                  : styles.error
-              }
-              role="status"
-            >
-              {passwordStatus.message}
-            </p>
-          )}
-
-          {/* Submits the password change request */}
-          <Button
-            type="submit"
-            active={!isChangingPassword}
-          >
-            {isChangingPassword ? 'Changing...' : 'Change Password'}
-          </Button>
-
-        </Form>
-      </section>
+      
+      <PasswordChangeForm />
 
       {/* =====================================================
           PAGE NAVIGATION
