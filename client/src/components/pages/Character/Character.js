@@ -146,6 +146,7 @@ const Character = () => {
         <p>OriginWorld: {character.originWorld}</p>
         <p>Description: {character.description}</p>
 
+         <Button to="/">Edit</Button>
         {/* Navigation back to the home page */}
         <Button to="/">Back to home</Button>
 

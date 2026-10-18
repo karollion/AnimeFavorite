@@ -162,7 +162,10 @@ const Anime = () => {
 
         {/* Anime editing action available only to administrators */}
         {user?.role === 'admin' && (
-          <Button to={"/anime/EditAnime/" + anime.slug}>Edit</Button>
+          <div>
+            <Button to={"/anime/EditAnime/" + anime.slug}>Edit</Button>
+            <Button to={"/character/AddCharacter"}>Add Character</Button>
+          </div>
         )}
 
         {/* =====================================================

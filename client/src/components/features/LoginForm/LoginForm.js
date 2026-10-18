@@ -13,12 +13,23 @@ const LoginForm = ({ actionText = 'Login' }) => {
   const {
     register,
     handleSubmit,
+    setError,
     formState: { errors },
   } = useForm({});
 
   const onSubmit = async data => {
-    await dispatch(loginRequest(data));
-    navigate('/');
+    try {
+      await dispatch(loginRequest(data));
+      navigate('/');
+    } catch (error) {
+    setError('root.serverError', {
+      type: 'server',
+      message:
+        error.response?.status === 401
+          ? 'Invalid login or password.'
+          : 'An error occurred during login. Please try again.',
+    });
+  }
   };
 
 
@@ -39,6 +50,7 @@ const LoginForm = ({ actionText = 'Login' }) => {
       <Form.Group className="mb-3">
         <Form.Label>Password</Form.Label>
         <Form.Control
+          type="password"
           {...register('password', { minLength: 3, maxLength: 50 })}
           placeholder="*****"
         />
@@ -48,6 +60,13 @@ const LoginForm = ({ actionText = 'Login' }) => {
       {/* ACTIONS */}
       <div className={styles.buttons}>
         <Button type="submit">{actionText}</Button>
+
+        {errors.root?.serverError && (
+          <p className="text-danger" role="alert">
+            {errors.root.serverError.message}
+          </p>
+        )}
+
         <p>Don't have an account?</p>
         <Button to="/Signup">Signup</Button>
         <Button to="/">Home</Button>

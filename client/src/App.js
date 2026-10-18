@@ -13,12 +13,13 @@ import Profile from './components/pages/Profile/Profile';
 import ProtectedRoute from './components/routing/ProtectedRoute';
 import Character from './components/pages/Character/Character';
 import Settings from './components/pages/Settings/Settings';
+import ProfileEdit from './components/pages/ProfileEdit/ProfileEdit';
+import EditAnime from './components/pages/EditAnime/EditAnime';
+import AddCharacter from './components/pages/AddCharacter/AddCharacter';
 
 import { fetchProfile } from './redux/reducers/userRedux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
-import ProfileEdit from './components/pages/ProfileEdit/ProfileEdit';
-import EditAnime from './components/pages/EditAnime/EditAnime';
 //import { useSelector } from 'react-redux';
 
 function App() {
@@ -37,8 +38,6 @@ function App() {
         <Routes>
           <Route path="/" element={<Home/>} />
           <Route path='/anime/:slug' element={<Anime/>} />
-
-          <Route path='/character/:id' element={<Character/>} />
 
           <Route path='/Signup' element={<Signup/>} />
           <Route path='/Login' element={<Login/>} />
@@ -86,6 +85,17 @@ function App() {
             element={
               <ProtectedRoute role="admin">
                 <EditAnime />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route path='/character/:id' element={<Character/>} />
+
+          <Route
+            path='/character/AddCharacter'
+            element={
+              <ProtectedRoute role="admin">
+                <AddCharacter />
               </ProtectedRoute>
             }
           />
