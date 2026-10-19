@@ -20,6 +20,7 @@ import AddCharacter from './components/pages/AddCharacter/AddCharacter';
 import { fetchProfile } from './redux/reducers/userRedux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
+import EditCharacter from './components/pages/EditCharacter/EditCharacter';
 //import { useSelector } from 'react-redux';
 
 function App() {
@@ -92,10 +93,19 @@ function App() {
           <Route path='/character/:id' element={<Character/>} />
 
           <Route
-            path='/character/AddCharacter'
+            path="/character/add"
             element={
               <ProtectedRoute role="admin">
                 <AddCharacter />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path="/character/:id/edit"
+            element={
+              <ProtectedRoute role="admin">
+                <EditCharacter />
               </ProtectedRoute>
             }
           />

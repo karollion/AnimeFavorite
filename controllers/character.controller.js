@@ -20,6 +20,7 @@ const asyncHandler = require("../utils/asyncHandler");
 exports.getCharactersByAnime = asyncHandler(async (req, res) => {
   const characters = await Character.find({
     anime: req.params.animeId,
+    is_deleted: { $ne: true },
   }).lean();
 
   res.json(characters);
@@ -110,10 +111,10 @@ exports.updatePhoto = asyncHandler(async (req, res) => {
 
   const character = await Character.findById(req.params.id);
 
-  if (!character) {
-    return res
-      .status(404)
-      .json({ message: "Character not found" });
+  if (!character || character.is_deleted) {
+    return res.status(404).json({
+      message: "Character not found",
+    });
   }
 
   /* ---------- REMOVE OLD IMAGE ---------- */
@@ -167,10 +168,10 @@ exports.updateCharacter = asyncHandler(async (req, res) => {
     }
   );
 
-  if (!character) {
-    return res
-      .status(404)
-      .json({ message: "Character not found" });
+  if (!character || character.is_deleted) {
+    return res.status(404).json({
+      message: "Character not found",
+    });
   }
 
   res.json(character);
@@ -193,10 +194,10 @@ exports.updateCharacter = asyncHandler(async (req, res) => {
 exports.deleteCharacter = asyncHandler(async (req, res) => {
   const character = await Character.findById(req.params.id);
 
-  if (!character) {
-    return res
-      .status(404)
-      .json({ message: "Character not found" });
+  if (!character || character.is_deleted) {
+    return res.status(404).json({
+      message: "Character not found",
+    });
   }
 
   await character.softDelete();

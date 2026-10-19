@@ -164,7 +164,9 @@ const Anime = () => {
         {user?.role === 'admin' && (
           <div>
             <Button to={"/anime/EditAnime/" + anime.slug}>Edit</Button>
-            <Button to={"/character/AddCharacter"}>Add Character</Button>
+            <Button to={`/character/add?animeId=${anime._id}`}>
+              Add character
+            </Button>
           </div>
         )}
 

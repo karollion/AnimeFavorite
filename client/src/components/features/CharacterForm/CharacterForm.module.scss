@@ -1,0 +1,49 @@
+@import '../../../styles/settings.scss';
+
+.root {
+  background-color: $homePage-bg-color;
+  color: $color-light;
+  width: 500px;
+
+  .coverPreview {
+    margin-top: 1rem;
+
+    img {
+      display: block;
+      max-width: 200px;
+      max-height: 280px;
+      object-fit: contain;
+      border-radius: 8px;
+    }
+  }
+
+  .coverSection {
+    margin-top: 2rem;
+    padding-top: 1.5rem;
+    border-top: 1px solid var(--bs-border-color);
+  }
+
+  .coverPreview {
+    margin: 1rem 0;
+
+    img {
+      display: block;
+      width: 100%;
+      max-width: 220px;
+      max-height: 320px;
+      object-fit: contain;
+      border-radius: 6px;
+    }
+  }
+
+  .success {
+    margin-top: 1rem;
+    color: var(--bs-success);
+  }
+
+  .error {
+    margin-top: 1rem;
+    color: var(--bs-danger);
+  }
+
+}

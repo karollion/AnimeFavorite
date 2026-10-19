@@ -31,6 +31,8 @@ import {
   getSelectedCharacter
 } from '../../../redux/reducers/charactersRedux'
 
+import { getUser } from '../../../redux/reducers/userRedux'
+
 /* =====================================================
    COMPONENTS AND ASSETS
    ===================================================== */
@@ -62,6 +64,12 @@ const Character = () => {
    * @type {string | undefined}
    */
   const { id } = useParams()
+
+    /**
+   * Currently authenticated user's data.
+   * Used to determine whether administrative actions are available.
+   */
+  const user = useSelector(getUser)
 
   /* =====================================================
      REDUX STATE AND DISPATCH
@@ -146,7 +154,15 @@ const Character = () => {
         <p>OriginWorld: {character.originWorld}</p>
         <p>Description: {character.description}</p>
 
-         <Button to="/">Edit</Button>
+         {/* Character editing action available only to administrators */}
+        {user?.role === 'admin' && (
+          <div>
+            <Button to={`/character/${character._id}/edit`}>
+                Edit character
+            </Button>
+          </div>
+        )}
+        
         {/* Navigation back to the home page */}
         <Button to="/">Back to home</Button>
 
