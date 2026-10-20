@@ -407,6 +407,48 @@ exports.update = asyncHandler(async (req, res) => {
   res.json(anime);
 });
 
+
+/* =====================================================
+   SEARCH ANIME
+   ===================================================== */
+
+/**
+ * Search anime by title for Navbar autocomplete.
+ *
+ * Searches the main and original titles.
+ * Returns a maximum of 8 matching anime.
+ *
+ * @route   GET /api/anime/search
+ * @access  Public
+ */
+exports.search = asyncHandler(async (req, res) => {
+  const search = req.query.search?.trim();
+
+  // Do not execute a database query for an empty or short phrase.
+  if (!search || search.length < 2) {
+    return res.json([]);
+  }
+
+  // Escape regular-expression characters entered by the user.
+  const escapedSearch = search.replace(/[.*+?^${}()|[\]\\]/g, '\\$&');
+  const searchRegex = new RegExp(escapedSearch, 'i');
+
+  const animes = await Anime.find({
+    is_deleted: { $ne: true },
+    $or: [
+      { title: searchRegex },
+      { original_title: searchRegex },
+    ],
+  })
+    .select('title original_title slug anime_cover type')
+    .sort({ title: 1 })
+    .limit(8)
+    .lean();
+
+  res.json(animes);
+});
+
+
 /* =====================================================
    SOFT DELETE
    ===================================================== */

@@ -22,4 +22,135 @@
       gap: 8px;
     }
   }
+
+  /* =====================================================
+     Anime Search
+     ===================================================== */
+  
+  .searchContainer {
+    position: relative;
+    width: 260px;
+    margin-right: 1rem;
+    align-self: center;
+  }
+  
+  .searchInput {
+    width: 100%;
+    border-radius: 8px;
+  }
+  
+  /* Dropdown containing matching anime. */
+  .searchDropdown {
+    position: absolute;
+    top: calc(100% + 8px);
+    left: 0;
+    width: 340px;
+    max-width: min(340px, 90vw);
+    max-height: 420px;
+    overflow-y: auto;
+    z-index: 1050;
+  
+    background: #202329;
+    border: 1px solid #414650;
+    border-radius: 8px;
+    box-shadow: 0 8px 24px rgb(0 0 0 / 30%);
+  }
+  
+  /* Loading, empty and error messages. */
+  .searchMessage {
+    display: flex;
+    align-items: center;
+    justify-content: center;
+    gap: 10px;
+    padding: 16px;
+    color: #c5c9d2;
+    font-size: 0.9rem;
+  }
+  
+  /* One autocomplete result. */
+  .searchResult {
+    display: flex;
+    align-items: center;
+    gap: 12px;
+    width: 100%;
+    padding: 10px 12px;
+  
+    color: #f5f5f5;
+    text-align: left;
+    background: transparent;
+    border: 0;
+    border-bottom: 1px solid #383d46;
+    cursor: pointer;
+  
+    &:hover,
+    &:focus-visible {
+      background: #343a46;
+      outline: none;
+    }
+  }
+  
+  .searchCover {
+    flex-shrink: 0;
+    width: 48px;
+    height: 64px;
+    object-fit: cover;
+    border-radius: 4px;
+  }
+  
+  .searchResultInfo {
+    display: flex;
+    flex-direction: column;
+    gap: 3px;
+    min-width: 0;
+  }
+  
+  .searchTitle {
+    font-size: 0.95rem;
+    font-weight: 600;
+    overflow-wrap: anywhere;
+  }
+  
+  .searchOriginalTitle {
+    color: #b7bdc8;
+    font-size: 0.8rem;
+    overflow-wrap: anywhere;
+  }
+  
+  .searchType {
+    color: #8eabff;
+    font-size: 0.75rem;
+    text-transform: uppercase;
+  }
+  
+  .showAllResults {
+    display: block;
+    width: 100%;
+    padding: 12px;
+  
+    color: #a9c1ff;
+    text-align: center;
+    background: transparent;
+    border: 0;
+    cursor: pointer;
+  
+    &:hover,
+    &:focus-visible {
+      color: #fff;
+      background: #343a46;
+      outline: none;
+    }
+  }
+  
+  /* Adapt the search field to the collapsed mobile navbar. */
+  @media (max-width: 991.98px) {
+    .searchContainer {
+      width: 100%;
+      margin: 0 0 1rem;
+    }
+  
+    .searchDropdown {
+      width: 100%;
+      max-width: 100%;
+    }
+  }
 }

@@ -26,6 +26,9 @@ export const getAnimeBySlug = (state, slug) => state.animes.list.find(a => a.slu
 export const getAnimesPage = state => state.animes.page
 export const getAnimesTotalPages = state => state.animes.totalPages
 export const getAnimesTotalItems = state => state.animes.totalItems
+export const getAnimeSearchResults = state => state.animes.searchResults
+export const getAnimeSearchLoading = state => state.animes.searchLoading
+export const getAnimeSearchError = state => state.animes.searchError
 
 /* =====================================================
    ACTION TYPES
@@ -42,6 +45,11 @@ const ADD_ANIME = createActionName('ADD')
 const UPDATE_ANIME = createActionName('UPDATE')
 const REMOVE_ANIME = createActionName('REMOVE')
 
+const SEARCH_ANIME_START = createActionName('SEARCH_START')
+const SEARCH_ANIME_SUCCESS = createActionName('SEARCH_SUCCESS')
+const SEARCH_ANIME_ERROR = createActionName('SEARCH_ERROR')
+const CLEAR_ANIME_SEARCH = createActionName('SEARCH_CLEAR')
+
 /* =====================================================
    ACTION CREATORS
    ===================================================== */
@@ -53,6 +61,11 @@ export const fetchError = payload => ({ type: FETCH_ERROR, payload })
 export const addAnime = payload => ({ type: ADD_ANIME, payload })
 export const updateAnime = payload => ({ type: UPDATE_ANIME, payload })
 export const removeAnime = payload => ({ type: REMOVE_ANIME, payload })
+
+export const searchAnimeStart = () => ({type: SEARCH_ANIME_START})
+export const searchAnimeSuccess = payload => ({type: SEARCH_ANIME_SUCCESS, payload})
+export const searchAnimeError = payload => ({type: SEARCH_ANIME_ERROR, payload})
+export const clearAnimeSearch = () => ({type: CLEAR_ANIME_SEARCH})
 
 /* =====================================================
    THUNKS — ANIME
@@ -143,6 +156,43 @@ export const removeAnimeRequest = anime => async dispatch => {
 }
 
 /* =====================================================
+   THUNK — SEARCH ANIME
+   ===================================================== */
+
+/**
+ * @function searchAnimeRequest
+ * @description Searches anime by title for Navbar autocomplete.
+ *
+ * @param {string} search - Search phrase entered by the user.
+ */
+export const searchAnimeRequest = search => async dispatch => {
+  const normalizedSearch = search.trim();
+
+  if (normalizedSearch.length < 2) {
+    dispatch(clearAnimeSearch());
+    return [];
+  }
+
+  dispatch(searchAnimeStart());
+
+  try {
+    const res = await api.get('/animes/search', {
+      params: { search: normalizedSearch }
+    });
+
+    dispatch(searchAnimeSuccess(res.data));
+
+    return res.data;
+  } catch (err) {
+    dispatch(searchAnimeError(
+      err.response?.data?.message || err.message
+    ));
+
+    throw err;
+  }
+};
+
+/* =====================================================
    INITIAL STATE
    ===================================================== */
 
@@ -153,7 +203,10 @@ const initialState = {
   totalItems: 0,
   selected: null,
   loading: false,
-  error: null
+  error: null,
+  searchResults: [],
+  searchLoading: false,
+  searchError: null
 }
 
 /* =====================================================
@@ -198,6 +251,37 @@ const animesReducer = (state = initialState, action) => {
       return {
         ...state,
         list: state.list.filter(anime => anime._id !== action.payload)
+      }
+    
+    case SEARCH_ANIME_START:
+      return {
+        ...state,
+        searchLoading: true,
+        searchError: null
+      }
+    
+    case SEARCH_ANIME_SUCCESS:
+      return {
+        ...state,
+        searchLoading: false,
+        searchResults: action.payload,
+        searchError: null
+      }
+    
+    case SEARCH_ANIME_ERROR:
+      return {
+        ...state,
+        searchLoading: false,
+        searchResults: [],
+        searchError: action.payload
+      }
+    
+    case CLEAR_ANIME_SEARCH:
+      return {
+        ...state,
+        searchResults: [],
+        searchLoading: false,
+        searchError: null
       }
 
     default:

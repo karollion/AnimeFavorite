@@ -17,9 +17,17 @@ const AnimeController = require('../controllers/anime.controller');
 const auth = require("../utils/authMiddleware");
 const admin = require("../utils/adminMiddleware");
 
+
 /* =====================================================
    GET ANIME
    ===================================================== */
+
+/**
+ * @route   GET /api/animes/search?query=
+ * @desc    Get searched animes 
+ * @access  Public
+ */
+router.get('/search', AnimeController.search);
 
 /**
  * @route   GET /api/animes
