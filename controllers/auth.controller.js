@@ -186,6 +186,7 @@ exports.getProfile = asyncHandler(async (req, res) => {
   id: user._id,
   login: user.login,
   email: user.email,
+  role: user.role,
   description: user.description,
   birth_year: user.birth_year,
   avatar: user.avatar,
