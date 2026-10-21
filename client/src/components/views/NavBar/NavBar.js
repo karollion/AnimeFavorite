@@ -244,7 +244,7 @@ const NavBar = () => {
                 
                 {user ? (<Button to="/Settings">Settings</Button>) : null }
 
-                {user ? (<Button >My animes</Button>) : null }
+                {user ? (<Button to="/MyAnimes">My animes</Button>) : null }
                 
               </Nav>
             </Navbar.Collapse>

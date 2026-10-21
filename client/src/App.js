@@ -21,6 +21,7 @@ import { fetchProfile } from './redux/reducers/userRedux';
 import { useEffect } from 'react';
 import { useDispatch } from 'react-redux';
 import EditCharacter from './components/pages/EditCharacter/EditCharacter';
+import MyAnimes from './components/pages/MyAnimes/MyAnimes';
 //import { useSelector } from 'react-redux';
 
 function App() {
@@ -59,6 +60,15 @@ function App() {
             element={
               <ProtectedRoute>
                 <Profile />
+              </ProtectedRoute>
+            }
+          />
+
+          <Route
+            path='/MyAnimes'
+            element={
+              <ProtectedRoute>
+                <MyAnimes />
               </ProtectedRoute>
             }
           />
