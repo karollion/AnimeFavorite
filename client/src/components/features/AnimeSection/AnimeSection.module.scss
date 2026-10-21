@@ -1,9 +1,97 @@
+
 @import '../../../styles/settings.scss';
 
-.root{
+.root {
   border: 2px solid #153283;
   border-radius: 10px;
   padding: 10px;
   background-color: $homePage-bg-color;
   color: $color-light;
+
+  min-width: 0;
+  overflow: hidden;
+}
+
+.sliderWrapper {
+  position: relative;
+  min-width: 0;
+}
+
+.slider {
+  width: 100%;
+  overflow-x: auto;
+  overflow-y: hidden;
+  scroll-behavior: smooth;
+  scrollbar-width: none;
+  -ms-overflow-style: none;
+}
+
+.slider::-webkit-scrollbar {
+  display: none;
+}
+
+.track {
+  display: flex;
+  flex-wrap: nowrap;
+  align-items: stretch;
+  gap: 16px;
+  width: max-content;
+  min-width: 100%;
+}
+
+.slide {
+  flex: 0 0 clamp(170px, 21vw, 250px);
+  min-width: 0;
+}
+
+/*
+ * Strzałki są umieszczone nad sliderem.
+ * Delikatne tło poprawia ich widoczność na kartach anime.
+ */
+.arrow {
+  position: absolute;
+  top: 50%;
+  transform: translateY(-50%);
+  z-index: 2;
+
+  display: flex;
+  align-items: center;
+  justify-content: center;
+
+  width: 38px;
+  height: 58px;
+  padding: 0;
+
+  color: $color-light;
+  background: rgba(0, 0, 0, 0.8);
+  border: 1px solid rgba(255, 255, 255, 0.25);
+  border-radius: 8px;
+
+  font-size: 22px;
+  cursor: pointer;
+  transition: background-color 0.2s ease;
+}
+
+.arrow:hover {
+  background: #153283;
+}
+
+.arrowLeft {
+  left: 4px;
+}
+
+.arrowRight {
+  right: 4px;
+}
+
+@media (max-width: 576px) {
+  .slide {
+    flex-basis: 155px;
+  }
+
+  .arrow {
+    width: 32px;
+    height: 48px;
+    font-size: 18px;
+  }
 }
