@@ -1,5 +1,6 @@
 const UserAnime = require("../models/userAnime.model");
 const Anime = require("../models/anime.model");
+const mongoose = require("mongoose");
 
 const asyncHandler = require("../utils/asyncHandler");
 
@@ -68,6 +69,118 @@ exports.upsert = asyncHandler(async (req, res) => {
   });
 
   res.status(201).json(userAnime);
+});
+
+
+/* =====================================================
+   GET ANIME COMMUNITY STATISTICS
+   ===================================================== */
+
+/**
+ * Get community statistics for a specific anime.
+ *
+ * @route   GET /api/user-anime/stats/:animeId
+ * @access  Public
+ *
+ * Returns the number of users assigned to each watch status,
+ * the total number of user-anime relations, and the number
+ * of users who marked the anime as a favorite.
+ */
+exports.getAnimeStats = asyncHandler(async (req, res) => {
+  const { animeId } = req.params;
+
+  /* ---------- VALIDATE ANIME ID ---------- */
+  if (!mongoose.isValidObjectId(animeId)) {
+    return res.status(400).json({
+      message: "Invalid anime ID",
+    });
+  }
+
+  /* ---------- CHECK ANIME EXISTS ---------- */
+  const animeExists = await Anime.exists({
+    _id: animeId,
+    is_deleted: { $ne: true },
+  });
+
+  if (!animeExists) {
+    return res.status(404).json({
+      message: "Anime not found",
+    });
+  }
+
+  /* ---------- AGGREGATE USER STATISTICS ---------- */
+  const results = await UserAnime.aggregate([
+    {
+      $match: {
+        anime: new mongoose.Types.ObjectId(animeId),
+      },
+    },
+    {
+      $group: {
+        _id: null,
+
+        total: { $sum: 1 },
+
+        favorites: {
+          $sum: {
+            $cond: [{ $eq: ["$favorite_anime", true] }, 1, 0],
+          },
+        },
+
+        notWatched: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "not watched"] }, 1, 0],
+          },
+        },
+
+        planned: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "planned"] }, 1, 0],
+          },
+        },
+
+        watching: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "watching"] }, 1, 0],
+          },
+        },
+
+        completed: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "completed"] }, 1, 0],
+          },
+        },
+
+        suspended: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "suspended"] }, 1, 0],
+          },
+        },
+
+        abandoned: {
+          $sum: {
+            $cond: [{ $eq: ["$status", "abandoned"] }, 1, 0],
+          },
+        },
+      },
+    },
+  ]);
+
+  /* ---------- RETURN ZERO COUNTS WHEN NO USERS EXIST ---------- */
+  const stats = results[0] || {
+    total: 0,
+    favorites: 0,
+    notWatched: 0,
+    planned: 0,
+    watching: 0,
+    completed: 0,
+    suspended: 0,
+    abandoned: 0,
+  };
+
+  delete stats._id;
+
+  res.json(stats);
 });
 
 /* =====================================================

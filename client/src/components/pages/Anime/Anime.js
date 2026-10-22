@@ -18,7 +18,7 @@ import styles from './Anime.module.scss'
    ===================================================== */
 
 import { useParams } from 'react-router-dom'
-import { useEffect } from 'react'
+import { useEffect, useState } from 'react'
 
 /* =====================================================
    REDUX STATE MANAGEMENT
@@ -29,7 +29,18 @@ import {
   fetchAnimeBySlug,
   getSelectedAnime,
   getAnimesLoading,
-  getAnimesError
+  getAnimesError,
+  fetchAnimeStats,
+  getAnimeStats,
+  getAnimeStatsLoading,
+  getAnimeStatsError,
+  fetchUserAnimeRelation,
+  saveUserAnimeRelation,
+  clearUserAnimeRelation,
+  getUserAnimeRelation,
+  getUserAnimeAnimeId,
+  getUserAnimeLoading,
+  getUserAnimeError,
 } from '../../../redux/reducers/animesRedux'
 
 import { getUser } from '../../../redux/reducers/userRedux'
@@ -99,6 +110,45 @@ const Anime = () => {
    */
   const user = useSelector(getUser)
 
+  /**
+   * Anime stats and relations
+   */
+  const stats = useSelector(getAnimeStats)
+  const statsLoading = useSelector(getAnimeStatsLoading)
+  const statsError = useSelector(getAnimeStatsError)
+  const statsAnimeId = useSelector(state => state.animes.statsAnimeId)
+
+  const userAnimeRelation = useSelector(getUserAnimeRelation)
+  const userAnimeAnimeId = useSelector(getUserAnimeAnimeId)
+  const userAnimeLoading = useSelector(getUserAnimeLoading)
+  const userAnimeError = useSelector(getUserAnimeError)
+
+  const [actionMessage, setActionMessage] = useState('')
+  const [actionError, setActionError] = useState('')
+
+   /* =====================================================
+   FETCH COMMUNITY STATISTICS
+   ===================================================== */
+
+  /**
+   * Fetches community statistics whenever the selected anime changes.
+   */
+  useEffect(() => {
+    if (!anime?._id || anime.slug !== slug) return
+
+    dispatch(fetchAnimeStats(anime._id))
+  }, [dispatch, anime?._id, anime?.slug, slug])
+
+  useEffect(() => {
+    if (!anime?._id || anime.slug !== slug) return
+
+    if (user) {
+      dispatch(fetchUserAnimeRelation(anime._id)).catch(() => {})
+    } else {
+      dispatch(clearUserAnimeRelation())
+    }
+  }, [dispatch, anime?._id, anime?.slug, slug, user])
+
   /* =====================================================
      DATA FETCHING
      ===================================================== */
@@ -116,6 +166,61 @@ const Anime = () => {
   }, [dispatch, slug])
 
   /* =====================================================
+     USER ANIME ACTIONS
+     ===================================================== */
+
+  /**
+   * Updates the authenticated user's watch status.
+   */
+  const handleStatusChange = async event => {
+    const status = event.target.value
+
+    if (!user || !anime?._id || !status) return
+
+    setActionMessage('')
+    setActionError('')
+
+    try {
+      await dispatch(saveUserAnimeRelation(anime._id, { status }))
+      setActionMessage('Watch status saved successfully.')
+    } catch (err) {
+      setActionError(
+        err.response?.data?.message || 'Could not save watch status.'
+      )
+    }
+  }
+
+  /**
+   * Toggles the authenticated user's favorite flag.
+   */
+  const handleFavoriteToggle = async () => {
+    if (!user || !anime?._id) return
+
+    const isFavorite =
+      userAnimeAnimeId === anime._id &&
+      userAnimeRelation?.favorite_anime === true
+
+    setActionMessage('')
+    setActionError('')
+
+    try {
+      await dispatch(saveUserAnimeRelation(anime._id, {
+        favorite_anime: !isFavorite,
+      }))
+
+      setActionMessage(
+        isFavorite
+          ? 'Removed from favorites.'
+          : 'Added to favorites.'
+      )
+    } catch (err) {
+      setActionError(
+        err.response?.data?.message || 'Could not update favorites.'
+      )
+    }
+  }
+
+  /* =====================================================
      LOADING AND ERROR HANDLING
      ===================================================== */
 
@@ -129,6 +234,8 @@ const Anime = () => {
    * Displays an error message if the anime request has failed.
    */
   if (error) return <p>Error: {error}</p>
+
+ 
 
   /* =====================================================
      ANIME DETAILS
@@ -158,6 +265,117 @@ const Anime = () => {
         <p>Categories: {anime.categories}</p>
         <p>Rating avg: {anime.rating_avg}</p>
         <p>Rating count: {anime.rating_count}</p>
+
+        {/* =====================================================
+            USER ANIME LIST
+            ===================================================== */}
+        
+        <section className={styles.userAnime}>
+          <h2>My anime list</h2>
+                
+          {!user ? (
+            <p>Log in to manage your anime list and favorites.</p>
+          ) : (
+            <>
+              <label htmlFor="anime-status">
+                Watch status
+              </label>
+          
+              <select
+                id="anime-status"
+                className={styles.statusSelect}
+                value={
+                  userAnimeAnimeId === anime._id
+                    ? userAnimeRelation?.status || ''
+                    : ''
+                }
+                onChange={handleStatusChange}
+                disabled={userAnimeLoading}
+              >
+                <option value="" disabled>
+                  Select watch status
+                </option>
+                <option value="not watched">Not watched</option>
+                <option value="planned">Planned</option>
+                <option value="watching">Watching</option>
+                <option value="completed">Completed</option>
+                <option value="suspended">Suspended</option>
+                <option value="abandoned">Abandoned</option>
+              </select>
+              
+              <button
+                type="button"
+                className={styles.favoriteButton}
+                onClick={handleFavoriteToggle}
+                disabled={userAnimeLoading}
+                aria-pressed={
+                  userAnimeAnimeId === anime._id &&
+                  userAnimeRelation?.favorite_anime === true
+                }
+              >
+                {userAnimeAnimeId === anime._id &&
+                userAnimeRelation?.favorite_anime === true
+                  ? '♥ Remove from favorites'
+                  : '♡ Add to favorites'}
+              </button>
+                
+              {userAnimeLoading && (
+                <p>Saving or loading your list...</p>
+              )}
+        
+              {actionMessage && (
+                <p role="status">{actionMessage}</p>
+              )}
+        
+              {(actionError || userAnimeError) && (
+                <p role="alert">
+                  {actionError || userAnimeError}
+                </p>
+              )}
+            </>
+          )}
+        </section>
+        
+        {/* =====================================================
+            COMMUNITY STATISTICS
+            ===================================================== */}
+
+        <section className={styles.statistics}>
+          <h2>Community statistics</h2>
+        
+          {statsLoading && <p>Loading statistics...</p>}
+        
+          {statsError && (
+            <p>Could not load community statistics: {statsError}</p>
+          )}
+
+          {!statsLoading &&
+            !statsError &&
+            stats &&
+            statsAnimeId === anime._id && (
+              <>
+                <p>
+                  Total users on list: <strong>{stats.total}</strong>
+                </p>
+            
+                <p>
+                  Favorites: <strong>{stats.favorites}</strong>
+                </p>
+            
+                <h3>Watch status</h3>
+            
+                <ul>
+                  <li>Not watched: {stats.notWatched}</li>
+                  <li>Planned: {stats.planned}</li>
+                  <li>Watching: {stats.watching}</li>
+                  <li>Completed: {stats.completed}</li>
+                  <li>Suspended: {stats.suspended}</li>
+                  <li>Abandoned: {stats.abandoned}</li>
+                </ul>
+              </>
+            )}
+        </section>
+
         <p>Description: {anime.description_short}</p>
 
         {/* Anime editing action available only to administrators */}

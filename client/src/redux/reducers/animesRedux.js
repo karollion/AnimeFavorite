@@ -20,15 +20,26 @@ import api from "../../utils/axios";
 export const getAllAnimes = state => state.animes.list
 export const getAnimesLoading = state => state.animes.loading
 export const getAnimesError = state => state.animes.error
+
 export const getSelectedAnime = state => state.animes.selected
 export const getAnimeById = (state, id) => state.animes.list.find(anime => anime._id === id)
 export const getAnimeBySlug = (state, slug) => state.animes.list.find(a => a.slug === slug)
 export const getAnimesPage = state => state.animes.page
 export const getAnimesTotalPages = state => state.animes.totalPages
 export const getAnimesTotalItems = state => state.animes.totalItems
+
 export const getAnimeSearchResults = state => state.animes.searchResults
 export const getAnimeSearchLoading = state => state.animes.searchLoading
 export const getAnimeSearchError = state => state.animes.searchError
+
+export const getAnimeStats = state => state.animes.stats
+export const getAnimeStatsLoading = state => state.animes.statsLoading
+export const getAnimeStatsError = state => state.animes.statsError
+
+export const getUserAnimeRelation = state => state.animes.userAnimeRelation
+export const getUserAnimeAnimeId = state => state.animes.userAnimeAnimeId
+export const getUserAnimeLoading = state => state.animes.userAnimeLoading
+export const getUserAnimeError = state => state.animes.userAnimeError
 
 /* =====================================================
    ACTION TYPES
@@ -49,6 +60,19 @@ const SEARCH_ANIME_START = createActionName('SEARCH_START')
 const SEARCH_ANIME_SUCCESS = createActionName('SEARCH_SUCCESS')
 const SEARCH_ANIME_ERROR = createActionName('SEARCH_ERROR')
 const CLEAR_ANIME_SEARCH = createActionName('SEARCH_CLEAR')
+
+const ANIME_STATS_START = createActionName('STATS_START')
+const ANIME_STATS_SUCCESS = createActionName('STATS_SUCCESS')
+const ANIME_STATS_ERROR = createActionName('STATS_ERROR')
+const CLEAR_ANIME_STATS = createActionName('STATS_CLEAR')
+
+const USER_ANIME_FETCH_START = createActionName('USER_ANIME_FETCH_START')
+const USER_ANIME_FETCH_SUCCESS = createActionName('USER_ANIME_FETCH_SUCCESS')
+const USER_ANIME_FETCH_ERROR = createActionName('USER_ANIME_FETCH_ERROR')
+const USER_ANIME_SAVE_START = createActionName('USER_ANIME_SAVE_START')
+const USER_ANIME_SAVE_SUCCESS = createActionName('USER_ANIME_SAVE_SUCCESS')
+const USER_ANIME_SAVE_ERROR = createActionName('USER_ANIME_SAVE_ERROR')
+const USER_ANIME_CLEAR = createActionName('USER_ANIME_CLEAR')
 
 /* =====================================================
    ACTION CREATORS
@@ -115,6 +139,9 @@ export const updateAnimeRequest = anime => async dispatch => {
     const res = await api.put(`/animes/${_id}`, updates);
 
     dispatch(updateAnime(res.data));
+
+    // Aktualizacja statystyk po udanym zapisie.
+    dispatch(fetchAnimeStats(_id));
     return res.data;
   } catch (err) {
     dispatch(fetchError(err.response?.data?.message || err.message));
@@ -193,6 +220,132 @@ export const searchAnimeRequest = search => async dispatch => {
 };
 
 /* =====================================================
+   THUNK — ANIME COMMUNITY STATISTICS
+   ===================================================== */
+
+/**
+ * @function fetchAnimeStats
+ * @description Fetches community statistics for a specific anime.
+ *
+ * @param {string} animeId - MongoDB ID of the anime.
+ * @returns {Function} Redux thunk.
+ */
+export const fetchAnimeStats = animeId => async dispatch => {
+  if (!animeId) return
+
+  dispatch({ type: ANIME_STATS_START })
+
+  try {
+    const res = await api.get(`/user-anime/stats/${animeId}`)
+
+    dispatch({
+      type: ANIME_STATS_SUCCESS,
+      payload: {
+        animeId,
+        stats: res.data,
+      },
+    })
+
+    return res.data
+  } catch (err) {
+    dispatch({
+      type: ANIME_STATS_ERROR,
+      payload: err.response?.data?.message || err.message,
+    })
+
+    throw err
+  }
+}
+
+export const clearAnimeStats = () => ({
+  type: CLEAR_ANIME_STATS,
+})
+
+/* =====================================================
+   THUNKS — USER ANIME RELATION
+   ===================================================== */
+
+/**
+ * Fetches the authenticated user's relation with a specific anime.
+ * Uses the existing /user-anime/me endpoint.
+ */
+export const fetchUserAnimeRelation = animeId => async dispatch => {
+  if (!animeId) return
+
+  dispatch({
+    type: USER_ANIME_FETCH_START,
+    payload: animeId,
+  })
+
+  try {
+    const res = await api.get('/user-anime/me')
+
+    const relation = res.data.find(entry =>
+      String(entry.anime?._id || entry.anime) === String(animeId)
+    ) || null
+
+    dispatch({
+      type: USER_ANIME_FETCH_SUCCESS,
+      payload: { animeId, relation },
+    })
+
+    return relation
+  } catch (err) {
+    dispatch({
+      type: USER_ANIME_FETCH_ERROR,
+      payload: err.response?.data?.message || err.message,
+    })
+
+    throw err
+  }
+}
+
+/**
+ * Creates or updates the authenticated user's anime relation.
+ * Refreshes community statistics after a successful save.
+ */
+export const saveUserAnimeRelation = (animeId, changes) => async dispatch => {
+  if (!animeId) return
+
+  dispatch({ type: USER_ANIME_SAVE_START })
+
+  try {
+    const res = await api.post('/user-anime', {
+      anime: animeId,
+      ...changes,
+    })
+
+    dispatch({
+      type: USER_ANIME_SAVE_SUCCESS,
+      payload: {
+        animeId,
+        relation: res.data,
+      },
+    })
+
+    // Refresh community statistics after the database update.
+    dispatch(fetchAnimeStats(animeId)).catch(() => {})
+
+    return res.data
+  } catch (err) {
+    dispatch({
+      type: USER_ANIME_SAVE_ERROR,
+      payload: err.response?.data?.message || err.message,
+    })
+
+    throw err
+  }
+}
+
+/**
+ * Clears the selected user's anime relation from Redux.
+ * Used when the user logs out.
+ */
+export const clearUserAnimeRelation = () => ({
+  type: USER_ANIME_CLEAR,
+})
+
+/* =====================================================
    INITIAL STATE
    ===================================================== */
 
@@ -206,7 +359,15 @@ const initialState = {
   error: null,
   searchResults: [],
   searchLoading: false,
-  searchError: null
+  searchError: null,
+  stats: null,
+  statsAnimeId: null,
+  statsLoading: false,
+  statsError: null,
+  userAnimeRelation: null,
+  userAnimeAnimeId: null,
+  userAnimeLoading: false,
+  userAnimeError: null,
 }
 
 /* =====================================================
@@ -282,6 +443,95 @@ const animesReducer = (state = initialState, action) => {
         searchResults: [],
         searchLoading: false,
         searchError: null
+      }
+
+    case ANIME_STATS_START:
+      return {
+        ...state,
+        statsLoading: true,
+        statsError: null,
+      }
+    
+    case ANIME_STATS_SUCCESS:
+      return {
+        ...state,
+        statsLoading: false,
+        statsError: null,
+        stats: action.payload.stats,
+        statsAnimeId: action.payload.animeId,
+      }
+    
+    case ANIME_STATS_ERROR:
+      return {
+        ...state,
+        statsLoading: false,
+        statsError: action.payload,
+      }
+    
+    case CLEAR_ANIME_STATS:
+      return {
+        ...state,
+        stats: null,
+        statsAnimeId: null,
+        statsLoading: false,
+        statsError: null,
+      }
+
+    case USER_ANIME_FETCH_START:
+      return {
+        ...state,
+        userAnimeRelation: null,
+        userAnimeAnimeId: action.payload,
+        userAnimeLoading: true,
+        userAnimeError: null,
+      }
+    
+    case USER_ANIME_FETCH_SUCCESS:
+      return {
+        ...state,
+        userAnimeRelation: action.payload.relation,
+        userAnimeAnimeId: action.payload.animeId,
+        userAnimeLoading: false,
+        userAnimeError: null,
+      }
+    
+    case USER_ANIME_FETCH_ERROR:
+      return {
+        ...state,
+        userAnimeLoading: false,
+        userAnimeError: action.payload,
+      }
+    
+    case USER_ANIME_SAVE_START:
+      return {
+        ...state,
+        userAnimeLoading: true,
+        userAnimeError: null,
+      }
+    
+    case USER_ANIME_SAVE_SUCCESS:
+      return {
+        ...state,
+        userAnimeRelation: action.payload.relation,
+        userAnimeAnimeId: action.payload.animeId,
+        userAnimeLoading: false,
+        userAnimeError: null,
+      }
+    
+    case USER_ANIME_SAVE_ERROR:
+      return {
+        ...state,
+        userAnimeLoading: false,
+        userAnimeError: action.payload,
+      }
+    
+    case USER_ANIME_CLEAR:
+      return {
+        ...state,
+        userAnimeRelation: null,
+        userAnimeAnimeId: null,
+        userAnimeLoading: false,
+        userAnimeError: null,
       }
 
     default:

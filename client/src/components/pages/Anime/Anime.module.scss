@@ -9,4 +9,49 @@
 		height: $anime-card-height;
   		width: $anime-card-width;
 	}
+
+	/* =====================================================
+	   USER ANIME LIST
+	   ===================================================== */
+	
+	.userAnime {
+	  display: flex;
+	  flex-direction: column;
+	  align-items: flex-start;
+	  gap: 10px;
+	  margin: 24px 0;
+	
+	  h2 {
+	    margin-bottom: 4px;
+	  }
+	}
+	
+	.statusSelect {
+	  width: 100%;
+	  max-width: 320px;
+	  padding: 10px;
+	  border: 1px solid #ccc;
+	  border-radius: 6px;
+	  background: inherit;
+	  color: inherit;
+	}
+	
+	.favoriteButton {
+	  padding: 10px 16px;
+	  border: 1px solid #d9534f;
+	  border-radius: 6px;
+	  background: transparent;
+	  color: #d9534f;
+	  cursor: pointer;
+	
+	  &:hover:not(:disabled) {
+	    background: #d9534f;
+	    color: white;
+	  }
+  
+	  &:disabled {
+	    cursor: not-allowed;
+	    opacity: 0.6;
+	  }
+	}
 }

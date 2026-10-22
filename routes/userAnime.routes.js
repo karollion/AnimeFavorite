@@ -47,6 +47,12 @@ router.get('/me', auth, controller.getUserAnime);
 router.post('/', auth, controller.upsert);
 
 /**
+ * @route   GET /api/user-anime/stats/ID_ANIME
+ * @desc   Get anime stats
+ */
+router.get("/stats/:animeId", controller.getAnimeStats);
+
+/**
  * @route   DELETE /api/user-anime/:id
  * @desc    Remove an anime from the user's list by relation ID
  * @access  Private
