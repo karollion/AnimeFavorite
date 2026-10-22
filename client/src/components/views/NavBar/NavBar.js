@@ -15,8 +15,10 @@ import {
   searchAnimeRequest,
   clearAnimeSearch
 } from '../../../redux/reducers/animesRedux';
+import { useTranslation } from 'react-i18next'
 
 const NavBar = () => {
+  const { t } = useTranslation()
   const user = useSelector(getUser);
   const [expanded, setExpanded] = useState(false);
 
@@ -111,7 +113,7 @@ const NavBar = () => {
         <Navbar.Brand className={styles.logo} as={NavLink} to="/">
           <img
             src={logo}
-            alt="Favorite Anime"
+            alt={t('navBar.altLogo')}
             className={styles.img}
           />
         </Navbar.Brand>
@@ -232,19 +234,19 @@ const NavBar = () => {
                   )}
                 </div>
                 
-                {!user ? (<Button to="/Login">Login</Button>) : null }
+                {!user ? (<Button to="/Login">{t('common.login')}</Button>) : null }
 
-                {!user ? (<Button to="/SignUp">Sign up</Button>) : null }
+                {!user ? (<Button to="/SignUp">{t('common.signup')}</Button>) : null }
 
-                {user ? (<Button to={"/Profile"}>Profile</Button>) : null }
+                {user ? (<Button to={"/Profile"}>{t('common.profile')}</Button>) : null }
 
-                {user ? (<Button to="/Logout">Logout</Button>) : null }
+                {user ? (<Button to="/Logout">{t('common.logout')}</Button>) : null }
                 
-                {user?.role === 'admin' && (<Button to="/anime/AddAnime">Add New</Button>)}
+                {user?.role === 'admin' && (<Button to="/anime/AddAnime">{t('common.addnew')}</Button>)}
                 
-                {user ? (<Button to="/Settings">Settings</Button>) : null }
+                {user ? (<Button to="/Settings">{t('common.settings')}</Button>) : null }
 
-                {user ? (<Button to="/MyAnimes">My animes</Button>) : null }
+                {user ? (<Button to="/MyAnimes">{t('common.myanimes')}</Button>) : null }
                 
               </Nav>
             </Navbar.Collapse>

@@ -1,0 +1,33 @@
+{
+  "common": {
+    "home": "Home",
+    "search": "Search",
+    "settings": "Settings",
+    "profile": "Profile",
+    "signup": "Sign up",
+    "login": "Log in",
+    "logout": "Log out",
+    "loading": "Loading...",
+    "save": "Save",
+    "cancel": "Cancel",
+    "myanimes": "My animes",
+    "addnew": "Add new",
+    "showMore": "Show more"
+  },
+  "settings": {
+    "title": "Settings",
+    "language": "Language",
+    "theme": "Theme",
+    "defaultView": "Default view",
+    "content": "Content",
+    "notifications": "Notifications",
+    "accountRequired": "Log in to manage these preferences."
+  },
+  "anime": {
+    "searchPlaceholder": "Enter an anime title...",
+    "noResults": "No anime found."
+  },
+  "navBar": {
+    "altLogo": "Favorite Anime"
+  }
+}

@@ -26,6 +26,10 @@ import { useForm } from 'react-hook-form'
 // React hooks
 import { useEffect, useState } from 'react'
 
+// Translation
+import { useTranslation } from 'react-i18next'
+import syncLanguage from '../../../i18n/syncLanguage'
+
 /**
  * Settings component.
  *
@@ -40,27 +44,40 @@ import { useEffect, useState } from 'react'
  * @component
  * @returns {JSX.Element} The settings page.
  */
-const Settings = () => {
 
-  // Redux dispatch function and current user data
+const Settings = () => {
   const dispatch = useDispatch()
   const user = useSelector(getUser)
 
-  // Tracks the result of the latest save operation
   const [saveStatus, setSaveStatus] = useState(null)
 
-  // Initialize form methods
+  const { t, i18n } = useTranslation()
+
   const {
     register,
     handleSubmit,
     reset,
   } = useForm()
 
-  /**
-   * Populate the form with the user's saved preferences.
+  const languageField = register('ui.language')
+
+  /*
+   * Changes the application language immediately.
+   * The selected language is also stored locally so that
+   * it can be restored when the application is reopened.
    *
-   * The form is reset whenever the preferences object changes,
-   * keeping the displayed values synchronized with Redux state.
+   * The user's database preference is saved when the
+   * Settings form is submitted.
+   */
+  const handleLanguageChange = async language => {
+    if (!['en', 'pl'].includes(language)) return
+
+    await i18n.changeLanguage(language)
+    setSaveStatus(null)
+  }
+
+  /*
+   * Loads the user's saved preferences into the form.
    */
   useEffect(() => {
     if (user?.preferences) {
@@ -68,29 +85,55 @@ const Settings = () => {
     }
   }, [user?.preferences, reset])
 
-  /**
-   * Submit updated preferences to the backend.
-   *
-   * Clears the previous save status before sending the request
-   * and updates the status depending on whether the request succeeds.
-   *
-   * @param {Object} data - The submitted preferences form data.
+
+  /*
+   * Saves the current preferences to the user's profile.
+   * The selected language is persisted locally only after
+   * the server confirms that the profile update succeeded.
    */
   const onSubmit = async data => {
     setSaveStatus(null)
-
+  
     try {
-      // Save the updated preferences through the profile update request
-      await dispatch(updateProfileRequest({
-        preferences: data,
-      }))
-
+      const updatedUser = await dispatch(
+        updateProfileRequest({
+          preferences: {
+            ...user?.preferences,
+            ...data,
+            ui: {
+              ...user?.preferences?.ui,
+              ...data.ui,
+            },
+            content: {
+              ...user?.preferences?.content,
+              ...data.content,
+            },
+            behavior: {
+              ...user?.preferences?.behavior,
+              ...data.behavior,
+            },
+            notifications: {
+              ...user?.preferences?.notifications,
+              ...data.notifications,
+            },
+          },
+        })
+      )
+    
+      const savedLanguage =
+        updatedUser?.preferences?.ui?.language || data.ui?.language
+    
+      if (['en', 'pl'].includes(savedLanguage)) {
+        await i18n.changeLanguage(savedLanguage)
+        localStorage.setItem('appLanguage', savedLanguage)
+      }
+    
       setSaveStatus('success')
     } catch (error) {
-      // Display an error message if the save operation fails
       setSaveStatus('error')
     }
   }
+
 
   return (
     <div className={styles.root}>
@@ -122,11 +165,17 @@ const Settings = () => {
 
                 {/* Preferred application language */}
                 <div className={styles.row}>
-                  <span>Language</span>
+                  <span>{t('settings.language')}</span>
 
-                  <Form.Select {...register('ui.language')}>
+                  <Form.Select
+                    {...languageField}
+                    onChange={event => {
+                      languageField.onChange(event)
+                      handleLanguageChange(event.target.value)
+                    }}
+                  >
                     <option value="en">English</option>
-                    <option value="pl">Polish</option>
+                    <option value="pl">Polski</option>
                   </Form.Select>
                 </div>
 

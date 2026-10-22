@@ -17,21 +17,24 @@ import ProfileEdit from './components/pages/ProfileEdit/ProfileEdit';
 import EditAnime from './components/pages/EditAnime/EditAnime';
 import AddCharacter from './components/pages/AddCharacter/AddCharacter';
 
-import { fetchProfile } from './redux/reducers/userRedux';
-import { useEffect } from 'react';
-import { useDispatch } from 'react-redux';
 import EditCharacter from './components/pages/EditCharacter/EditCharacter';
 import MyAnimes from './components/pages/MyAnimes/MyAnimes';
-//import { useSelector } from 'react-redux';
+import { useDispatch, useSelector } from 'react-redux'
+import { getUser, fetchProfile } from './redux/reducers/userRedux'
+import { useEffect } from 'react'
+import syncLanguage from './i18n/syncLanguage'
 
 function App() {
   const dispatch = useDispatch()
-
-  //const user = useSelector(getUser);
+  const user = useSelector(getUser)
 
   useEffect(() => {
     dispatch(fetchProfile());
   }, [dispatch]);
+
+    useEffect(() => {
+    syncLanguage(user)
+  }, [user])
 
   return (
     <div>
