@@ -128,8 +128,8 @@ const NavBar = () => {
                 <div className={styles.searchContainer} ref={searchRef}>
                   <Form.Control
                     type="search"
-                    placeholder="Search anime..."
-                    aria-label="Search anime by title"
+                    placeholder={t('navBar.placeholder')}
+                    aria-label={t('navBar.aria-label')}
                     autoComplete="off"
                     value={searchQuery}
                     className={styles.searchInput}
@@ -158,13 +158,13 @@ const NavBar = () => {
                       {isSearching && (
                         <div className={styles.searchMessage}>
                           <Spinner size="sm" animation="border" />
-                          <span>Searching...</span>
+                          <span>{t('navBar.searhing')}</span>
                         </div>
                       )}
 
                       {!isSearching && searchError && (
                         <div className={styles.searchMessage}>
-                          Search failed. Please try again.
+                          {t('navBar.searchfailed')}
                         </div>
                       )}
 
@@ -172,7 +172,7 @@ const NavBar = () => {
                         !searchError &&
                         searchResults.length === 0 && (
                           <div className={styles.searchMessage}>
-                            No anime found.
+                            {t('navBar.noanimefound')}
                           </div>
                         )}
 
@@ -227,7 +227,7 @@ const NavBar = () => {
                               setExpanded(false);
                             }}
                           >
-                            Show all results
+                            {t('navBar.showAllResults')}
                           </button>
                         )}
                     </div>

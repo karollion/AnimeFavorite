@@ -28,6 +28,12 @@
     "noResults": "No anime found."
   },
   "navBar": {
-    "altLogo": "Favorite Anime"
+    "altLogo": "Favorite Anime",
+    "placeholder": "Search anime...",
+    "aria-label": "Search anime by title",
+    "showAllResults": "Show all results",
+    "searhing": "Searching...",
+    "searchfailed": "Search failed. Please try again.",
+    "noanimefound": "No anime found."
   }
 }
