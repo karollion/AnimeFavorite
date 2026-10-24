@@ -35,5 +35,12 @@
     "searhing": "Searching...",
     "searchfailed": "Search failed. Please try again.",
     "noanimefound": "No anime found."
+  },
+  "homePage": {
+    "newAnimes": "New Animes",
+    "topRated": "Top Rated",
+    "random": "Random",
+    "movies": "Movies",
+    "tvSeries": "TV Series"
   }
 }

@@ -19,6 +19,7 @@ import styles from './Home.module.scss'
 import { useEffect } from 'react'
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchHome } from '../../../redux/reducers/homeSliceRedux'
+import { useTranslation } from 'react-i18next'
 
 /* =====================================================
    COMPONENTS
@@ -40,6 +41,7 @@ import Container from '../../common/container/Container'
  * @returns {JSX.Element} The home page containing anime sections.
  */
 const Home = () => {
+   const { t } = useTranslation()
 
   /* =====================================================
      REDUX STATE AND DISPATCH
@@ -103,19 +105,19 @@ const Home = () => {
         <div>
 
           {/* Displays the newest anime entries */}
-          <AnimeSection title="New Animes" animes={newest} />
+          <AnimeSection title={t('homePage.newAnimes')} animes={newest} />
 
           {/* Displays the highest-rated anime entries */}
-          <AnimeSection title="Top Rated" animes={topRated} />
+          <AnimeSection title={t('homePage.topRated')} animes={topRated} />
 
           {/* Displays randomly selected anime entries */}
-          <AnimeSection title="Random" animes={random} />
+          <AnimeSection title={t('homePage.random')} animes={random} />
 
           {/* Displays anime movies */}
-          <AnimeSection title="Movies" animes={films} />
+          <AnimeSection title={t('homePage.movies')} animes={films} />
 
           {/* Displays anime TV series */}
-          <AnimeSection title="TV series" animes={tvSeries} />
+          <AnimeSection title={t('homePage.tvSeries')} animes={tvSeries} />
 
         </div>
       </Container>

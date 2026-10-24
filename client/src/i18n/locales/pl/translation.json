@@ -35,5 +35,12 @@
     "searhing": "Szukanie...",
     "searchfailed": "Wyszukiwanie nie powiodło się. Spróbuj ponownie.",
     "noanimefound": "Nie znaleziono żadnego anime."
+  },
+  "homePage": {
+    "newAnimes": "Najnowsze",
+    "topRated": "Najwyżej oceniane",
+    "random": "Losowe",
+    "movies": "Filmy",
+    "tvSeries": "Seriale TV"
   }
 }
