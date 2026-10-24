@@ -12,7 +12,8 @@
     "myanimes": "Moje anime",
     "addnew": "Dodaj nowe",
     "loading": "Ładowanie...",
-    "showMore": "Pokaż więcej"
+    "showMore": "Pokaż więcej",
+    "edit": "Edytuj"
   },
   "settings": {
     "title": "Ustawienia",
@@ -46,5 +47,17 @@
   "animeSection": {
     "btnLariaLabel": "Poprzednie anime",
     "btnRariaLabel": "Następne anime"
+  },
+  "footer": {
+    "createdBy": "Autor: "
+  },
+  "profile": {
+    "title": "Profil użytkownika",
+    "login": "Login: ",
+    "role": "Rola: ",
+    "email": "Email: ",
+    "birthYear": "Rok urodzenia: ",
+    "description": "Opis: ",
+    "favoriteCharacters": "Ulubione postacie:"
   }
 }

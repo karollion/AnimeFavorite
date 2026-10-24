@@ -1,6 +1,6 @@
 {
   "common": {
-    "home": "Home",
+    "home": "Home Page",
     "search": "Search",
     "settings": "Settings",
     "profile": "Profile",
@@ -12,7 +12,8 @@
     "cancel": "Cancel",
     "myanimes": "My animes",
     "addnew": "Add new",
-    "showMore": "Show more"
+    "showMore": "Show more",
+    "edit": "Edit"
   },
   "settings": {
     "title": "Settings",
@@ -42,5 +43,17 @@
     "random": "Random",
     "movies": "Movies",
     "tvSeries": "TV Series"
+  },
+  "footer": {
+    "createdBy": "Create by:"
+  },
+  "profile": {
+    "title": "Profil użytkownika",
+    "login": "Login: ",
+    "role": "Role: ",
+    "email": "Email: ",
+    "birthYear": "Birth year: ",
+    "description": "Description: ",
+    "favoriteCharacters": "Favorite characters:"
   }
 }

@@ -15,6 +15,7 @@ import styles from './Profile.module.scss'
    ===================================================== */
 
 import { Col } from 'react-bootstrap'
+import { useTranslation } from 'react-i18next'
 
 /* =====================================================
    REDUX STATE MANAGEMENT
@@ -46,6 +47,7 @@ import CharacterCard from '../../features/CharacterCard/CharacterCard'
  * @returns {JSX.Element} The user profile page.
  */
 const Profile = () => {
+  const { t } = useTranslation()
 
   /* =====================================================
      REDUX STATE
@@ -66,7 +68,7 @@ const Profile = () => {
       <Container>
 
         {/* Main page heading */}
-        <h1>User Profile</h1>
+        <h1>{t('profile.title')}</h1>
 
         {/* User avatar and personal information */}
         <div className={styles.about}>
@@ -81,14 +83,14 @@ const Profile = () => {
           <div>
 
             {/* Navigation to the profile editing page */}
-            <Button to="/ProfileEdit">Edit</Button>
+            <Button to="/ProfileEdit">{t('common.edit')}</Button>
 
             {/* Basic user account information */}
-            <p>Login: {user.login}</p>
-            <p>Role: {user.role}</p>
-            <p>Email: {user.email}</p>
-            <p>Birth year: {user.birth_year}</p>
-            <p>Description: {user.description}</p>
+            <p>{t('profile.login')}{user.login}</p>
+            <p>{t('profile.role')}{user.role}</p>
+            <p>{t('profile.email')}{user.email}</p>
+            <p>{t('profile.birthYear')}{user.birth_year}</p>
+            <p>{t('profile.description')}{user.description}</p>
 
           </div>
         </div>
@@ -98,7 +100,7 @@ const Profile = () => {
             ===================================================== */}
 
         {/* Displays the characters marked as favorites by the user */}
-        <p>Favorite characters:</p>
+        <p>{t('profile.favoriteCharacters')}</p>
 
         <div className={styles.characters}>
           {user.favorite_characters?.map(c => (
@@ -114,7 +116,7 @@ const Profile = () => {
 
         {/* Navigation back to the home page */}
         <Col xs="12" className="d-flex justify-content-center my-3">
-          <Button to="/">Back to home</Button>
+          <Button to="/">{t('common.home')}</Button>
         </Col>
 
       </Container>
