@@ -29,6 +29,7 @@ import { useEffect, useState } from 'react'
 // Translation
 import { useTranslation } from 'react-i18next'
 import syncLanguage from '../../../i18n/syncLanguage'
+import syncTheme from '../../../theme/syncTheme'
 
 /**
  * Settings component.
@@ -85,6 +86,17 @@ const Settings = () => {
     }
   }, [user?.preferences, reset])
 
+  /*
+   * Changes the application theme immediately.
+   */
+  const handleThemeChange = event => {
+    const theme = event.target.value
+
+    if (!['light', 'dark'].includes(theme)) return
+
+    document.documentElement.setAttribute('data-theme', theme)
+    setSaveStatus(null)
+  }
 
   /*
    * Saves the current preferences to the user's profile.
@@ -127,6 +139,14 @@ const Settings = () => {
         await i18n.changeLanguage(savedLanguage)
         localStorage.setItem('appLanguage', savedLanguage)
       }
+
+      const savedTheme =
+        updatedUser?.preferences?.ui?.theme || data.ui?.theme
+          
+      if (['light', 'dark'].includes(savedTheme)) {
+        localStorage.setItem('appTheme', savedTheme)
+        syncTheme(updatedUser)
+      }
     
       setSaveStatus('success')
     } catch (error) {
@@ -157,7 +177,13 @@ const Settings = () => {
                 <div className={styles.row}>
                   <span>Theme</span>
 
-                  <Form.Select {...register('ui.theme')}>
+                  <Form.Select
+                    {...register('ui.theme')}
+                    onChange={event => {
+                      register('ui.theme').onChange(event)
+                      handleThemeChange(event)
+                    }}
+                  >
                     <option value="dark">Dark</option>
                     <option value="light">Light</option>
                   </Form.Select>

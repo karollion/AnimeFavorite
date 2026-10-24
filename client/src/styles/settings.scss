@@ -60,3 +60,54 @@ $review-card-border-color: $secondary-color-dark;
 // ------ Footer ------ //
 
 $footer-bg-color: $primary-color-dark;
+
+/* =====================================================
+   THEME COLORS
+   ===================================================== */
+
+/* Light theme */
+:root,
+[data-theme='light'] {
+  color-scheme: light;
+
+  --color-background: #f5f6fa;
+  --color-surface: #ffffff;
+  --color-text: #1a1a1a;
+  --color-text-muted: #555555;
+  --color-border: #dcdde1;
+  --color-hover: #e9edf5;
+
+  --navbar-background: #ffffff;
+  --home-background: #f5f6fa;
+  --footer-background: #e8ecf5;
+
+  --anime-card-background: #fa983a;
+  --anime-card-text: #1a1a1a;
+  --anime-card-shadow: #172b7a;
+
+  --primary-color: #4a69bd;
+  --accent-color: #e58e26;
+}
+
+/* Dark theme */
+[data-theme='dark'] {
+  color-scheme: dark;
+
+  --color-background: #121212;
+  --color-surface: #1e1e1e;
+  --color-text: #f1f1f1;
+  --color-text-muted: #c1c1c1;
+  --color-border: #444444;
+  --color-hover: #343a46;
+
+  --navbar-background: #1a1a1a;
+  --home-background: #121212;
+  --footer-background: #06163d;
+
+  --anime-card-background: #fa983a;
+  --anime-card-text: #1a1a1a;
+  --anime-card-shadow: #06163d;
+
+  --primary-color: #6a89cc;
+  --accent-color: #f6b93b;
+}

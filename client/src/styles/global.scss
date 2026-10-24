@@ -1,14 +1,23 @@
 @import './settings.scss';
 
-
-*, *::before, *::after {
+*,
+*::before,
+*::after {
   box-sizing: border-box;
+}
+
+html {
+  background-color: var(--color-background);
+  color: var(--color-text);
 }
 
 body {
   margin: 0;
   padding: 0;
   letter-spacing: 0.5px;
+  background-color: var(--color-background);
+  color: var(--color-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
 }
 
 :global(.container) {
@@ -17,4 +26,4 @@ body {
   margin: 0 auto;
 }
 
-@import "./typography.scss";
+@import './typography.scss';

@@ -23,6 +23,7 @@ import { useDispatch, useSelector } from 'react-redux'
 import { getUser, fetchProfile } from './redux/reducers/userRedux'
 import { useEffect } from 'react'
 import syncLanguage from './i18n/syncLanguage'
+import syncTheme from './theme/syncTheme'
 
 function App() {
   const dispatch = useDispatch()
@@ -32,8 +33,12 @@ function App() {
     dispatch(fetchProfile());
   }, [dispatch]);
 
-    useEffect(() => {
+  useEffect(() => {
     syncLanguage(user)
+  }, [user])
+
+  useEffect(() => {
+    syncTheme(user)
   }, [user])
 
   return (

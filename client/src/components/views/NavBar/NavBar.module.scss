@@ -1,18 +1,19 @@
 @import '../../../styles/settings.scss';
 
 .root {
-  background: $navbar-bg-color;
-  color: $color-light;
+  background: var(--navbar-background);
+  color: var(--color-text);
+  transition: background-color 0.3s ease, color 0.3s ease;
 
   .navbar {
-    padding: 0 15px 0 15px;
+    padding: 0 15px;
     margin: 0;
     display: flex;
-    justify-content: space-between; 
-    align-items: center;  
+    justify-content: space-between;
+    align-items: center;
 
     .img {
-      //width: 50px;
+      // width: 50px;
       height: 50px;
       margin: 0;
     }
@@ -26,20 +27,37 @@
   /* =====================================================
      Anime Search
      ===================================================== */
-  
+
   .searchContainer {
     position: relative;
     width: 260px;
     margin-right: 1rem;
     align-self: center;
   }
-  
+
   .searchInput {
     width: 100%;
     border-radius: 8px;
+
+    background-color: var(--color-surface);
+    color: var(--color-text);
+    border-color: var(--color-border);
+
+    &::placeholder {
+      color: var(--color-text-muted);
+    }
+
+    &:focus {
+      background-color: var(--color-surface);
+      color: var(--color-text);
+      border-color: var(--primary-color);
+      box-shadow: 0 0 0 0.2rem
+        color-mix(in srgb, var(--primary-color) 25%, transparent);
+    }
   }
-  
+
   /* Dropdown containing matching anime. */
+
   .searchDropdown {
     position: absolute;
     top: calc(100% + 8px);
@@ -49,46 +67,51 @@
     max-height: 420px;
     overflow-y: auto;
     z-index: 1050;
-  
-    background: #202329;
-    border: 1px solid #414650;
+
+    background: var(--color-surface);
+    color: var(--color-text);
+    border: 1px solid var(--color-border);
     border-radius: 8px;
-    box-shadow: 0 8px 24px rgb(0 0 0 / 30%);
+    box-shadow: 0 8px 24px rgb(0 0 0 / 20%);
   }
-  
+
   /* Loading, empty and error messages. */
+
   .searchMessage {
     display: flex;
     align-items: center;
     justify-content: center;
     gap: 10px;
     padding: 16px;
-    color: #c5c9d2;
+
+    color: var(--color-text-muted);
     font-size: 0.9rem;
   }
-  
+
   /* One autocomplete result. */
+
   .searchResult {
     display: flex;
     align-items: center;
     gap: 12px;
     width: 100%;
     padding: 10px 12px;
-  
-    color: #f5f5f5;
+
+    color: var(--color-text);
     text-align: left;
     background: transparent;
     border: 0;
-    border-bottom: 1px solid #383d46;
+    border-bottom: 1px solid var(--color-border);
     cursor: pointer;
-  
+    transition: background-color 0.2s ease;
+
     &:hover,
     &:focus-visible {
-      background: #343a46;
+      background: var(--color-hover);
       outline: none;
     }
   }
-  
+
   .searchCover {
     flex-shrink: 0;
     width: 48px;
@@ -96,58 +119,61 @@
     object-fit: cover;
     border-radius: 4px;
   }
-  
+
   .searchResultInfo {
     display: flex;
     flex-direction: column;
     gap: 3px;
     min-width: 0;
   }
-  
+
   .searchTitle {
+    color: var(--color-text);
     font-size: 0.95rem;
     font-weight: 600;
     overflow-wrap: anywhere;
   }
-  
+
   .searchOriginalTitle {
-    color: #b7bdc8;
+    color: var(--color-text-muted);
     font-size: 0.8rem;
     overflow-wrap: anywhere;
   }
-  
+
   .searchType {
-    color: #8eabff;
+    color: var(--primary-color);
     font-size: 0.75rem;
     text-transform: uppercase;
   }
-  
+
   .showAllResults {
     display: block;
     width: 100%;
     padding: 12px;
-  
-    color: #a9c1ff;
+
+    color: var(--primary-color);
     text-align: center;
     background: transparent;
     border: 0;
     cursor: pointer;
-  
+    transition: background-color 0.2s ease, color 0.2s ease;
+
     &:hover,
     &:focus-visible {
-      color: #fff;
-      background: #343a46;
+      color: var(--color-text);
+      background: var(--color-hover);
       outline: none;
     }
   }
-  
+
   /* Adapt the search field to the collapsed mobile navbar. */
+
   @media (max-width: 991.98px) {
     .searchContainer {
       width: 100%;
       margin: 0 0 1rem;
     }
-  
+
     .searchDropdown {
       width: 100%;
       max-width: 100%;
