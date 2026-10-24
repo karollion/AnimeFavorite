@@ -104,7 +104,9 @@ const Home = () => {
       <Container>
         <div>
          <p>!!! Dokonczyć tłumaczenia wszystkich stron, i przerabianie motywów wszsystkich scss !!!</p>
+         <p>!!! Problem z statusem anime reincarnated jobless, bylo dodawane przez strone add a nie seed (wszedzie jest 0)!!!</p>
          <p>!!! Zrobic strone pokazujaca wszystkie wyniki wyszukiwania !!!</p>
+         <p>!!! Zrobic podstrony do sekcji po kliknieciu pokaz wiecej !!!</p>
           {/* Displays the newest anime entries */}
           <AnimeSection title={t('homePage.newAnimes')} animes={newest} />
 

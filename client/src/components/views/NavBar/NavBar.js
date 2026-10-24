@@ -221,7 +221,7 @@ const NavBar = () => {
                             className={styles.showAllResults}
                             onClick={() => {
                               navigate(
-                                `/Search?query=${encodeURIComponent(searchQuery.trim())}`
+                                `/Search?q=${encodeURIComponent(searchQuery.trim())}`
                               );
                               setIsSearchOpen(false);
                               setExpanded(false);

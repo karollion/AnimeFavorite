@@ -7,54 +7,64 @@ const pick = require("../utils/pickAllowedFields");
 const asyncHandler = require("../utils/asyncHandler");
 const parseArrayField = require("../utils/parseArrayField");
 
+
 /* =====================================================
    GET ALL ANIME
    ===================================================== */
 
 /**
- * Get paginated anime list with filters & search
+ * Returns paginated anime with optional search, filters and sorting.
  *
- * @route   GET /api/anime
- * @access  Public
- *
- * Query params:
- * - page
- * - limit
- * - search (text index)
- * - type
- * - genres (comma separated)
- * - category
- * - world
- * - sort (rating | title | newest)
- *
- * Response:
- * {
- *   page,
- *   totalPages,
- *   totalItems,
- *   items: Anime[]
- * }
+ * @route GET /api/animes
+ * @access Public
  */
 exports.getAll = asyncHandler(async (req, res) => {
-  const page = parseInt(req.query.page, 10) || 1;
-  const limit = parseInt(req.query.limit, 10) || 20;
+  // Parse pagination parameters and protect against invalid values.
+  const page = Math.max(1, parseInt(req.query.page, 10) || 1);
+  const limit = Math.min(
+    100,
+    Math.max(1, parseInt(req.query.limit, 10) || 20)
+  );
   const skip = (page - 1) * limit;
 
-  const query = {};
+  // Exclude soft-deleted anime, including documents where is_deleted
+  // has not been set.
+  const query = {
+    is_deleted: { $ne: true },
+  };
 
   /* ================= SEARCH ================= */
 
-  if (req.query.search) {
-    query.$text = { $search: req.query.search };
+  // Accept both parameter names for compatibility.
+  const search = String(req.query.search || req.query.query || '').trim();
+
+  if (search.length > 0) {
+    // Treat user input as literal text, not as a regular expression.
+    const escapedSearch = search.replace(
+      /[.*+?^${}()|[\]\\]/g,
+      '\\$&'
+    );
+
+    const searchRegex = new RegExp(escapedSearch, 'i');
+
+    query.$or = [
+      { title: searchRegex },
+      { original_title: searchRegex },
+    ];
   }
 
   /* ================= FILTERS ================= */
 
-  if (req.query.type) query.type = req.query.type;
+  if (req.query.type) {
+    query.type = req.query.type;
+  }
 
   if (req.query.genres) {
     query.genres = {
-      $in: req.query.genres.split(",").map(g => g.toLowerCase()),
+      $in: req.query.genres
+        .split(',')
+        .map(genre => genre.trim().toLowerCase())
+        .filter(Boolean),
     };
   }
 
@@ -62,22 +72,29 @@ exports.getAll = asyncHandler(async (req, res) => {
     query.categories = req.query.category.toLowerCase();
   }
 
-  if (req.query.world) query.world = req.query.world;
+  if (req.query.world) {
+    query.world = req.query.world;
+  }
 
   /* ================= SORT ================= */
 
   let sort = { createdAt: -1 };
 
-  if (req.query.sort === "rating") sort = { rating_avg: -1 };
-  if (req.query.sort === "title") sort = { title: 1 };
+  if (req.query.sort === 'rating') {
+    sort = { rating_avg: -1, title: 1 };
+  } else if (req.query.sort === 'title') {
+    sort = { title: 1 };
+  } else if (req.query.sort === 'newest') {
+    sort = { createdAt: -1 };
+  }
 
-  /* ================= QUERY ================= */
+  /* ================= DATABASE QUERY ================= */
 
   const total = await Anime.countDocuments(query);
 
   const animes = await Anime.find(query)
     .select(
-      "title slug anime_cover rating_avg rating_count type age_rating"
+      'title original_title slug anime_cover rating_avg rating_count type age_rating createdAt'
     )
     .sort(sort)
     .skip(skip)
@@ -91,6 +108,7 @@ exports.getAll = asyncHandler(async (req, res) => {
     items: animes,
   });
 });
+
 
 /* =====================================================
    GET ONE BY ID

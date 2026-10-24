@@ -6,6 +6,7 @@ import { useTranslation } from 'react-i18next';
 import styles from './Search.module.scss';
 
 import api from '../../../utils/axios';
+import { useSearchParams } from 'react-router-dom';
 import { getUser } from '../../../redux/reducers/userRedux';
 
 import Container from '../../common/container/Container';
@@ -26,7 +27,10 @@ const Search = () => {
   const { t } = useTranslation();
   const user = useSelector(getUser);
 
-  const [query, setQuery] = useState('');
+  const [searchParams] = useSearchParams();
+  const queryFromUrl = searchParams.get('q') || '';
+  const [query, setQuery] = useState(queryFromUrl);
+
   const [results, setResults] = useState([]);
   const [loading, setLoading] = useState(false);
   const [error, setError] = useState('');
@@ -52,6 +56,11 @@ const Search = () => {
 
   const view = viewOverride ?? defaultView;
   const sort = sortOverride ?? defaultSort;
+
+  useEffect(() => {
+    setQuery(queryFromUrl);
+    setPage(1);
+  }, [queryFromUrl]);
 
   /*
    * Wyszukiwanie jest opóźnione o 300 ms, aby nie wysyłać zapytania
