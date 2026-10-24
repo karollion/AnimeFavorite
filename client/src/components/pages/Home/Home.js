@@ -103,7 +103,8 @@ const Home = () => {
     <div className={styles.root}>
       <Container>
         <div>
-
+         <p>!!! Dokonczyć tłumaczenia wszystkich stron, i przerabianie motywów wszsystkich scss !!!</p>
+         <p>!!! Zrobic strone pokazujaca wszystkie wyniki wyszukiwania !!!</p>
           {/* Displays the newest anime entries */}
           <AnimeSection title={t('homePage.newAnimes')} animes={newest} />
 

@@ -23,6 +23,7 @@ import { Col } from 'react-bootstrap'
 
 import { useSelector } from 'react-redux'
 import {
+  getUser,
   getUserStats
 } from '../../../redux/reducers/userRedux'
 
@@ -53,19 +54,26 @@ import StatsList from '../../features/StatsList/StatsList'
  * @returns {JSX.Element} The user animes page.
  */
 const MyAnimes = () => {
-  const stats = useSelector(getUserStats)
+  const stats = useSelector(getUserStats);
+  const user = useSelector(getUser);
 
-  /* =====================================================
-     TAB STATE
-     ===================================================== */
+  const [activeTab, setActiveTab] = useState('favorites');
 
-  /**
-   * Currently selected profile statistics tab.
-   * Defaults to the favorites collection.
-   *
-   * @type {[string, Function]}
-   */
-  const [activeTab, setActiveTab] = useState('favorites')
+  // null oznacza korzystanie z ustawienia domyślnego z profilu.
+  const [viewOverride, setViewOverride] = useState(null);
+  const [sortOverride, setSortOverride] = useState(null);
+
+  const defaultView =
+    user?.preferences?.ui?.defaultView === 'list' ? 'list' : 'grid';
+
+  const savedSort = user?.preferences?.behavior?.defaultSort;
+
+  const defaultSort = ['rating', 'newest', 'title'].includes(savedSort)
+    ? savedSort
+    : 'newest';
+
+  const view = viewOverride ?? defaultView;
+  const sort = sortOverride ?? defaultSort;
 
   /* =====================================================
      PROFILE INFORMATION
@@ -136,6 +144,36 @@ const MyAnimes = () => {
         </div>
 
         {/* =====================================================
+            VIEW AND SORT CONTROLS
+            ===================================================== */}
+        <div className={styles.displayControls}>
+          <label>
+            View
+
+            <select
+              value={view}
+              onChange={event => setViewOverride(event.target.value)}
+            >
+              <option value="grid">Grid</option>
+              <option value="list">List</option>
+            </select>
+          </label>
+
+          <label>
+            Sort by
+
+            <select
+              value={sort}
+              onChange={event => setSortOverride(event.target.value)}
+            >
+              <option value="rating">Rating</option>
+              <option value="newest">Newest</option>
+              <option value="title">Name (A–Z)</option>
+            </select>
+          </label>
+        </div>
+
+        {/* =====================================================
             ANIMATED STATISTICS CONTENT
             ===================================================== */}
 
@@ -155,32 +193,62 @@ const MyAnimes = () => {
 
             {/* Favorite anime */}
             {activeTab === 'favorites' && (
-              <><StatsList stats={stats?.favoriteAnime || []} /></>
+              <><StatsList 
+                stats={stats?.favoriteAnime || []} 
+                view={view}
+                sort={sort}
+                loading={stats == null}
+              /></>
             )}
 
             {/* Anime currently being watched */}
             {activeTab === 'watching' && (
-              <><StatsList stats={stats?.statuses?.watching?.anime || []} /></>
+              <><StatsList 
+                stats={stats?.statuses?.watching?.anime || []} 
+                view={view}
+                sort={sort}
+                loading={stats == null}
+              /></>
             )}
 
             {/* Completed anime */}
             {activeTab === 'completed' && (
-              <><StatsList stats={stats?.statuses?.completed?.anime || []} /></>
+              <><StatsList 
+                stats={stats?.statuses?.completed?.anime || []} 
+                view={view}
+                sort={sort}
+                loading={stats == null}
+              /></>
             )}
 
             {/* Anime planned for future viewing */}
             {activeTab === 'planned' && (
-              <><StatsList stats={stats?.statuses?.planned?.anime || []} /></>
+              <><StatsList 
+                stats={stats?.statuses?.planned?.anime || []} 
+                view={view}
+                sort={sort}
+                loading={stats == null}
+              /></>
             )}
 
             {/* Anime temporarily put on hold */}
             {activeTab === 'suspended' && (
-              <><StatsList stats={stats?.statuses?.suspended?.anime || []} /></>
+              <><StatsList 
+                stats={stats?.statuses?.suspended?.anime || []} 
+                view={view}
+                sort={sort}
+                loading={stats == null}
+              /></>
             )}
 
             {/* Anime the user has stopped watching */}
             {activeTab === 'abandoned' && (
-              <><StatsList stats={stats?.statuses?.abandoned?.anime || []} /></>
+              <><StatsList 
+                stats={stats?.statuses?.abandoned?.anime || []} 
+                view={view}
+                sort={sort}
+                loading={stats == null}
+              /></>
             )}
 
           </motion.div>

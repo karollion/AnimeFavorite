@@ -142,7 +142,7 @@ const Settings = () => {
 
       const savedTheme =
         updatedUser?.preferences?.ui?.theme || data.ui?.theme
-          
+
       if (['light', 'dark'].includes(savedTheme)) {
         localStorage.setItem('appTheme', savedTheme)
         syncTheme(updatedUser)
@@ -232,6 +232,7 @@ const Settings = () => {
                   <Form.Select {...register('behavior.defaultSort')}>
                     <option value="rating">Rating</option>
                     <option value="newest">Newest</option>
+                    <option value="title">Name (A–Z)</option>
                   </Form.Select>
                 </div>
               </div>

@@ -24,6 +24,7 @@ import { getUser, fetchProfile } from './redux/reducers/userRedux'
 import { useEffect } from 'react'
 import syncLanguage from './i18n/syncLanguage'
 import syncTheme from './theme/syncTheme'
+import Search from './components/pages/Search/Search';
 
 function App() {
   const dispatch = useDispatch()
@@ -53,6 +54,8 @@ function App() {
           <Route path='/Login' element={<Login/>} />
 
           <Route path='/Settings' element={<Settings/>} />
+
+          <Route path='/Search' element={<Search/>} />
 
           <Route
             path='/Logout'

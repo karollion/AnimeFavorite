@@ -1,0 +1,58 @@
+@import '../../../styles/settings.scss';
+
+.root {
+  min-height: 60vh;
+  padding: 1.5rem 0;
+  color: var(--color-text, inherit);
+}
+
+.title {
+  margin-bottom: 1.5rem;
+}
+
+.searchForm {
+  max-width: 700px;
+  margin-bottom: 1.5rem;
+}
+
+.toolbar {
+  display: flex;
+  justify-content: flex-end;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin-bottom: 1.5rem;
+}
+
+.control {
+  width: 180px;
+}
+
+.message {
+  padding: 1.5rem 0;
+  text-align: center;
+  color: var(--color-text-muted, #888);
+}
+
+.error {
+  padding: 1rem;
+  color: #dc3545;
+}
+
+.pagination {
+  display: flex;
+  align-items: center;
+  justify-content: center;
+  flex-wrap: wrap;
+  gap: 1rem;
+  margin: 1.5rem 0;
+}
+
+@media (max-width: 480px) {
+  .toolbar {
+    justify-content: stretch;
+  }
+
+  .control {
+    width: 100%;
+  }
+}

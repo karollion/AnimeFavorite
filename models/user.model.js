@@ -53,7 +53,7 @@ const UserSchema = new mongoose.Schema(
       },
     
       behavior: {
-        defaultSort: { type: String, enum: ['rating', 'newest'], default: 'rating' },
+        defaultSort: { type: String, enum: ['rating', 'newest', 'title'], default: 'rating' },
       },
     
       notifications: {
