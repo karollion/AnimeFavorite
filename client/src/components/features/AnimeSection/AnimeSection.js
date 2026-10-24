@@ -5,9 +5,12 @@ import PropTypes from 'prop-types'
 import AnimeCard from '../AnimeCard/AnimeCard'
 import SkeletonAnimeCard from '../AnimeCard/SkeletonAnimeCard'
 import Button from '../../common/Button/Button'
+import { useTranslation } from 'react-i18next'
+
 
 const AnimeSection = ({ title, animes }) => {
   const sliderRef = useRef(null)
+  const { t } = useTranslation()
 
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
@@ -87,7 +90,7 @@ const AnimeSection = ({ title, animes }) => {
             type="button"
             className={`${styles.arrow} ${styles.arrowLeft}`}
             onClick={() => scrollSlider(-1)}
-            aria-label="Poprzednie anime"
+            aria-label={t('animeSection.btnLariaLabel')}
           >
             &#10094;
           </button>
@@ -115,14 +118,14 @@ const AnimeSection = ({ title, animes }) => {
             type="button"
             className={`${styles.arrow} ${styles.arrowRight}`}
             onClick={() => scrollSlider(1)}
-            aria-label="Następne anime"
+            aria-label={t('animeSection.btnRariaLabel')}
           >
             &#10095;
           </button>
         )}
       </div>
 
-      <Button to="/">Show more</Button>
+      <Button to="/">{t('common.showMore')}</Button>
     </section>
   )
 }

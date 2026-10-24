@@ -42,5 +42,9 @@
     "random": "Losowe",
     "movies": "Filmy",
     "tvSeries": "Seriale TV"
+  },
+  "animeSection": {
+    "btnLariaLabel": "Poprzednie anime",
+    "btnRariaLabel": "Następne anime"
   }
 }
