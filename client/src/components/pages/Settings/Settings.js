@@ -215,7 +215,7 @@ const Settings = () => {
                   </Form.Select>
                 </div>
 
-                {/* Enable or disable automatic playback */}
+                {/* Enable or disable automatic playback *
                 <div className={styles.row}>
                   <span>Auto Play</span>
 
@@ -223,7 +223,7 @@ const Settings = () => {
                     className={styles.switch}
                     {...register('ui.autoPlay')}
                   />
-                </div>
+                </div>/}
 
                 {/* Default sorting method for content */}
                 <div className={styles.row}>
