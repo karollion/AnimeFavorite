@@ -60,15 +60,38 @@ exports.upsert = asyncHandler(async (req, res) => {
   }
 
   /* ---------- CREATE NEW RELATION ---------- */
-  userAnime = await UserAnime.create({
+  const newRelation = {
     user: userId,
     anime,
-    favorite_anime,
-    rating,
-    status,
-  });
-
-  res.status(201).json(userAnime);
+  };
+  
+  // Add only the fields that the client actually provided.
+  // This prevents omitted fields from being saved as undefined.
+  if (favorite_anime !== undefined) {
+    newRelation.favorite_anime = favorite_anime;
+  }
+  
+  if (status !== undefined) {
+    newRelation.status = status;
+  }
+  
+  if (rating !== undefined && rating !== null && rating !== '') {
+    const numericRating = Number(rating);
+  
+    if (!Number.isFinite(numericRating) ||
+        numericRating < 0 ||
+        numericRating > 10) {
+      return res.status(400).json({
+        message: 'Rating must be a number between 0 and 10.',
+      });
+    }
+  
+    newRelation.rating = Math.round(numericRating);
+  }
+  
+  userAnime = await UserAnime.create(newRelation);
+  
+  return res.status(201).json(userAnime);
 });
 
 

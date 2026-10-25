@@ -36,12 +36,28 @@ const UserAnimeSchema = new mongoose.Schema(
       default: "not watched"
     },
 
-    /** User's rating for the anime (0–10, rounded to nearest integer) */
+    /** User's rating for the anime (0–10, rounded to nearest integer). */
     rating: {
       type: Number,
       min: 0,
       max: 10,
-      set: v => Math.round(v)
+    
+      // Do not transform a missing or empty rating into NaN.
+      // Leave the field unset when the user has not rated the anime.
+      set: v => {
+        if (v === undefined || v === null || v === '') {
+          return undefined;
+        }
+      
+        const numericValue = Number(v);
+      
+        // Reject invalid values instead of storing NaN.
+        if (!Number.isFinite(numericValue)) {
+          return undefined;
+        }
+      
+        return Math.round(numericValue);
+      },
     },
 
     /** User's personal opinion / review text */
