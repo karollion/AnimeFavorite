@@ -24,8 +24,8 @@ const ReviewSchema = new mongoose.Schema(
     /** Reference to the anime being reviewed */
     anime: { type: mongoose.Schema.Types.ObjectId, ref: "Anime", required: true },
 
-    /** Rating given by the user (0-10) */
-    rating: { type: Number, min: 0, max: 10, required: true },
+    /** Rating given by the user (1-10) */
+    rating: { type: Number, min: 1, max: 10, required: true },
 
     /** Optional text review */
     review_text: { type: String, trim: true },

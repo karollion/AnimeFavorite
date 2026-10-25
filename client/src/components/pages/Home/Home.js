@@ -68,7 +68,7 @@ const Home = () => {
     films,
     tvSeries,
     random,
-    loading,
+    //loading,
   } = useSelector(state => state.home)
 
   /* =====================================================
@@ -105,6 +105,7 @@ const Home = () => {
         <div>
          <p>!!! Dokonczyć tłumaczenia wszystkich stron, i przerabianie motywów wszsystkich scss !!!</p>
          <p>!!! Zrobic podstrony do sekcji w home po kliknieciu pokaz wiecej !!!</p>
+          <p>!!! Sprawdzic rewiew i season rating i ich powiazania , chyba trzeba dodac rating sezonu!!!</p>
           {/* Displays the newest anime entries */}
           <AnimeSection title={t('homePage.newAnimes')} animes={newest} />
 

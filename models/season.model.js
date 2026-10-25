@@ -37,7 +37,7 @@ const SeasonSchema = new mongoose.Schema(
     episodes_count: { type: Number },
 
     /** Optional average rating of the season */
-    rating: { type: Number, min: 0, max: 10 },
+    rating: { type: Number, min: 1, max: 10 },
 
     /** URL to season cover image */
     season_cover: { type: String, trim: true },

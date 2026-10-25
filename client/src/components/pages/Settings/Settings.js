@@ -28,7 +28,6 @@ import { useEffect, useState } from 'react'
 
 // Translation
 import { useTranslation } from 'react-i18next'
-import syncLanguage from '../../../i18n/syncLanguage'
 import syncTheme from '../../../theme/syncTheme'
 
 /**
@@ -162,7 +161,7 @@ const Settings = () => {
         <Container className={styles.container}>
 
           {/* Page heading */}
-          <h1 className={styles.title}>Settings</h1>
+          <h1 className={styles.title}>{t('settings.title')}</h1>
 
           <Row className={styles.grid}>
 

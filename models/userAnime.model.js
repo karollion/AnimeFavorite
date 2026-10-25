@@ -36,7 +36,7 @@ const UserAnimeSchema = new mongoose.Schema(
       default: "not watched"
     },
 
-    /** User's rating for the anime (0–10, rounded to nearest integer). */
+    /** User's rating for the anime (1–10, rounded to nearest integer). */
     rating: {
       type: Number,
       min: 1,
