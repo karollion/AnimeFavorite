@@ -309,8 +309,29 @@ const Anime = () => {
         <p>World: {anime.world}</p>
         <p>Genres: {anime.genres}</p>
         <p>Categories: {anime.categories}</p>
-        <p>Rating avg: {anime.rating_avg}</p>
-        <p>Rating count: {anime.rating_count}</p>
+        {/* =====================================================
+            COMMUNITY RATING
+            ===================================================== */}
+        
+        <p>
+          Rating avg:{' '}
+          <strong>
+            {statsAnimeId === anime._id && stats
+              ? Number.isFinite(stats.ratingAvg)
+                ? stats.ratingAvg.toFixed(1)
+                : '—'
+              : anime.rating_avg ?? '—'}
+          </strong>
+        </p>
+            
+        <p>
+          Rating count:{' '}
+          <strong>
+            {statsAnimeId === anime._id && stats
+              ? stats.ratingCount
+              : anime.rating_count ?? 0}
+          </strong>
+        </p>
 
         {/* =====================================================
             USER ANIME LIST
@@ -326,10 +347,10 @@ const Anime = () => {
             {/* =====================================================
                 PERSONAL ANIME RATING
                 ===================================================== */}
-            
+
             <div className={styles.ratingSection}>
               <h3>Your rating</h3>
-                        
+
               {/*
                 The rating belongs to the currently displayed anime.
                 Zero means that the user has not rated this anime yet.
@@ -373,7 +394,7 @@ const Anime = () => {
                           </button>
                         )
                       })}
-            
+
                       <span className={styles.ratingValue}>
                         {currentRating > 0
                           ? `${currentRating}/10`

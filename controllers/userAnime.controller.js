@@ -173,58 +173,81 @@ exports.getAnimeStats = asyncHandler(async (req, res) => {
     {
       $group: {
         _id: null,
-
+      
+        // Liczba wszystkich relacji użytkowników z tym anime.
         total: { $sum: 1 },
-
+      
+        // Liczba użytkowników, którzy dodali anime do ulubionych.
         favorites: {
           $sum: {
             $cond: [{ $eq: ["$favorite_anime", true] }, 1, 0],
           },
         },
-
+      
+        // Średnia wyłącznie z faktycznie wystawionych ocen.
+        // MongoDB pomija brakujące wartości rating.
+        ratingAvg: { $avg: "$rating" },
+      
+        // Liczba faktycznie wystawionych ocen.
+        // Samo dodanie anime do listy nie zwiększa tego licznika.
+        ratingCount: {
+          $sum: {
+            $cond: [
+              { $isNumber: "$rating" },
+              1,
+              0,
+            ],
+          },
+        },
+      
         notWatched: {
           $sum: {
             $cond: [{ $eq: ["$status", "not watched"] }, 1, 0],
           },
         },
-
+      
         planned: {
           $sum: {
             $cond: [{ $eq: ["$status", "planned"] }, 1, 0],
           },
         },
-
+      
         watching: {
           $sum: {
             $cond: [{ $eq: ["$status", "watching"] }, 1, 0],
           },
         },
-
+      
         completed: {
           $sum: {
             $cond: [{ $eq: ["$status", "completed"] }, 1, 0],
           },
         },
-
+      
         suspended: {
           $sum: {
             $cond: [{ $eq: ["$status", "suspended"] }, 1, 0],
           },
         },
-
+      
         abandoned: {
           $sum: {
             $cond: [{ $eq: ["$status", "abandoned"] }, 1, 0],
           },
         },
       },
-    },
+    }
   ]);
 
   /* ---------- RETURN ZERO COUNTS WHEN NO USERS EXIST ---------- */
   const stats = results[0] || {
     total: 0,
     favorites: 0,
+  
+    // Brak ocen oznacza brak średniej, a nie ocenę 0.
+    ratingAvg: null,
+    ratingCount: 0,
+  
     notWatched: 0,
     planned: 0,
     watching: 0,
@@ -232,9 +255,9 @@ exports.getAnimeStats = asyncHandler(async (req, res) => {
     suspended: 0,
     abandoned: 0,
   };
-
+  
   delete stats._id;
-
+  
   res.json(stats);
 });
 
