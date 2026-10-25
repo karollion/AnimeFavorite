@@ -126,6 +126,8 @@ const Anime = () => {
   const [actionMessage, setActionMessage] = useState('')
   const [actionError, setActionError] = useState('')
 
+  const [ratingHover, setRatingHover] = useState(0)
+
    /* =====================================================
    FETCH COMMUNITY STATISTICS
    ===================================================== */
@@ -235,7 +237,51 @@ const Anime = () => {
    */
   if (error) return <p>Error: {error}</p>
 
- 
+  /**
+   * Saves the authenticated user's rating for the current anime.
+   * The value must be an integer between 1 and 10.
+   */
+  const handleRatingChange = async rating => {
+    if (!user || !anime?._id || userAnimeLoading) return
+
+    setActionMessage('')
+    setActionError('')
+
+    try {
+      await dispatch(
+        saveUserAnimeRelation(anime._id, { rating })
+      )
+
+      setActionMessage(`Your rating of ${rating}/10 has been saved.`)
+    } catch (err) {
+      setActionError(
+        err.response?.data?.message || 'Could not save your rating.'
+      )
+    }
+  }
+
+  /**
+   * Removes the user's rating without changing watch status
+   * or favorite settings.
+   */
+  const handleRatingClear = async () => {
+    if (!user || !anime?._id || userAnimeLoading) return
+
+    setActionMessage('')
+    setActionError('')
+
+    try {
+      await dispatch(
+        saveUserAnimeRelation(anime._id, { rating: null })
+      )
+
+      setActionMessage('Your rating has been removed.')
+    } catch (err) {
+      setActionError(
+        err.response?.data?.message || 'Could not remove your rating.'
+      )
+    }
+  }
 
   /* =====================================================
      ANIME DETAILS
@@ -277,6 +323,78 @@ const Anime = () => {
             <p>Log in to manage your anime list and favorites.</p>
           ) : (
             <>
+            {/* =====================================================
+                PERSONAL ANIME RATING
+                ===================================================== */}
+            
+            <div className={styles.ratingSection}>
+              <h3>Your rating</h3>
+                        
+              {/*
+                The rating belongs to the currently displayed anime.
+                Zero means that the user has not rated this anime yet.
+              */}
+              {(() => {
+                const currentRating =
+                  userAnimeAnimeId === anime._id
+                    ? Number(userAnimeRelation?.rating) || 0
+                    : 0
+              
+                const displayedRating = ratingHover || currentRating
+              
+                return (
+                  <>
+                    <div
+                      className={styles.ratingStars}
+                      role="group"
+                      aria-label="Rate this anime from 1 to 10"
+                      onMouseLeave={() => setRatingHover(0)}
+                    >
+                      {Array.from({ length: 10 }, (_, index) => {
+                        const starValue = index + 1
+                      
+                        return (
+                          <button
+                            key={starValue}
+                            type="button"
+                            className={
+                              starValue <= displayedRating
+                                ? styles.starButtonActive
+                                : styles.starButton
+                            }
+                            onClick={() => handleRatingChange(starValue)}
+                            onMouseEnter={() => setRatingHover(starValue)}
+                            disabled={userAnimeLoading}
+                            aria-label={`Rate ${starValue} out of 10`}
+                            aria-pressed={currentRating === starValue}
+                            title={`${starValue}/10`}
+                          >
+                            ★
+                          </button>
+                        )
+                      })}
+            
+                      <span className={styles.ratingValue}>
+                        {currentRating > 0
+                          ? `${currentRating}/10`
+                          : 'Not rated'}
+                      </span>
+                    </div>
+                        
+                    {currentRating > 0 && (
+                      <button
+                        type="button"
+                        className={styles.clearRatingButton}
+                        onClick={handleRatingClear}
+                        disabled={userAnimeLoading}
+                      >
+                        Remove rating
+                      </button>
+                    )}
+                  </>
+                )
+              })()}
+            </div>
               <label htmlFor="anime-status">
                 Watch status
               </label>

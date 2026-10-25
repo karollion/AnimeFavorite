@@ -39,7 +39,7 @@ const UserAnimeSchema = new mongoose.Schema(
     /** User's rating for the anime (0–10, rounded to nearest integer). */
     rating: {
       type: Number,
-      min: 0,
+      min: 1,
       max: 10,
     
       // Do not transform a missing or empty rating into NaN.

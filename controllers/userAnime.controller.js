@@ -48,11 +48,43 @@ exports.upsert = asyncHandler(async (req, res) => {
 
   /* ---------- UPDATE EXISTING ---------- */
   if (userAnime) {
-    userAnime.favorite_anime =
-      favorite_anime ?? userAnime.favorite_anime;
+    // Change the favorite flag only when it was provided.
+    if (favorite_anime !== undefined) {
+      userAnime.favorite_anime = favorite_anime;
+    }
 
-    userAnime.rating = rating ?? userAnime.rating;
-    userAnime.status = status ?? userAnime.status;
+    // Change the watch status only when it was provided.
+    if (status !== undefined) {
+      userAnime.status = status;
+    }
+
+    /*
+     * Update the rating only when the request explicitly contains
+     * the rating property. This prevents a favorite/status update
+     * from accidentally overwriting the user's existing rating.
+     *
+     * null or an empty string means that the user wants to remove
+     * their rating.
+     */
+    if (Object.prototype.hasOwnProperty.call(req.body, 'rating')) {
+      if (rating === null || rating === '') {
+        userAnime.rating = undefined;
+      } else {
+        const numericRating = Number(rating);
+
+        if (
+          !Number.isFinite(numericRating) ||
+          numericRating < 1 ||
+          numericRating > 10
+        ) {
+          return res.status(400).json({
+            message: 'Rating must be a number between 1 and 10.',
+          });
+        }
+
+        userAnime.rating = Math.round(numericRating);
+      }
+    }
 
     await userAnime.save();
 
@@ -64,33 +96,33 @@ exports.upsert = asyncHandler(async (req, res) => {
     user: userId,
     anime,
   };
-  
+
   // Add only the fields that the client actually provided.
   // This prevents omitted fields from being saved as undefined.
   if (favorite_anime !== undefined) {
     newRelation.favorite_anime = favorite_anime;
   }
-  
+
   if (status !== undefined) {
     newRelation.status = status;
   }
-  
+
   if (rating !== undefined && rating !== null && rating !== '') {
     const numericRating = Number(rating);
-  
+
     if (!Number.isFinite(numericRating) ||
-        numericRating < 0 ||
+        numericRating < 1 ||
         numericRating > 10) {
       return res.status(400).json({
-        message: 'Rating must be a number between 0 and 10.',
+        message: 'Rating must be a number between 1 and 10.',
       });
     }
-  
+
     newRelation.rating = Math.round(numericRating);
   }
-  
+
   userAnime = await UserAnime.create(newRelation);
-  
+
   return res.status(201).json(userAnime);
 });
 
