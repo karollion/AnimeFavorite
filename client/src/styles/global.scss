@@ -6,6 +6,11 @@
   box-sizing: border-box;
 }
 
+#root {
+  min-height: 100%;
+  background-color: #06163d;
+}
+
 html {
   background-color: var(--color-background);
   color: var(--color-text);
