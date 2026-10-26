@@ -170,11 +170,11 @@ const Settings = () => {
 
               {/* USER INTERFACE SETTINGS */}
               <div className={styles.section}>
-                <h2>User Interface</h2>
+                <h2>{t('settings.userinterface')}</h2>
 
                 {/* Preferred application theme */}
                 <div className={styles.row}>
-                  <span>Theme</span>
+                  <span>{t('settings.theme')}</span>
 
                   <Form.Select
                     {...register('ui.theme')}
@@ -183,8 +183,8 @@ const Settings = () => {
                       handleThemeChange(event)
                     }}
                   >
-                    <option value="dark">Dark</option>
-                    <option value="light">Light</option>
+                    <option value="dark">{t('settings.themeDark')}</option>
+                    <option value="light">{t('settings.themeLight')}</option>
                   </Form.Select>
                 </div>
 
@@ -199,18 +199,18 @@ const Settings = () => {
                       handleLanguageChange(event.target.value)
                     }}
                   >
-                    <option value="en">English</option>
-                    <option value="pl">Polski</option>
+                    <option value="en">{t('settings.languageEN')}</option>
+                    <option value="pl">{t('settings.languagePL')}</option>
                   </Form.Select>
                 </div>
 
                 {/* Default layout for displaying content */}
                 <div className={styles.row}>
-                  <span>Default View</span>
+                  <span>{t('settings.defaultView')}</span>
 
                   <Form.Select {...register('ui.defaultView')}>
-                    <option value="grid">Grid</option>
-                    <option value="list">List</option>
+                    <option value="grid">{t('settings.grid')}</option>
+                    <option value="list">{t('settings.list')}</option>
                   </Form.Select>
                 </div>
 
@@ -226,23 +226,23 @@ const Settings = () => {
 
                 {/* Default sorting method for content */}
                 <div className={styles.row}>
-                  <span>Default Sort</span>
+                  <span>{t('settings.defaultSort')}</span>
 
                   <Form.Select {...register('behavior.defaultSort')}>
-                    <option value="rating">Rating</option>
-                    <option value="newest">Newest</option>
-                    <option value="title">Name (A–Z)</option>
+                    <option value="rating">{t('settings.defrating')}</option>
+                    <option value="newest">{t('settings.defnewest')}</option>
+                    <option value="title"> {t('settings.deftitle')}(A–Z)</option>
                   </Form.Select>
                 </div>
               </div>
 
               {/* CONTENT SETTINGS */}
               <div className={styles.section}>
-                <h2>Content</h2>
+                <h2>{t('settings.content')}</h2>
 
                 {/* Control whether NSFW content is displayed */}
                 <div className={styles.row}>
-                  <span>Show NSFW</span>
+                  <span>{t('settings.showNSFW')}</span>
 
                   <Form.Switch
                     className={styles.switch}
@@ -252,7 +252,7 @@ const Settings = () => {
 
                 {/* Control whether spoiler-related content is hidden */}
                 <div className={styles.row}>
-                  <span>Hide Spoilers</span>
+                  <span>{t('settings.hideSpoilers')}</span>
 
                   <Form.Switch
                     className={styles.switch}
@@ -262,7 +262,7 @@ const Settings = () => {
 
                 {/* Select preferred genres using multiple checkboxes */}
                 <div className={`${styles.row} ${styles.genresRow}`}>
-                  <span>Preferred Genres</span>
+                  <span>{t('settings.preferredGenres')}</span>
 
                   <div className={styles.genresList}>
 
@@ -324,11 +324,11 @@ const Settings = () => {
 
               {/* NOTIFICATION SETTINGS */}
               <div className={styles.section}>
-                <h2>Notifications</h2>
+                <h2>{t('settings.notifications')}</h2>
 
                 {/* Enable or disable email notifications */}
                 <div className={styles.row}>
-                  <span>Email</span>
+                  <span>{t('settings.email')}</span>
 
                   <Form.Switch
                     className={styles.switch}
@@ -338,7 +338,7 @@ const Settings = () => {
 
                 {/* Enable or disable in-app notifications */}
                 <div className={styles.row}>
-                  <span>In App</span>
+                  <span>{t('settings.inApp')}</span>
 
                   <Form.Switch
                     className={styles.switch}
@@ -348,7 +348,7 @@ const Settings = () => {
 
                 {/* Enable or disable push notifications */}
                 <div className={styles.row}>
-                  <span>Push</span>
+                  <span>{t('settings.push')}</span>
 
                   <Form.Switch
                     className={styles.switch}
@@ -365,24 +365,24 @@ const Settings = () => {
           <div className={styles.actions}>
 
             {/* Submit the updated preferences */}
-            <Button type="submit">Save</Button>
+            <Button type="submit">{t('common.save')}</Button>
 
             {/* Navigate back to the home page */}
             <Button to="/">
-              Back to home
+              {t('common.home')}
             </Button>
 
             {/* Confirmation displayed after a successful save */}
             {saveStatus === 'success' && (
               <span className={styles.success}>
-                Settings saved successfully.
+                {t('settings.saveSuccess')}
               </span>
             )}
 
             {/* Error message displayed when saving fails */}
             {saveStatus === 'error' && (
               <span className={styles.error}>
-                Failed to save settings.
+                {t('settings.saveFailed')}
               </span>
             )}
           </div>
