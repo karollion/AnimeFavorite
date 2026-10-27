@@ -8,8 +8,8 @@
   justify-content: center;  // ⬅️ pion (środek ekranu)
   align-items: center;      // ⬅️ poziom
 
-  background-color: $homePage-bg-color;
-  color: $color-light;
+  //background-color: $homePage-bg-color;
+  color: var(--color-text);
 
   .characters {
     display: flex;

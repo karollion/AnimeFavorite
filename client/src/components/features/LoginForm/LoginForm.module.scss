@@ -1,7 +1,7 @@
 @import '../../../styles/settings.scss';
 
 .root {
-  background-color: $homePage-bg-color;
-  color: $color-light;
+  //background-color: $homePage-bg-color;
+  color: var(--color-text);
   width: 500px;
 }
