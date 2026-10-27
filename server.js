@@ -91,12 +91,17 @@ app.disable("x-powered-by");
  * CORS only enabled in development.
  * Production should be handled by reverse proxy.
  */
-if (process.env.NODE_ENV !== "production") {
-  app.use(cors({
-    origin: "http://127.0.0.1:3000",
-    credentials: true
-  }));
-}
+const allowedOrigins =
+  process.env.NODE_ENV === "production"
+    ? [process.env.APP_URL]
+    : ["http://127.0.0.1:3000"];
+
+app.use(
+  cors({
+    origin: allowedOrigins,
+    credentials: true,
+  })
+);
 
 /**
  * Body parsers
@@ -186,12 +191,7 @@ const startServer = async () => {
   app.use("/api/reviews", reviewRoutes);
 
 
-  app.get("/debug-session", (req, res) => {
-  res.json({
-      cookie: req.headers.cookie || null,
-      session: req.session || null,
-    });
-  });
+
 
   /* =====================================================
      STATIC FILES

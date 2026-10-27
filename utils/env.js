@@ -25,8 +25,6 @@ const REQUIRED_ENV = [
   "CLOUDINARY_CLOUD_NAME",
   "CLOUDINARY_API_KEY",
   "CLOUDINARY_API_SECRET",
-  "MONGO_URI_DEV",
-  "MONGO_URI_PROD"
 ];
 
 /* =====================================================
@@ -48,19 +46,23 @@ const DEFAULTS = {
  * Throws error if required ENV variables are missing.
  */
 function validateRequiredEnv() {
-  const missing = REQUIRED_ENV.filter(
-    key => !process.env[key]
-  );
+  const required = [
+    ...REQUIRED_ENV,
+    process.env.NODE_ENV === "production"
+      ? "MONGO_URI_PROD"
+      : "MONGO_URI_DEV",
+  ];
+
+  const missing = required.filter((key) => !process.env[key]);
 
   if (missing.length > 0) {
     console.error("\n❌ Missing required ENV variables:\n");
 
-    missing.forEach(key => {
+    missing.forEach((key) => {
       console.error(`   - ${key}`);
     });
 
-    console.error("\nFix your .env file before starting the server.\n");
-
+    console.error("\nFix your environment variables before starting the server.\n");
     process.exit(1);
   }
 }
