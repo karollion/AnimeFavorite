@@ -79,6 +79,11 @@ const loginLimiter = rateLimit({
 app.use(
   helmet({
     crossOriginResourcePolicy: false,
+    contentSecurityPolicy: {
+      directives: {
+        imgSrc: ["'self'", "data:", "https://res.cloudinary.com"],
+      },
+    },
   })
 );
 
