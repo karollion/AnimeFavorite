@@ -76,8 +76,14 @@ const Profile = () => {
           {/* Displays the user avatar or a fallback image */}
           <img
             src={user.avatar || noImage}
-            alt={user.login}
+            alt={user.login || 'Avatar użytkownika'}
             className={styles.img}
+            onError={(event) => {
+              // Nie próbuj ponownie ładować obrazka, który już jest fallbackiem.
+              if (event.currentTarget.src !== new URL(noImage, window.location.href).href) {
+                event.currentTarget.src = noImage;
+              }
+            }}
           />
 
           <div>
