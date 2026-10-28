@@ -15,6 +15,8 @@ The backend provides a REST API with session-based authentication and role-based
 
 ## 📸 Preview
 
+Project page: [AnimeFavorite](https://animefavorite.onrender.com/)
+
 ------------------------------------------------------------------------
 
 ## 🛠 Tech stack

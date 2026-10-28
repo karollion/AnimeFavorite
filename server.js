@@ -195,18 +195,31 @@ const startServer = async () => {
   app.use("/api/seasons", seasonRoutes);
   app.use("/api/reviews", reviewRoutes);
 
-
-
-
   /* =====================================================
      STATIC FILES
      ===================================================== */
 
-  /**
-   * Public uploads + React production build.
-   */
   app.use(express.static(path.join(__dirname, "public")));
-  app.use(express.static(path.join(__dirname, "client/build")));
+
+  const buildPath = path.join(__dirname, "client/build");
+
+  app.use(express.static(buildPath));
+
+  /* =====================================================
+     REACT SPA FALLBACK
+     ===================================================== */
+
+  /**
+   * Return React's index.html for frontend routes.
+   * Keep API requests out of this fallback.
+   */
+  app.get(/.*/, (req, res, next) => {
+    if (req.path.startsWith("/api/")) {
+      return next();
+    }
+
+    res.sendFile(path.join(buildPath, "index.html"));
+  });
 
   /* =====================================================
      404 HANDLER
@@ -222,10 +235,6 @@ const startServer = async () => {
      GLOBAL ERROR HANDLER
      ===================================================== */
 
-  /**
-   * Centralized error handling middleware.
-   * Works together with asyncHandler().
-   */
   app.use((err, req, res, next) => {
     console.error(err);
 
