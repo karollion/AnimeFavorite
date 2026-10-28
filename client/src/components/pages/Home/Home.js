@@ -103,9 +103,7 @@ const Home = () => {
     <div className={styles.root}>
       <Container>
         <div>
-         <p>!!! Dokonczyć tłumaczenia wszystkich stron, i przerabianie motywów wszsystkich scss !!!</p>
-         <p>!!! Zrobic podstrony do sekcji w home po kliknieciu pokaz wiecej !!!</p>
-          <p>!!! Sprawdzic rewiew i season rating i ich powiazania , chyba trzeba dodac rating sezonu!!!</p>
+         
           {/* Displays the newest anime entries */}
           <AnimeSection title={t('homePage.newAnimes')} animes={newest} />
 
@@ -120,6 +118,14 @@ const Home = () => {
 
           {/* Displays anime TV series */}
           <AnimeSection title={t('homePage.tvSeries')} animes={tvSeries} />
+
+          <section>
+            <p>!!! Dokonczyć tłumaczenia wszystkich stron, i przerabianie motywów wszsystkich scss !!!</p>
+            <p>!!! Zrobic podstrony do sekcji w home po kliknieciu pokaz wiecej !!!</p>
+            <p>!!! Sprawdzic rewiew i season rating i ich powiazania , chyba trzeba dodac rating sezonu!!!</p>
+            <p>!!! Usuwanie anime, dodawanie sezonów</p>
+            <p>!!! dodanie okienek gdzie trzeba</p>
+          </section>
 
         </div>
       </Container>

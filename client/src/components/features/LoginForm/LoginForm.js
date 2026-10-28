@@ -5,31 +5,34 @@ import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { loginRequest } from '../../../redux/reducers/userRedux';
 import { useNavigate } from 'react-router-dom';
+import { useMessage } from '../../../context/MessageContext';
 
 const LoginForm = ({ actionText = 'Login' }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+  const { showMessage } = useMessage();
 
   const {
     register,
     handleSubmit,
-    setError,
     formState: { errors },
   } = useForm({});
 
-  const onSubmit = async data => {
+  const onSubmit = async (data) => {
     try {
       await dispatch(loginRequest(data));
       navigate('/');
     } catch (error) {
-    setError('root.serverError', {
-      type: 'server',
-      message:
-        error.response?.status === 401
-          ? 'Invalid login or password.'
-          : 'An error occurred during login. Please try again.',
-    });
-  }
+      await showMessage({
+        title: 'Login failed',
+        message:
+          error.response?.status === 401
+            ? 'Invalid login or password.'
+            : 'An error occurred during login. Please try again.',
+        mode: 'alert',
+        confirmText: 'OK',
+      });
+    }
   };
 
 
@@ -60,12 +63,6 @@ const LoginForm = ({ actionText = 'Login' }) => {
       {/* ACTIONS */}
       <div className={styles.buttons}>
         <Button type="submit">{actionText}</Button>
-
-        {errors.root?.serverError && (
-          <p className="text-danger" role="alert">
-            {errors.root.serverError.message}
-          </p>
-        )}
 
         <p>Don't have an account?</p>
         <Button to="/Signup">Signup</Button>
