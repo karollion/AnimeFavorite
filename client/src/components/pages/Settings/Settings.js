@@ -19,12 +19,13 @@ import Button from '../../common/Button/Button'
 // Redux
 import { getUser, updateProfileRequest } from '../../../redux/reducers/userRedux'
 import { useDispatch, useSelector } from 'react-redux'
+import { useMessage } from '../../../context/MessageContext'
 
 // Form management
 import { useForm } from 'react-hook-form'
 
 // React hooks
-import { useEffect, useState } from 'react'
+import { useEffect } from 'react'
 
 // Translation
 import { useTranslation } from 'react-i18next'
@@ -49,9 +50,8 @@ const Settings = () => {
   const dispatch = useDispatch()
   const user = useSelector(getUser)
 
-  const [saveStatus, setSaveStatus] = useState(null)
-
   const { t, i18n } = useTranslation()
+  const { showMessage } = useMessage()
 
   const {
     register,
@@ -73,7 +73,6 @@ const Settings = () => {
     if (!['en', 'pl'].includes(language)) return
 
     await i18n.changeLanguage(language)
-    setSaveStatus(null)
   }
 
   /*
@@ -94,7 +93,6 @@ const Settings = () => {
     if (!['light', 'dark'].includes(theme)) return
 
     document.documentElement.setAttribute('data-theme', theme)
-    setSaveStatus(null)
   }
 
   /*
@@ -103,8 +101,6 @@ const Settings = () => {
    * the server confirms that the profile update succeeded.
    */
   const onSubmit = async data => {
-    setSaveStatus(null)
-  
     try {
       const updatedUser = await dispatch(
         updateProfileRequest({
@@ -130,10 +126,10 @@ const Settings = () => {
           },
         })
       )
-    
+
       const savedLanguage =
         updatedUser?.preferences?.ui?.language || data.ui?.language
-    
+
       if (['en', 'pl'].includes(savedLanguage)) {
         await i18n.changeLanguage(savedLanguage)
         localStorage.setItem('appLanguage', savedLanguage)
@@ -146,13 +142,23 @@ const Settings = () => {
         localStorage.setItem('appTheme', savedTheme)
         syncTheme(updatedUser)
       }
-    
-      setSaveStatus('success')
+
+      await showMessage({
+        title: t('settings.title'),
+        message: t('settings.saveSuccess'),
+        mode: 'alert',
+        confirmText: 'OK',
+      })
+
     } catch (error) {
-      setSaveStatus('error')
+      await showMessage({
+        title: 'Error',
+        message: t('settings.saveFailed'),
+        mode: 'alert',
+        confirmText: 'OK',
+      })
     }
   }
-
 
   return (
     <div className={styles.root}>
@@ -372,19 +378,6 @@ const Settings = () => {
               {t('common.home')}
             </Button>
 
-            {/* Confirmation displayed after a successful save */}
-            {saveStatus === 'success' && (
-              <span className={styles.success}>
-                {t('settings.saveSuccess')}
-              </span>
-            )}
-
-            {/* Error message displayed when saving fails */}
-            {saveStatus === 'error' && (
-              <span className={styles.error}>
-                {t('settings.saveFailed')}
-              </span>
-            )}
           </div>
 
         </Container>
