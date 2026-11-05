@@ -16,7 +16,7 @@
     "edit": "Edit"
   },
   "settings": {
-    "title": "Settings",
+    "title": "SETTINGS",
     "language": "Language",
     "languageEN": "English",
     "languagePL": "Polish",
@@ -57,11 +57,11 @@
     "noanimefound": "No anime found."
   },
   "homePage": {
-    "newAnimes": "New Animes",
-    "topRated": "Top Rated",
-    "random": "Random",
-    "movies": "Movies",
-    "tvSeries": "TV Series"
+    "newAnimes": "NEW ANIMES",
+    "topRated": "TOP RATED",
+    "random": "RANDOM",
+    "movies": "MOVIES",
+    "tvSeries": "TV SERIES"
   },
   "footer": {
     "createdBy": "Create by:"

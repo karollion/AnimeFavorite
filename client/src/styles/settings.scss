@@ -1,3 +1,21 @@
+// -------- Fonts -------- //
+
+@font-face {
+  font-family: 'Chalkduster';
+  src: url('../fonts/Chalkduster.ttf') format('truetype');
+  font-weight: 400;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'Caveat';
+  src: url('../fonts/Kalam-Regular.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 // -------- Colors -------- //
 $primary-color-light: #6a89cc;
 $primary-color-light-medium: #4a69bd;
@@ -73,6 +91,11 @@ $footer-bg-color: $primary-color-dark;
 [data-theme='light'] {
   color-scheme: light;
 
+  /* Typography */
+  --theme-heading: 'Chalkduster', cursive;
+  --theme-primary: 'Caveat', cursive;
+
+  /* Colors */
   --color-background: #f5f6fa;
   --color-surface: #ffffff;
   --color-text: #1a1a1a;
@@ -98,7 +121,12 @@ $footer-bg-color: $primary-color-dark;
 /* Dark theme */
 [data-theme='dark'] {
   color-scheme: dark;
+  
+  /* Typography */
+  --theme-heading: 'Chalkduster', cursive;
+  --theme-primary: 'Caveat', cursive;
 
+  /* Colors */
   --color-background: #121212;
   --color-surface: #1e1e1e;
   --color-text: #f1f1f1;

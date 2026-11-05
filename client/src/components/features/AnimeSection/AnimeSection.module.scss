@@ -9,6 +9,10 @@
 
   min-width: 0;
   overflow: hidden;
+
+  .title{
+    font-family: var(--theme-heading);
+  }
 }
 
 .sliderWrapper {

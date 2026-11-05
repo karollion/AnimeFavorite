@@ -16,7 +16,7 @@
     "edit": "Edytuj"
   },
   "settings": {
-    "title": "Ustawienia",
+    "title": "USTAWIENIA",
     "language": "Język",
     "languageEN": "Angielski",
     "languagePL": "Polski",
@@ -57,11 +57,11 @@
     "noanimefound": "Nie znaleziono żadnego anime."
   },
   "homePage": {
-    "newAnimes": "Najnowsze",
-    "topRated": "Najwyżej oceniane",
-    "random": "Losowe",
-    "movies": "Filmy",
-    "tvSeries": "Seriale TV"
+    "newAnimes": "NAJNOWSZE",
+    "topRated": "NAJWYŻEJ OCENIANE",
+    "random": "LOSOWE",
+    "movies": "FILMY",
+    "tvSeries": "SERIALE TV"
   },
   "animeSection": {
     "btnLariaLabel": "Poprzednie anime",

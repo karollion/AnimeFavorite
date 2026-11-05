@@ -82,7 +82,7 @@ const AnimeSection = ({ title, animes }) => {
 
   return (
     <section className={styles.root}>
-      <h2>{title}</h2>
+      <h2 className={styles.title}>{title}</h2>
 
       <div className={styles.sliderWrapper}>
         {canScrollLeft && (
