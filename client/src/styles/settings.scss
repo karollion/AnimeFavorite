@@ -16,6 +16,22 @@
   font-display: swap;
 }
 
+@font-face {
+  font-family: 'GrenzeGotisch';
+  src: url('../fonts/GrenzeGotisch-VariableFont_wght.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
+@font-face {
+  font-family: 'CormorantGaramond';
+  src: url('../fonts/CormorantGaramond-VariableFont_wght.ttf') format('truetype');
+  font-weight: 400 700;
+  font-style: normal;
+  font-display: swap;
+}
+
 // -------- Colors -------- //
 $primary-color-light: #6a89cc;
 $primary-color-light-medium: #4a69bd;
@@ -95,6 +111,12 @@ $footer-bg-color: $primary-color-dark;
   --theme-heading: 'Chalkduster', cursive;
   --theme-primary: 'Caveat', cursive;
 
+  /* Parallax backgrounds */
+  --parallax-sky: url('../assets/parallax/light/sky.png');
+  --parallax-mountains: url('../assets/parallax/light/mountains.png');
+  --parallax-clouds: url('../assets/parallax/light/clouds.png');
+  --parallax-foreground: url('../assets/parallax/light/foreground.png');
+
   /* Colors */
   --color-background: #f5f6fa;
   --color-surface: #ffffff;
@@ -123,8 +145,14 @@ $footer-bg-color: $primary-color-dark;
   color-scheme: dark;
   
   /* Typography */
-  --theme-heading: 'Chalkduster', cursive;
-  --theme-primary: 'Caveat', cursive;
+  --theme-heading: 'GrenzeGotisch', cursive;
+  --theme-primary: 'CormorantGaramond', cursive;
+
+  /* Parallax backgrounds */
+  --parallax-sky: url('../assets/parallax/dark/sky.png');
+  --parallax-mountains: url('../assets/parallax/dark/mountains.png');
+  --parallax-clouds: url('../assets/parallax/dark/clouds.png');
+  --parallax-foreground: url('../assets/parallax/dark/foreground.png');
 
   /* Colors */
   --color-background: #121212;

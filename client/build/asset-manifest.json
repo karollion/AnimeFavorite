@@ -1,21 +1,23 @@
 {
   "files": {
-    "main.css": "/static/css/main.a8a5aa44.css",
+    "main.css": "/static/css/main.dd7f1ff2.css",
     "main.js": "/static/js/main.cf1960a1.js",
+    "static/media/CormorantGaramond-VariableFont_wght.ttf": "/static/media/CormorantGaramond-VariableFont_wght.b30f6dd107ae0d40f7ab.ttf",
     "static/media/Chalkduster.ttf": "/static/media/Chalkduster.9ff31f6c447e398c8ebd.ttf",
     "static/media/Kalam-Regular.ttf": "/static/media/Kalam-Regular.c9a40923d1e67f922719.ttf",
-    "static/media/clouds.png": "/static/media/clouds.22ba57f9b87c406bf8d3.png",
-    "static/media/foreground.png": "/static/media/foreground.68fdbdf8c8642e188a35.png",
-    "static/media/mountains.png": "/static/media/mountains.0101cb8b707b6f90d39c.png",
-    "static/media/sky.png": "/static/media/sky.0fc96873ba3902fee574.png",
+    "static/media/clouds.png": "/static/media/clouds.7078f3440f3ea3be0879.png",
+    "static/media/GrenzeGotisch-VariableFont_wght.ttf": "/static/media/GrenzeGotisch-VariableFont_wght.ddd4797c686385f65db0.ttf",
+    "static/media/foreground.png": "/static/media/foreground.cfadeae47ed22fb73149.png",
+    "static/media/mountains.png": "/static/media/mountains.12932bddf577c6c9b5a5.png",
+    "static/media/sky.png": "/static/media/sky.6a965822e425c4240972.png",
     "static/media/logo_S.png": "/static/media/logo_S.a4970bc779b71f82d703.png",
     "static/media/no-image.png": "/static/media/no-image.bb10b224f5f932f7779c.png",
     "index.html": "/index.html",
-    "main.a8a5aa44.css.map": "/static/css/main.a8a5aa44.css.map",
+    "main.dd7f1ff2.css.map": "/static/css/main.dd7f1ff2.css.map",
     "main.cf1960a1.js.map": "/static/js/main.cf1960a1.js.map"
   },
   "entrypoints": [
-    "static/css/main.a8a5aa44.css",
+    "static/css/main.dd7f1ff2.css",
     "static/js/main.cf1960a1.js"
   ]
 }
