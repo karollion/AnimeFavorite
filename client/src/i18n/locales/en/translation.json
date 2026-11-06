@@ -144,5 +144,18 @@
   },
   "signup": {
     "title": "Signup"
+  },
+  "animeCard": {
+    "ageRating": "Age rating",
+    "type": "Anime type",
+    "rating": "Average rating",
+    "types": {
+      "TV": "TV Series",
+      "Movie": "Movie",
+      "OVA": "OVA",
+      "ONA": "ONA",
+      "Special": "Special",
+      "Music": "Music Video"
+    }
   }
 }

@@ -148,6 +148,19 @@
   },
   "signup": {
     "title": "Rejestracja"
+  },
+  "animeCard": {
+    "ageRating": "Kategoria wiekowa",
+    "type": "Typ anime",
+    "rating": "Średnia ocena",
+    "types": {
+      "TV": "Serial",
+      "Movie": "Film",
+      "OVA": "OVA",
+      "ONA": "ONA",
+      "Special": "Odcinek specjalny",
+      "Music": "Teledysk"
+    }
   }
 }
 
