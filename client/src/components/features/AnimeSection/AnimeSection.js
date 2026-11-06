@@ -89,7 +89,7 @@ const AnimeSection = ({ title, animes }) => {
               slidesPerView: 2,
               spaceBetween: 16,
             },
-            768: {
+            900: {
               slidesPerView: 3,
               spaceBetween: 16,
             },
