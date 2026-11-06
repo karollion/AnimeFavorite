@@ -1,51 +1,39 @@
-/* =====================================================
-   Settings Page
-   ===================================================== */
-
 /**
  * @file Settings.js
  * @description Allows authenticated users to manage their
  * interface, content, and notification preferences.
  */
 
-// Styles
+import { useEffect } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import { Row, Col, Form } from 'react-bootstrap'
+
 import styles from './Settings.module.scss'
 
-// UI components
-import { Row, Col, Form } from 'react-bootstrap'
 import Container from '../../common/container/Container'
 import Button from '../../common/Button/Button'
 
-// Redux
-import { getUser, updateProfileRequest } from '../../../redux/reducers/userRedux'
-import { useDispatch, useSelector } from 'react-redux'
+import {
+  getUser,
+  updateProfileRequest,
+} from '../../../redux/reducers/userRedux'
+
 import { useMessage } from '../../../context/MessageContext'
-
-// Form management
-import { useForm } from 'react-hook-form'
-
-// React hooks
-import { useEffect } from 'react'
-
-// Translation
-import { useTranslation } from 'react-i18next'
 import syncTheme from '../../../theme/syncTheme'
 
 /**
- * Settings component.
- *
- * Loads the user's saved preferences into the form and
- * submits changes to the profile update request.
+ * @component
+ * @description Renders the user settings page.
  *
  * Preferences are grouped into three sections:
  * - User Interface
  * - Content
  * - Notifications
  *
- * @component
  * @returns {JSX.Element} The settings page.
  */
-
 const Settings = () => {
   const dispatch = useDispatch()
   const user = useSelector(getUser)
@@ -59,23 +47,11 @@ const Settings = () => {
     reset,
   } = useForm()
 
+  // Register fields that require custom change handlers.
+  const themeField = register('ui.theme')
   const languageField = register('ui.language')
 
-  /*
-   * Changes the application language immediately.
-   * The selected language is also stored locally so that
-   * it can be restored when the application is reopened.
-   *
-   * The user's database preference is saved when the
-   * Settings form is submitted.
-   */
-  const handleLanguageChange = async language => {
-    if (!['en', 'pl'].includes(language)) return
-
-    await i18n.changeLanguage(language)
-  }
-
-  /*
+  /**
    * Loads the user's saved preferences into the form.
    */
   useEffect(() => {
@@ -84,8 +60,23 @@ const Settings = () => {
     }
   }, [user?.preferences, reset])
 
-  /*
+  /**
+   * Changes the application language immediately.
+   * The selected language is persisted after a successful form submission.
+   *
+   * @param {string} language - Selected application language.
+   */
+  const handleLanguageChange = async language => {
+    if (!['en', 'pl'].includes(language)) return
+
+    await i18n.changeLanguage(language)
+  }
+
+  /**
    * Changes the application theme immediately.
+   * The selected theme is persisted after a successful form submission.
+   *
+   * @param {React.ChangeEvent<HTMLSelectElement>} event
    */
   const handleThemeChange = event => {
     const theme = event.target.value
@@ -95,10 +86,13 @@ const Settings = () => {
     document.documentElement.setAttribute('data-theme', theme)
   }
 
-  /*
+  /**
    * Saves the current preferences to the user's profile.
-   * The selected language is persisted locally only after
-   * the server confirms that the profile update succeeded.
+   *
+   * Existing preference groups are merged with the submitted values
+   * to avoid overwriting settings that are not part of this form.
+   *
+   * @param {Object} data - Submitted preference values.
    */
   const onSubmit = async data => {
     try {
@@ -107,18 +101,22 @@ const Settings = () => {
           preferences: {
             ...user?.preferences,
             ...data,
+
             ui: {
               ...user?.preferences?.ui,
               ...data.ui,
             },
+
             content: {
               ...user?.preferences?.content,
               ...data.content,
             },
+
             behavior: {
               ...user?.preferences?.behavior,
               ...data.behavior,
             },
+
             notifications: {
               ...user?.preferences?.notifications,
               ...data.notifications,
@@ -127,6 +125,7 @@ const Settings = () => {
         })
       )
 
+      // Persist the selected language after the server confirms the update.
       const savedLanguage =
         updatedUser?.preferences?.ui?.language || data.ui?.language
 
@@ -135,6 +134,7 @@ const Settings = () => {
         localStorage.setItem('appLanguage', savedLanguage)
       }
 
+      // Persist and synchronize the selected theme.
       const savedTheme =
         updatedUser?.preferences?.ui?.theme || data.ui?.theme
 
@@ -144,57 +144,65 @@ const Settings = () => {
       }
 
       await showMessage({
-        title: t('settings.title'),
+        title: t('common.success'),
         message: t('settings.saveSuccess'),
         mode: 'alert',
-        confirmText: 'OK',
+        confirmText: t('common.ok'),
       })
-
     } catch (error) {
       await showMessage({
-        title: 'Error',
+        title: t('common.error'),
         message: t('settings.saveFailed'),
         mode: 'alert',
-        confirmText: 'OK',
+        confirmText: t('common.ok'),
       })
     }
   }
 
   return (
     <div className={styles.root}>
-      {/* Submit all preference changes through a single form */}
-      <Form onSubmit={handleSubmit(onSubmit)} className={styles.root}>
+      <Form
+        onSubmit={handleSubmit(onSubmit)}
+        className={styles.root}
+      >
         <Container className={styles.container}>
 
           {/* Page heading */}
-          <h1 className={styles.title}>{t('settings.title')}</h1>
+          <h1 className={styles.title}>
+            {t('settings.title')}
+          </h1>
 
           <Row className={styles.grid}>
 
-            {/* LEFT COLUMN */}
+            {/* Left column: interface and content preferences */}
             <Col xs="12" lg="6">
 
-              {/* USER INTERFACE SETTINGS */}
+              {/* Interface preferences */}
               <div className={styles.section}>
                 <h2>{t('settings.userinterface')}</h2>
 
-                {/* Preferred application theme */}
+                {/* Application theme */}
                 <div className={styles.row}>
                   <span>{t('settings.theme')}</span>
 
                   <Form.Select
-                    {...register('ui.theme')}
+                    {...themeField}
                     onChange={event => {
-                      register('ui.theme').onChange(event)
+                      themeField.onChange(event)
                       handleThemeChange(event)
                     }}
                   >
-                    <option value="dark">{t('settings.themeDark')}</option>
-                    <option value="light">{t('settings.themeLight')}</option>
+                    <option value="dark">
+                      {t('settings.themeDark')}
+                    </option>
+
+                    <option value="light">
+                      {t('settings.themeLight')}
+                    </option>
                   </Form.Select>
                 </div>
 
-                {/* Preferred application language */}
+                {/* Application language */}
                 <div className={styles.row}>
                   <span>{t('settings.language')}</span>
 
@@ -205,48 +213,56 @@ const Settings = () => {
                       handleLanguageChange(event.target.value)
                     }}
                   >
-                    <option value="en">{t('settings.languageEN')}</option>
-                    <option value="pl">{t('settings.languagePL')}</option>
+                    <option value="en">
+                      {t('settings.languageEN')}
+                    </option>
+
+                    <option value="pl">
+                      {t('settings.languagePL')}
+                    </option>
                   </Form.Select>
                 </div>
 
-                {/* Default layout for displaying content */}
+                {/* Default content layout */}
                 <div className={styles.row}>
                   <span>{t('settings.defaultView')}</span>
 
                   <Form.Select {...register('ui.defaultView')}>
-                    <option value="grid">{t('settings.grid')}</option>
-                    <option value="list">{t('settings.list')}</option>
+                    <option value="grid">
+                      {t('settings.grid')}
+                    </option>
+
+                    <option value="list">
+                      {t('settings.list')}
+                    </option>
                   </Form.Select>
                 </div>
 
-                {/* Enable or disable automatic playback *
-                <div className={styles.row}>
-                  <span>Auto Play</span>
-
-                  <Form.Switch
-                    className={styles.switch}
-                    {...register('ui.autoPlay')}
-                  />
-                </div>/}
-
-                {/* Default sorting method for content */}
+                {/* Default content sorting method */}
                 <div className={styles.row}>
                   <span>{t('settings.defaultSort')}</span>
 
                   <Form.Select {...register('behavior.defaultSort')}>
-                    <option value="rating">{t('settings.defrating')}</option>
-                    <option value="newest">{t('settings.defnewest')}</option>
-                    <option value="title"> {t('settings.deftitle')}(A–Z)</option>
+                    <option value="rating">
+                      {t('settings.defrating')}
+                    </option>
+
+                    <option value="newest">
+                      {t('settings.defnewest')}
+                    </option>
+
+                    <option value="title">
+                      {t('settings.deftitle')} (A–Z)
+                    </option>
                   </Form.Select>
                 </div>
               </div>
 
-              {/* CONTENT SETTINGS */}
+              {/* Content preferences */}
               <div className={styles.section}>
                 <h2>{t('settings.content')}</h2>
 
-                {/* Control whether NSFW content is displayed */}
+                {/* NSFW content visibility */}
                 <div className={styles.row}>
                   <span>{t('settings.showNSFW')}</span>
 
@@ -256,7 +272,7 @@ const Settings = () => {
                   />
                 </div>
 
-                {/* Control whether spoiler-related content is hidden */}
+                {/* Spoiler visibility */}
                 <div className={styles.row}>
                   <span>{t('settings.hideSpoilers')}</span>
 
@@ -266,73 +282,68 @@ const Settings = () => {
                   />
                 </div>
 
-                {/* Select preferred genres using multiple checkboxes */}
+                {/* Preferred content genres */}
                 <div className={`${styles.row} ${styles.genresRow}`}>
                   <span>{t('settings.preferredGenres')}</span>
 
                   <div className={styles.genresList}>
 
-                    {/* Action genre preference */}
                     <Form.Check
                       type="checkbox"
-                      label="Action"
+                      label={t('genres.action')}
                       value="action"
                       {...register('content.preferredGenres')}
                     />
 
-                    {/* Comedy genre preference */}
                     <Form.Check
                       type="checkbox"
-                      label="Comedy"
+                      label={t('genres.comedy')}
                       value="comedy"
                       {...register('content.preferredGenres')}
                     />
 
-                    {/* Drama genre preference */}
                     <Form.Check
                       type="checkbox"
-                      label="Drama"
+                      label={t('genres.drama')}
                       value="drama"
                       {...register('content.preferredGenres')}
                     />
 
-                    {/* Fantasy genre preference */}
                     <Form.Check
                       type="checkbox"
-                      label="Fantasy"
+                      label={t('genres.fantasy')}
                       value="fantasy"
                       {...register('content.preferredGenres')}
                     />
 
-                    {/* Romance genre preference */}
                     <Form.Check
                       type="checkbox"
-                      label="Romance"
+                      label={t('genres.romance')}
                       value="romance"
                       {...register('content.preferredGenres')}
                     />
 
-                    {/* Science fiction genre preference */}
                     <Form.Check
                       type="checkbox"
-                      label="Sci-Fi"
+                      label={t('genres.sciFi')}
                       value="sci-fi"
                       {...register('content.preferredGenres')}
                     />
+
                   </div>
                 </div>
               </div>
 
             </Col>
 
-            {/* RIGHT COLUMN */}
+            {/* Right column: notification preferences */}
             <Col xs="12" lg="6">
 
-              {/* NOTIFICATION SETTINGS */}
+              {/* Notification preferences */}
               <div className={styles.section}>
                 <h2>{t('settings.notifications')}</h2>
 
-                {/* Enable or disable email notifications */}
+                {/* Email notifications */}
                 <div className={styles.row}>
                   <span>{t('settings.email')}</span>
 
@@ -342,7 +353,7 @@ const Settings = () => {
                   />
                 </div>
 
-                {/* Enable or disable in-app notifications */}
+                {/* In-app notifications */}
                 <div className={styles.row}>
                   <span>{t('settings.inApp')}</span>
 
@@ -352,7 +363,7 @@ const Settings = () => {
                   />
                 </div>
 
-                {/* Enable or disable push notifications */}
+                {/* Push notifications */}
                 <div className={styles.row}>
                   <span>{t('settings.push')}</span>
 
@@ -364,16 +375,17 @@ const Settings = () => {
               </div>
 
             </Col>
-
           </Row>
 
-          {/* Form actions and save feedback */}
+          {/* Form actions */}
           <div className={styles.actions}>
 
-            {/* Submit the updated preferences */}
-            <Button type="submit">{t('common.save')}</Button>
+            {/* Save preference changes */}
+            <Button type="submit">
+              {t('common.save')}
+            </Button>
 
-            {/* Navigate back to the home page */}
+            {/* Return to the home page */}
             <Button to="/">
               {t('common.home')}
             </Button>
@@ -386,4 +398,4 @@ const Settings = () => {
   )
 }
 
-export default Settings;
+export default Settings

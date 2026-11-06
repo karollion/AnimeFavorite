@@ -1,54 +1,69 @@
-import styles from './NavBar.module.scss'
+
+import styles from './NavBar.module.scss';
+
 import Navbar from 'react-bootstrap/Navbar';
-import Button from '../../common/Button/Button';
 import Nav from 'react-bootstrap/Nav';
-import { getUser } from '../../../redux/reducers/userRedux';
+import { Form, Spinner } from 'react-bootstrap';
+
 import { NavLink, useNavigate } from 'react-router-dom';
 import { useDispatch, useSelector } from 'react-redux';
 import { useEffect, useRef, useState } from 'react';
-import { Form, Spinner } from 'react-bootstrap';
-import logo from '../../../assets/logo_S.png';
+import { useTranslation } from 'react-i18next';
+
+import Button from '../../common/Button/Button';
+
+import { getUser } from '../../../redux/reducers/userRedux';
+
 import {
   getAnimeSearchResults,
   getAnimeSearchLoading,
   getAnimeSearchError,
   searchAnimeRequest,
-  clearAnimeSearch
+  clearAnimeSearch,
 } from '../../../redux/reducers/animesRedux';
-import { useTranslation } from 'react-i18next'
+
+import logo from '../../../assets/logo_S.png';
 
 const NavBar = () => {
-  const { t } = useTranslation()
-  const user = useSelector(getUser);
-  const [expanded, setExpanded] = useState(false);
+  const { t } = useTranslation();
+
+  const dispatch = useDispatch();
+  const navigate = useNavigate();
 
   /* =====================================================
-   Anime Search
-   ===================================================== */
+     REDUX STATE
+     ===================================================== */
 
-  /**
-   * Stores the search query, autocomplete results and loading
-   * state. The request is delayed slightly so the API is not
-   * called after every single keystroke.
-   */
-  const dispatch = useDispatch();
+  const user = useSelector(getUser);
 
   const searchResults = useSelector(getAnimeSearchResults);
   const isSearching = useSelector(getAnimeSearchLoading);
   const searchError = useSelector(getAnimeSearchError);
+
+  /* =====================================================
+     LOCAL STATE
+     ===================================================== */
+
+  const [expanded, setExpanded] = useState(false);
   const [searchQuery, setSearchQuery] = useState('');
   const [isSearchOpen, setIsSearchOpen] = useState(false);
 
+  /* =====================================================
+     REFS
+     ===================================================== */
+
   const searchRef = useRef(null);
-  const navigate = useNavigate();
 
   /* =====================================================
-     Anime Search Effect
+     ANIME SEARCH EFFECT
      ===================================================== */
 
   /**
-   * @description Dispatches the Redux search thunk after the
-   * user pauses typing. A minimum of two characters is required.
+   * Dispatches the anime search request after the user
+   * pauses typing. A minimum of two characters is required.
+   *
+   * The debounce prevents unnecessary API requests while
+   * the user is entering a search phrase.
    */
   useEffect(() => {
     const query = searchQuery.trim();
@@ -60,7 +75,8 @@ const NavBar = () => {
 
     const timeoutId = setTimeout(() => {
       dispatch(searchAnimeRequest(query)).catch(() => {
-        // The Redux thunk already stores the error in the state.
+        // The Redux thunk already stores the error in its state.
+        // The component displays the error inside the search dropdown.
       });
     }, 300);
 
@@ -69,12 +85,16 @@ const NavBar = () => {
     };
   }, [searchQuery, dispatch]);
 
+  /* =====================================================
+     CLOSE SEARCH ON OUTSIDE CLICK
+     ===================================================== */
+
   /**
-   * Close the suggestions when the user clicks outside the
-   * search area.
+   * Closes the autocomplete dropdown when the user clicks
+   * outside the search container.
    */
   useEffect(() => {
-    const handleClickOutside = (event) => {
+    const handleClickOutside = event => {
       if (
         searchRef.current &&
         !searchRef.current.contains(event.target)
@@ -86,170 +106,284 @@ const NavBar = () => {
     document.addEventListener('mousedown', handleClickOutside);
 
     return () => {
-      document.removeEventListener(
-        'mousedown',
-        handleClickOutside
-      );
+      document.removeEventListener('mousedown', handleClickOutside);
     };
   }, []);
 
+  /* =====================================================
+     HANDLERS
+     ===================================================== */
+
   /**
-   * Navigate to the selected anime detail page.
+   * Handles the selection of an anime from search results.
+   *
+   * Clears the search state and navigates to the selected
+   * anime detail page.
+   *
+   * @param {Object} anime - Selected anime object.
    */
-  const handleSelectAnime = (anime) => {
+  const handleSelectAnime = anime => {
+    if (!anime?.slug) return;
+
     setSearchQuery('');
     setIsSearchOpen(false);
+    setExpanded(false);
+
     dispatch(clearAnimeSearch());
-    
-    if (anime.slug) {
-      navigate(`/anime/${anime.slug}`);
-      setExpanded(false);
+
+    navigate(`/anime/${anime.slug}`);
+  };
+
+  /**
+   * Handles navigation to the full search results page.
+   */
+  const handleShowAllResults = () => {
+    const query = searchQuery.trim();
+
+    if (!query) return;
+
+    setIsSearchOpen(false);
+    setExpanded(false);
+
+    navigate(`/Search?q=${encodeURIComponent(query)}`);
+  };
+
+  /**
+   * Handles changes to the search input.
+   *
+   * @param {Event} event - Input change event.
+   */
+  const handleSearchChange = event => {
+    setSearchQuery(event.target.value);
+    setIsSearchOpen(true);
+  };
+
+  /**
+   * Handles keyboard interactions in the search input.
+   *
+   * Enter selects the first result.
+   * Escape closes the autocomplete dropdown.
+   *
+   * @param {Event} event - Keyboard event.
+   */
+  const handleSearchKeyDown = event => {
+    if (event.key === 'Enter' && searchResults.length > 0) {
+      event.preventDefault();
+      handleSelectAnime(searchResults[0]);
+    }
+
+    if (event.key === 'Escape') {
+      setIsSearchOpen(false);
     }
   };
 
+  /**
+   * Clears the search input and closes the dropdown.
+   */
+  const handleSearchFocus = () => {
+    setIsSearchOpen(true);
+  };
+
+  /* =====================================================
+     RENDER
+     ===================================================== */
+
   return (
     <div className={styles.root}>
-      <Navbar expanded={expanded} variant="dark" expand="lg" className={styles.navbar}>
-        <Navbar.Brand className={styles.logo} as={NavLink} to="/">
+      <Navbar
+        expanded={expanded}
+        onToggle={setExpanded}
+        variant="dark"
+        expand="lg"
+        className={styles.navbar}
+      >
+        {/* Logo */}
+        <Navbar.Brand
+          as={NavLink}
+          to="/"
+          className={styles.logo}
+          onClick={() => setExpanded(false)}
+        >
           <img
             src={logo}
             alt={t('navBar.altLogo')}
             className={styles.img}
           />
         </Navbar.Brand>
-        <Navbar.Toggle onClick={() => setExpanded(expanded ? false : "expanded")} aria-controls="basic-navbar-nav" />
-            <Navbar.Collapse id="basic-navbar-nav">
-              <Nav className="ms-auto">
 
-                {/* =====================================================
-                    Anime Search Input and Autocomplete Results
-                    ===================================================== */}
+        {/* Mobile navigation toggle */}
+        <Navbar.Toggle
+          aria-controls="basic-navbar-nav"
+          aria-expanded={expanded}
+        />
 
-                <div className={styles.searchContainer} ref={searchRef}>
-                  <Form.Control
-                    type="search"
-                    placeholder={t('navBar.placeholder')}
-                    aria-label={t('navBar.aria-label')}
-                    autoComplete="off"
-                    value={searchQuery}
-                    className={styles.searchInput}
-                    onChange={(event) => {
-                      setSearchQuery(event.target.value);
-                      setIsSearchOpen(true);
-                    }}
-                    onFocus={() => setIsSearchOpen(true)}
-                    onKeyDown={(event) => {
-                      if (
-                        event.key === 'Enter' &&
-                        searchResults.length > 0
-                      ) {
-                        event.preventDefault();
-                        handleSelectAnime(searchResults[0]);
-                      }
-                    
-                      if (event.key === 'Escape') {
-                        setIsSearchOpen(false);
-                      }
-                    }}
-                  />
+        <Navbar.Collapse id="basic-navbar-nav">
+          <Nav className="ms-auto">
 
-                  {isSearchOpen && searchQuery.trim().length >= 2 && (
-                    <div className={styles.searchDropdown}>
-                      {isSearching && (
-                        <div className={styles.searchMessage}>
-                          <Spinner size="sm" animation="border" />
-                          <span>{t('navBar.searhing')}</span>
-                        </div>
-                      )}
+            {/* =====================================================
+                ANIME SEARCH
+                ===================================================== */}
 
-                      {!isSearching && searchError && (
-                        <div className={styles.searchMessage}>
-                          {t('navBar.searchfailed')}
-                        </div>
-                      )}
+            <div
+              className={styles.searchContainer}
+              ref={searchRef}
+            >
+              <Form.Control
+                type="search"
+                placeholder={t('navBar.placeholder')}
+                aria-label={t('navBar.aria-label')}
+                aria-expanded={
+                  isSearchOpen && searchQuery.trim().length >= 2
+                }
+                aria-controls="anime-search-results"
+                autoComplete="off"
+                value={searchQuery}
+                className={styles.searchInput}
+                onChange={handleSearchChange}
+                onFocus={handleSearchFocus}
+                onKeyDown={handleSearchKeyDown}
+              />
 
-                      {!isSearching &&
-                        !searchError &&
-                        searchResults.length === 0 && (
-                          <div className={styles.searchMessage}>
-                            {t('navBar.noanimefound')}
-                          </div>
-                        )}
-
-                      {!isSearching &&
-                        !searchError &&
-                        searchResults.map((anime) => (
-                          <button
-                            key={anime._id}
-                            type="button"
-                            className={styles.searchResult}
-                            onClick={() => handleSelectAnime(anime)}
-                          >
-                            {anime.anime_cover && (
-                              <img
-                                src={anime.anime_cover}
-                                alt=""
-                                className={styles.searchCover}
-                              />
-                            )}
-
-                            <span className={styles.searchResultInfo}>
-                              <span className={styles.searchTitle}>
-                                {anime.title}
-                              </span>
-                          
-                              {anime.original_title && (
-                                <span className={styles.searchOriginalTitle}>
-                                  {anime.original_title}
-                                </span>
-                              )}
-
-                              {anime.type && (
-                                <span className={styles.searchType}>
-                                  {anime.type}
-                                </span>
-                              )}
-                            </span>
-                          </button>
-                        ))}
-
-                      {!isSearching &&
-                        !searchError &&
-                        searchResults.length > 0 && (
-                          <button
-                            type="button"
-                            className={styles.showAllResults}
-                            onClick={() => {
-                              navigate(
-                                `/Search?q=${encodeURIComponent(searchQuery.trim())}`
-                              );
-                              setIsSearchOpen(false);
-                              setExpanded(false);
-                            }}
-                          >
-                            {t('navBar.showAllResults')}
-                          </button>
-                        )}
+              {/* Search autocomplete dropdown */}
+              {isSearchOpen && searchQuery.trim().length >= 2 && (
+                <div
+                  id="anime-search-results"
+                  className={styles.searchDropdown}
+                >
+                  {/* Loading state */}
+                  {isSearching && (
+                    <div className={styles.searchMessage}>
+                      <Spinner size="sm" animation="border" />
+                      <span>{t('navBar.searching')}</span>
                     </div>
                   )}
+
+                  {/* Error state */}
+                  {!isSearching && searchError && (
+                    <div className={styles.searchMessage}>
+                      {t('navBar.searchfailed')}
+                    </div>
+                  )}
+
+                  {/* Empty results state */}
+                  {!isSearching &&
+                    !searchError &&
+                    searchResults.length === 0 && (
+                      <div className={styles.searchMessage}>
+                        {t('navBar.noanimefound')}
+                      </div>
+                    )}
+
+                  {/* Search results */}
+                  {!isSearching &&
+                    !searchError &&
+                    searchResults.map(anime => (
+                      <button
+                        key={anime._id}
+                        type="button"
+                        className={styles.searchResult}
+                        onClick={() => handleSelectAnime(anime)}
+                      >
+                        {anime.anime_cover && (
+                          <img
+                            src={anime.anime_cover}
+                            alt=""
+                            className={styles.searchCover}
+                          />
+                        )}
+
+                        <span className={styles.searchResultInfo}>
+                          <span className={styles.searchTitle}>
+                            {anime.title}
+                          </span>
+
+                          {anime.original_title && (
+                            <span className={styles.searchOriginalTitle}>
+                              {anime.original_title}
+                            </span>
+                          )}
+
+                          {anime.type && (
+                            <span className={styles.searchType}>
+                              {anime.type}
+                            </span>
+                          )}
+                        </span>
+                      </button>
+                    ))}
+
+                  {/* Navigate to all search results */}
+                  {!isSearching &&
+                    !searchError &&
+                    searchResults.length > 0 && (
+                      <button
+                        type="button"
+                        className={styles.showAllResults}
+                        onClick={handleShowAllResults}
+                      >
+                        {t('navBar.showAllResults')}
+                      </button>
+                    )}
                 </div>
-                
-                {!user ? (<Button to="/Login">{t('common.login')}</Button>) : null }
+              )}
+            </div>
 
-                {!user ? (<Button to="/SignUp">{t('common.signup')}</Button>) : null }
+            {/* =====================================================
+                AUTHENTICATION NAVIGATION
+                ===================================================== */}
 
-                {user ? (<Button to={"/Profile"}>{t('common.profile')}</Button>) : null }
+            {!user && (
+              <>
+                <Button to="/Login">
+                  {t('common.login')}
+                </Button>
 
-                {user ? (<Button to="/Logout">{t('common.logout')}</Button>) : null }
-                
-                {user?.role === 'admin' && (<Button to="/anime/AddAnime">{t('common.addnew')}</Button>)}
-                
-                {user ? (<Button to="/Settings">{t('common.settings')}</Button>) : null }
+                <Button to="/SignUp">
+                  {t('common.signup')}
+                </Button>
+              </>
+            )}
 
-                {user ? (<Button to="/MyAnimes">{t('common.myanimes')}</Button>) : null }
-                
-              </Nav>
-            </Navbar.Collapse>
+            {user && (
+              <>
+                <Button to="/Profile">
+                  {t('common.profile')}
+                </Button>
+
+                <Button to="/Logout">
+                  {t('common.logout')}
+                </Button>
+              </>
+            )}
+
+            {/* =====================================================
+                ADMIN NAVIGATION
+                ===================================================== */}
+
+            {user?.role === 'admin' && (
+              <Button to="/anime/AddAnime">
+                {t('common.addnew')}
+              </Button>
+            )}
+
+            {/* =====================================================
+                USER NAVIGATION
+                ===================================================== */}
+
+            {user && (
+              <>
+                <Button to="/Settings">
+                  {t('common.settings')}
+                </Button>
+
+                <Button to="/MyAnimes">
+                  {t('common.myanimes')}
+                </Button>
+              </>
+            )}
+
+          </Nav>
+        </Navbar.Collapse>
       </Navbar>
     </div>
   );

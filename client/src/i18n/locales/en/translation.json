@@ -43,18 +43,14 @@
     "saveSuccess": "Settings saved successfully.",
     "saveFailed": "Failed to save settings."
   },
-  "anime": {
-    "searchPlaceholder": "Enter an anime title...",
-    "noResults": "No anime found."
-  },
   "navBar": {
-    "altLogo": "Favorite Anime",
+    "altLogo": "AnimeFavorite logo",
     "placeholder": "Search anime...",
-    "aria-label": "Search anime by title",
-    "showAllResults": "Show all results",
-    "searhing": "Searching...",
-    "searchfailed": "Search failed. Please try again.",
-    "noanimefound": "No anime found."
+    "aria-label": "Anime search",
+    "searching": "Searching...",
+    "searchfailed": "An error occurred while searching.",
+    "noanimefound": "No anime found.",
+    "showAllResults": "Show all results"
   },
   "homePage": {
     "newAnimes": "NEW ANIMES",
@@ -64,7 +60,8 @@
     "tvSeries": "TV SERIES"
   },
   "footer": {
-    "createdBy": "Create by:"
+    "createdBy": "Created by",
+    "portfolioTitle": "Author's portfolio website"
   },
   "profile": {
     "title": "Profil użytkownika",
@@ -74,5 +71,78 @@
     "birthYear": "Birth year: ",
     "description": "Description: ",
     "favoriteCharacters": "Favorite characters:"
+  },
+  "genres": {
+    "action": "Action",
+    "comedy": "Comedy",
+    "drama": "Drama",
+    "fantasy": "Fantasy",
+    "romance": "Romance",
+    "sciFi": "Science Fiction"
+  },
+  "anime": {
+    "searchPlaceholder": "Enter an anime title...",
+    "noResults": "No anime found.",
+    "loadError": "Failed to load anime data.",
+    "statusSaved": "Watch status saved successfully.",
+    "statusSaveError": "Could not save watch status.",
+    "favoriteAdded": "Anime added to favorites.",
+    "favoriteRemoved": "Anime removed from favorites.",
+    "favoriteError": "Could not update favorites.",
+    "ratingSaved": "Your rating of {{rating}}/10 has been saved.",
+    "ratingSaveError": "Could not save your rating.",
+    "ratingRemoved": "Your rating has been removed.",
+    "ratingRemoveError": "Could not remove your rating.",
+    "titleLabel": "Title:",
+    "originalTitle": "Original title:",
+    "ageRating": "Age rating:",
+    "type": "Type:",
+    "world": "World:",
+    "genres": "Genres:",
+    "categories": "Categories:",
+    "description": "Description:",
+    "communityRating": "Community Rating",
+    "ratingAverage": "Average rating:",
+    "ratingCount": "Rating count:",
+    "myAnimeList": "My Anime List",
+    "loginToManage": "Log in to manage your anime list and favorites.",
+    "yourRating": "Your rating",
+    "ratingAriaLabel": "Rate this anime from 1 to 10",
+    "rateValue": "Rate {{rating}} out of 10",
+    "notRated": "Not rated",
+    "removeRating": "Remove rating",
+    "watchStatus": "Watch status",
+    "selectWatchStatus": "Select watch status",
+    "status": {
+      "notWatched": "Not watched",
+      "planned": "Planned",
+      "watching": "Watching",
+      "completed": "Completed",
+      "suspended": "Suspended",
+      "abandoned": "Abandoned"
+    },
+    "removeFromFavorites": "♥ Remove from favorites",
+    "addToFavorites": "♡ Add to favorites",
+    "savingOrLoading": "Saving or loading your list...",
+    "communityStatistics": "Community Statistics",
+    "loadingStatistics": "Loading statistics...",
+    "statisticsError": "Could not load community statistics",
+    "totalUsersOnList": "Total users on list",
+    "favorites": "Favorites",
+    "edit": "Edit",
+    "addCharacter": "Add character",
+    "characters": "Characters",
+    "noCharacters": "No characters assigned to this anime.",
+    "seasons": "Seasons",
+    "noSeasons": "No seasons available.",
+    "reviews": "Reviews",
+    "noReviews": "No reviews available."
+  },
+  "wrongPage": {
+    "title": "Oh no!",
+    "backToHome": "Back to home"
+  },
+  "signup": {
+    "title": "Signup"
   }
 }

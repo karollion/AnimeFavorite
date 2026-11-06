@@ -97,28 +97,32 @@ export const clearAnimeSearch = () => ({type: CLEAR_ANIME_SEARCH})
 
 
 export const fetchAnimes = (page = 1) => async dispatch => {
-  dispatch(fetchStart())
+  dispatch(fetchStart());
 
   try {
     const res = await api.get('/animes?page=' + page);
 
-    dispatch(fetchSuccess(res.data))
+    dispatch(fetchSuccess(res.data));
+    return res.data;
   } catch (err) {
-    dispatch(fetchError(err.response?.data?.message || err.message))
+    dispatch(fetchError(err.response?.data?.message || err.message));
+    throw err;
   }
-}
+};
 
 export const fetchAnimeBySlug = slug => async dispatch => {
-  dispatch(fetchStart())
+  dispatch(fetchStart());
 
   try {
-    const res = await api.get('/animes/slug/' + slug)
+    const res = await api.get('/animes/slug/' + slug);
 
-    dispatch({ type: FETCH_ONE_SUCCESS, payload: res.data }) 
+    dispatch({ type: FETCH_ONE_SUCCESS, payload: res.data });
+    return res.data;
   } catch (err) {
-    dispatch(fetchError(err.response?.data?.message || err.message))
+    dispatch(fetchError(err.response?.data?.message || err.message));
+    throw err;
   }
-}
+};
 
 export const addAnimeRequest = (anime) => async dispatch => {
   try {
@@ -141,7 +145,7 @@ export const updateAnimeRequest = anime => async dispatch => {
     dispatch(updateAnime(res.data));
 
     // Aktualizacja statystyk po udanym zapisie.
-    dispatch(fetchAnimeStats(_id));
+    dispatch(fetchAnimeStats(_id)).catch(() => {});
     return res.data;
   } catch (err) {
     dispatch(fetchError(err.response?.data?.message || err.message));
@@ -175,12 +179,17 @@ export const updateAnimeCoverRequest = (id, cover) => async dispatch => {
 
 export const removeAnimeRequest = anime => async dispatch => {
   try {
-    const res = await api.delete(`/animes/${anime._id}`)
-    dispatch(removeAnime(res.data))
+    await api.delete(`/animes/${anime._id}`);
+
+    // The reducer expects an ID, not the complete response object.
+    dispatch(removeAnime(anime._id));
+
+    return anime._id;
   } catch (err) {
-    dispatch(fetchError(err.response?.data?.message || err.message))
+    dispatch(fetchError(err.response?.data?.message || err.message));
+    throw err;
   }
-}
+};
 
 /* =====================================================
    THUNK — SEARCH ANIME

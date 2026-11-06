@@ -1,7 +1,3 @@
-/* =====================================================
-   Wrong Page
-   ===================================================== */
-
 /**
  * @file WrongPage.js
  * @description Displays a 404 error page when the user
@@ -9,14 +5,17 @@
  */
 
 // Styles
-import styles from './WrongPage.module.scss'
+import styles from './WrongPage.module.scss';
 
 // Layout components
-import { Col } from 'react-bootstrap'
-import Container from '../../common/container/Container'
+import { Col } from 'react-bootstrap';
+import Container from '../../common/container/Container';
 
 // UI components
-import Button from '../../common/Button/Button'
+import Button from '../../common/Button/Button';
+
+// Translations
+import { useTranslation } from 'react-i18next';
 
 /**
  * WrongPage component.
@@ -28,17 +27,18 @@ import Button from '../../common/Button/Button'
  * @returns {JSX.Element} The 404 error page.
  */
 const WrongPage = () => {
+  const { t } = useTranslation();
 
   return (
     <div className={styles.root}>
       <Container>
-        {/* Display the HTTP 404 error code and message */}
         <h1>404</h1>
-        <h4>Oh no!</h4>
+        <h4>{t('wrongPage.title')}</h4>
 
-        {/* Provide navigation back to the home page */}
         <Col xs="12" className="d-flex justify-content-center my-3">
-          <Button to="/">Back to home</Button>
+          <Button to="/">
+            {t('wrongPage.backToHome')}
+          </Button>
         </Col>
       </Container>
     </div>

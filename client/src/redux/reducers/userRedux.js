@@ -139,13 +139,16 @@ export const registerRequest = userData => async dispatch => {
  */
 export const logoutRequest = () => async dispatch => {
   try {
-    await api.post('/auth/logout');
+    const res = await api.post('/auth/logout');
 
-    dispatch(logoutUser())
+    dispatch(logoutUser());
+
+    return res.data;
   } catch (err) {
-    dispatch(fetchError(err.message))
+    dispatch(fetchError(err.response?.data?.message || err.message));
+    throw err;
   }
-}
+};
 
 /**
  * Restore session (important after refresh)
@@ -155,16 +158,16 @@ export const fetchProfile = () => async dispatch => {
   dispatch(fetchStart());
 
   try {
-    // 1️⃣ restore user
     const userRes = await api.get('/auth/me');
     dispatch(profileSuccess(userRes.data));
 
-    // 2️⃣ fetch stats AUTOMATYCZNIE
     const statsRes = await api.get('/auth/me/stats');
     dispatch(setStats(statsRes.data));
 
+    return userRes.data;
   } catch (err) {
     dispatch(fetchError(null));
+    return null;
   }
 };
 
@@ -217,8 +220,11 @@ export const updateAvatarRequest = file => async dispatch => {
     const res = await api.put('/auth/me/avatar', formData);
 
     dispatch(updateAvatarSuccess(res.data));
+
+    return res.data;
   } catch (err) {
-    dispatch(fetchError(err.message));
+    dispatch(fetchError(err.response?.data?.message || err.message));
+    throw err;
   }
 };
 

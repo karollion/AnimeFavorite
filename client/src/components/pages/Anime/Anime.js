@@ -1,30 +1,18 @@
-/* =====================================================
-   Anime Page
-   ===================================================== */
-
 /**
  * @file Anime.js
- * @description Page component for displaying detailed information about
- *              a single anime entity.
- *              Fetches anime data by slug and displays its basic information,
- *              cover image, characters, seasons, and reviews.
- *              Provides an anime editing option for administrators.
+ * @description Displays detailed information about a single anime,
+ * including its characters, seasons, reviews, and community statistics.
+ * Authenticated users can manage their personal anime list and rating.
+ * Administrators can access anime and character management actions.
  */
+
+import { useEffect, useRef, useState } from 'react'
+import { useParams } from 'react-router-dom'
+import { useDispatch, useSelector } from 'react-redux'
+import { useTranslation } from 'react-i18next'
 
 import styles from './Anime.module.scss'
 
-/* =====================================================
-   ROUTING AND REACT HOOKS
-   ===================================================== */
-
-import { useParams } from 'react-router-dom'
-import { useEffect, useState } from 'react'
-
-/* =====================================================
-   REDUX STATE MANAGEMENT
-   ===================================================== */
-
-import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchAnimeBySlug,
   getSelectedAnime,
@@ -45,95 +33,68 @@ import {
 
 import { getUser } from '../../../redux/reducers/userRedux'
 
-/* =====================================================
-   COMPONENTS AND ASSETS
-   ===================================================== */
+import { useMessage } from '../../../context/MessageContext'
 
 import noImage from '../../../assets/no-image.png'
+
 import CharacterCard from '../../features/CharacterCard/CharacterCard'
 import SeasonCard from '../../features/SeasonCard/SeasonCard'
 import ReviewCard from '../../features/ReviewCard/ReviewCard'
+
 import Container from '../../common/container/Container'
 import Button from '../../common/Button/Button'
 
-/* =====================================================
-   ANIME COMPONENT
-   ===================================================== */
-
 /**
  * @component
- * @description Displays detailed information about the selected anime.
- *              Retrieves the anime slug from the URL and fetches the
- *              corresponding anime data through Redux.
+ * @description Renders detailed information about the selected anime.
  *
  * @returns {JSX.Element} The anime details page.
  */
 const Anime = () => {
-
-  /* =====================================================
-     ROUTE PARAMETERS
-     ===================================================== */
-
-  /**
-   * Slug identifying the anime in the current URL.
-   * @type {string | undefined}
-   */
   const { slug } = useParams()
 
-  /* =====================================================
-     REDUX STATE AND DISPATCH
-     ===================================================== */
-
-  /**
-   * Redux dispatch function used to trigger anime data requests.
-   */
   const dispatch = useDispatch()
 
-  /**
-   * Indicates whether anime data is currently being loaded.
-   */
-  const loading = useSelector(getAnimesLoading)
+  const { t } = useTranslation()
+  const { showMessage } = useMessage()
 
-  /**
-   * Anime entity currently selected in the Redux store.
-   */
+  // Redux state: anime details.
   const anime = useSelector(getSelectedAnime)
-
-  /**
-   * Error returned by the anime data fetching process, if any.
-   */
+  const loading = useSelector(getAnimesLoading)
   const error = useSelector(getAnimesError)
 
-  /**
-   * Currently authenticated user's data.
-   * Used to determine whether administrative actions are available.
-   */
+  // Redux state: authenticated user.
   const user = useSelector(getUser)
 
-  /**
-   * Anime stats and relations
-   */
+  // Redux state: community statistics.
   const stats = useSelector(getAnimeStats)
   const statsLoading = useSelector(getAnimeStatsLoading)
   const statsError = useSelector(getAnimeStatsError)
   const statsAnimeId = useSelector(state => state.animes.statsAnimeId)
 
+  // Redux state: authenticated user's anime relation.
   const userAnimeRelation = useSelector(getUserAnimeRelation)
   const userAnimeAnimeId = useSelector(getUserAnimeAnimeId)
   const userAnimeLoading = useSelector(getUserAnimeLoading)
   const userAnimeError = useSelector(getUserAnimeError)
 
-  const [actionMessage, setActionMessage] = useState('')
-  const [actionError, setActionError] = useState('')
-
+  // Local state: rating interaction.
   const [ratingHover, setRatingHover] = useState(0)
 
-   /* =====================================================
-   FETCH COMMUNITY STATISTICS
-   ===================================================== */
+  // Prevents displaying the same fetch error repeatedly.
+  const displayedErrorRef = useRef(null)
 
   /**
-   * Fetches community statistics whenever the selected anime changes.
+   * Fetches anime details whenever the URL slug changes.
+   */
+  useEffect(() => {
+    if (!slug) return
+
+    dispatch(fetchAnimeBySlug(slug))
+  }, [dispatch, slug])
+
+  /**
+   * Fetches community statistics for the currently selected anime.
    */
   useEffect(() => {
     if (!anime?._id || anime.slug !== slug) return
@@ -141,6 +102,10 @@ const Anime = () => {
     dispatch(fetchAnimeStats(anime._id))
   }, [dispatch, anime?._id, anime?.slug, slug])
 
+  /**
+   * Loads the authenticated user's relation to the selected anime.
+   * Clears the relation when no user is authenticated.
+   */
   useEffect(() => {
     if (!anime?._id || anime.slug !== slug) return
 
@@ -151,44 +116,56 @@ const Anime = () => {
     }
   }, [dispatch, anime?._id, anime?.slug, slug, user])
 
-  /* =====================================================
-     DATA FETCHING
-     ===================================================== */
-
   /**
-   * Fetches anime details whenever the URL slug changes.
-   * Skips the request if no slug is available.
-   *
-   * @dependency dispatch - Redux dispatch function.
-   * @dependency slug - Identifier of the requested anime.
+   * Displays a notification when loading anime data fails.
+   * The reference prevents the same error from opening repeatedly.
    */
   useEffect(() => {
-    if (!slug) return
-    dispatch(fetchAnimeBySlug(slug))
-  }, [dispatch, slug])
+    if (!error) {
+      displayedErrorRef.current = null
+      return
+    }
 
-  /* =====================================================
-     USER ANIME ACTIONS
-     ===================================================== */
+    if (displayedErrorRef.current === error) return
+
+    displayedErrorRef.current = error
+
+    showMessage({
+      title: t('common.error'),
+      message: t('anime.loadError'),
+      mode: 'alert',
+      confirmText: t('common.ok'),
+    })
+  }, [error, showMessage, t])
 
   /**
-   * Updates the authenticated user's watch status.
+   * Saves a watch status for the authenticated user.
+   *
+   * @param {React.ChangeEvent<HTMLSelectElement>} event
    */
   const handleStatusChange = async event => {
     const status = event.target.value
 
     if (!user || !anime?._id || !status) return
 
-    setActionMessage('')
-    setActionError('')
-
     try {
-      await dispatch(saveUserAnimeRelation(anime._id, { status }))
-      setActionMessage('Watch status saved successfully.')
-    } catch (err) {
-      setActionError(
-        err.response?.data?.message || 'Could not save watch status.'
+      await dispatch(
+        saveUserAnimeRelation(anime._id, { status })
       )
+
+      await showMessage({
+        title: t('common.success'),
+        message: t('anime.statusSaved'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
+    } catch (error) {
+      await showMessage({
+        title: t('common.error'),
+        message: error.response?.data?.message || t('anime.statusSaveError'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
     }
   }
 
@@ -202,61 +179,57 @@ const Anime = () => {
       userAnimeAnimeId === anime._id &&
       userAnimeRelation?.favorite_anime === true
 
-    setActionMessage('')
-    setActionError('')
-
     try {
-      await dispatch(saveUserAnimeRelation(anime._id, {
-        favorite_anime: !isFavorite,
-      }))
+      await dispatch(
+        saveUserAnimeRelation(anime._id, {
+          favorite_anime: !isFavorite,
+        })
+      )
 
-      setActionMessage(
-        isFavorite
-          ? 'Removed from favorites.'
-          : 'Added to favorites.'
-      )
-    } catch (err) {
-      setActionError(
-        err.response?.data?.message || 'Could not update favorites.'
-      )
+      await showMessage({
+        title: t('common.success'),
+        message: isFavorite
+          ? t('anime.favoriteRemoved')
+          : t('anime.favoriteAdded'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
+    } catch (error) {
+      await showMessage({
+        title: t('common.error'),
+        message: error.response?.data?.message || t('anime.favoriteError'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
     }
   }
 
-  /* =====================================================
-     LOADING AND ERROR HANDLING
-     ===================================================== */
-
   /**
-   * Displays a loading message while the request is in progress
-   * or while the selected anime data is not yet available.
-   */
-  if (loading || !anime) return <p>Loading...</p>
-
-  /**
-   * Displays an error message if the anime request has failed.
-   */
-  if (error) return <p>Error: {error}</p>
-
-  /**
-   * Saves the authenticated user's rating for the current anime.
-   * The value must be an integer between 1 and 10.
+   * Saves a rating for the currently selected anime.
+   *
+   * @param {number} rating - Integer rating between 1 and 10.
    */
   const handleRatingChange = async rating => {
     if (!user || !anime?._id || userAnimeLoading) return
-
-    setActionMessage('')
-    setActionError('')
 
     try {
       await dispatch(
         saveUserAnimeRelation(anime._id, { rating })
       )
 
-      setActionMessage(`Your rating of ${rating}/10 has been saved.`)
-    } catch (err) {
-      setActionError(
-        err.response?.data?.message || 'Could not save your rating.'
-      )
+      await showMessage({
+        title: t('common.success'),
+        message: t('anime.ratingSaved', { rating }),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
+    } catch (error) {
+      await showMessage({
+        title: t('common.error'),
+        message: error.response?.data?.message || t('anime.ratingSaveError'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
     }
   }
 
@@ -267,164 +240,212 @@ const Anime = () => {
   const handleRatingClear = async () => {
     if (!user || !anime?._id || userAnimeLoading) return
 
-    setActionMessage('')
-    setActionError('')
-
     try {
       await dispatch(
         saveUserAnimeRelation(anime._id, { rating: null })
       )
 
-      setActionMessage('Your rating has been removed.')
-    } catch (err) {
-      setActionError(
-        err.response?.data?.message || 'Could not remove your rating.'
-      )
+      setRatingHover(0)
+
+      await showMessage({
+        title: t('common.success'),
+        message: t('anime.ratingRemoved'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
+    } catch (error) {
+      await showMessage({
+        title: t('common.error'),
+        message: error.response?.data?.message || t('anime.ratingRemoveError'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
     }
   }
 
-  /* =====================================================
-     ANIME DETAILS
-     ===================================================== */
+  // Display a loading state while anime details are being fetched.
+  if (loading || !anime || anime.slug !== slug) {
+    return (
+      <Container>
+        <p>{t('common.loading')}</p>
+      </Container>
+    )
+  }
+
+  // Display an error state if anime details could not be loaded.
+  if (error) {
+    return (
+      <Container>
+        <p role="alert">{t('anime.loadError')}</p>
+
+        <Button to="/">
+          {t('common.home')}
+        </Button>
+      </Container>
+    )
+  }
+
+  // Determine whether the current anime has a relation loaded for the user.
+  const hasCurrentRelation = userAnimeAnimeId === anime._id
+
+  const currentRating = hasCurrentRelation
+    ? Number(userAnimeRelation?.rating) || 0
+    : 0
+
+  const displayedRating = ratingHover || currentRating
+
+  const isFavorite =
+    hasCurrentRelation &&
+    userAnimeRelation?.favorite_anime === true
 
   return (
     <div className={styles.root}>
       <Container>
 
-        {/* Main anime title */}
-        <h1>{anime.title}</h1>
+        {/* Main anime information */}
+        <section className={styles.animeDetails}>
+          <h1>{anime.title}</h1>
 
-        {/* Anime cover with a fallback image when no cover is available */}
-        <img
-          src={anime.anime_cover || noImage}
-          alt={anime.title}
-          className={styles.img}
-        />
+          {/* Anime cover */}
+          <img
+            src={anime.anime_cover || noImage}
+            alt={anime.title}
+            className={styles.img}
+          />
 
-        {/* Basic anime information */}
-        <p>Title:  {anime.title}</p>
-        <p>Original title: {anime.original_title}</p>
-        <p>Age rating: {anime.age_rating}</p>
-        <p>Type: {anime.type}</p>
-        <p>World: {anime.world}</p>
-        <p>Genres: {anime.genres}</p>
-        <p>Categories: {anime.categories}</p>
-        {/* =====================================================
-            COMMUNITY RATING
-            ===================================================== */}
-        
-        <p>
-          Rating avg:{' '}
-          <strong>
-            {statsAnimeId === anime._id && stats
-              ? Number.isFinite(stats.ratingAvg)
-                ? stats.ratingAvg.toFixed(1)
-                : '—'
-              : anime.rating_avg ?? '—'}
-          </strong>
-        </p>
-            
-        <p>
-          Rating count:{' '}
-          <strong>
-            {statsAnimeId === anime._id && stats
-              ? stats.ratingCount
-              : anime.rating_count ?? 0}
-          </strong>
-        </p>
+          {/* Basic anime metadata */}
+          <p>
+            {t('anime.titleLabel')} {anime.title}
+          </p>
 
-        {/* =====================================================
-            USER ANIME LIST
-            ===================================================== */}
-        
+          <p>
+            {t('anime.originalTitle')} {anime.original_title}
+          </p>
+
+          <p>
+            {t('anime.ageRating')} {anime.age_rating}
+          </p>
+
+          <p>
+            {t('anime.type')} {anime.type}
+          </p>
+
+          <p>
+            {t('anime.world')} {anime.world}
+          </p>
+
+          <p>
+            {t('anime.genres')} {anime.genres}
+          </p>
+
+          <p>
+            {t('anime.categories')} {anime.categories}
+          </p>
+
+          <p>
+            {t('anime.description')} {anime.description_short}
+          </p>
+        </section>
+
+        {/* Community rating */}
+        <section className={styles.statistics}>
+          <h2>{t('anime.communityRating')}</h2>
+
+          <p>
+            {t('anime.ratingAverage')}{' '}
+            <strong>
+              {statsAnimeId === anime._id && stats
+                ? Number.isFinite(stats.ratingAvg)
+                  ? stats.ratingAvg.toFixed(1)
+                  : '—'
+                : anime.rating_avg ?? '—'}
+            </strong>
+          </p>
+
+          <p>
+            {t('anime.ratingCount')}{' '}
+            <strong>
+              {statsAnimeId === anime._id && stats
+                ? stats.ratingCount
+                : anime.rating_count ?? 0}
+            </strong>
+          </p>
+        </section>
+
+        {/* Personal anime list */}
         <section className={styles.userAnime}>
-          <h2>My anime list</h2>
-                
+          <h2>{t('anime.myAnimeList')}</h2>
+
           {!user ? (
-            <p>Log in to manage your anime list and favorites.</p>
+            <p>{t('anime.loginToManage')}</p>
           ) : (
             <>
-            {/* =====================================================
-                PERSONAL ANIME RATING
-                ===================================================== */}
+              {/* Personal rating */}
+              <div className={styles.ratingSection}>
+                <h3>{t('anime.yourRating')}</h3>
 
-            <div className={styles.ratingSection}>
-              <h3>Your rating</h3>
+                <div
+                  className={styles.ratingStars}
+                  role="group"
+                  aria-label={t('anime.ratingAriaLabel')}
+                  onMouseLeave={() => setRatingHover(0)}
+                >
+                  {Array.from({ length: 10 }, (_, index) => {
+                    const starValue = index + 1
 
-              {/*
-                The rating belongs to the currently displayed anime.
-                Zero means that the user has not rated this anime yet.
-              */}
-              {(() => {
-                const currentRating =
-                  userAnimeAnimeId === anime._id
-                    ? Number(userAnimeRelation?.rating) || 0
-                    : 0
-              
-                const displayedRating = ratingHover || currentRating
-              
-                return (
-                  <>
-                    <div
-                      className={styles.ratingStars}
-                      role="group"
-                      aria-label="Rate this anime from 1 to 10"
-                      onMouseLeave={() => setRatingHover(0)}
-                    >
-                      {Array.from({ length: 10 }, (_, index) => {
-                        const starValue = index + 1
-                      
-                        return (
-                          <button
-                            key={starValue}
-                            type="button"
-                            className={
-                              starValue <= displayedRating
-                                ? styles.starButtonActive
-                                : styles.starButton
-                            }
-                            onClick={() => handleRatingChange(starValue)}
-                            onMouseEnter={() => setRatingHover(starValue)}
-                            disabled={userAnimeLoading}
-                            aria-label={`Rate ${starValue} out of 10`}
-                            aria-pressed={currentRating === starValue}
-                            title={`${starValue}/10`}
-                          >
-                            ★
-                          </button>
-                        )
-                      })}
-
-                      <span className={styles.ratingValue}>
-                        {currentRating > 0
-                          ? `${currentRating}/10`
-                          : 'Not rated'}
-                      </span>
-                    </div>
-                        
-                    {currentRating > 0 && (
+                    return (
                       <button
+                        key={starValue}
                         type="button"
-                        className={styles.clearRatingButton}
-                        onClick={handleRatingClear}
+                        className={
+                          starValue <= displayedRating
+                            ? styles.starButtonActive
+                            : styles.starButton
+                        }
+                        onClick={() => handleRatingChange(starValue)}
+                        onMouseEnter={() => setRatingHover(starValue)}
                         disabled={userAnimeLoading}
+                        aria-label={t('anime.rateValue', {
+                          rating: starValue,
+                        })}
+                        aria-pressed={currentRating === starValue}
+                        title={`${starValue}/10`}
                       >
-                        Remove rating
+                        ★
                       </button>
-                    )}
-                  </>
-                )
-              })()}
-            </div>
+                    )
+                  })}
+
+                  <span className={styles.ratingValue}>
+                    {currentRating > 0
+                      ? `${currentRating}/10`
+                      : t('anime.notRated')}
+                  </span>
+                </div>
+
+                {/* Remove the current rating */}
+                {currentRating > 0 && (
+                  <button
+                    type="button"
+                    className={styles.clearRatingButton}
+                    onClick={handleRatingClear}
+                    disabled={userAnimeLoading}
+                  >
+                    {t('anime.removeRating')}
+                  </button>
+                )}
+              </div>
+
+              {/* Watch status */}
               <label htmlFor="anime-status">
-                Watch status
+                {t('anime.watchStatus')}
               </label>
-          
+
               <select
                 id="anime-status"
                 className={styles.statusSelect}
                 value={
-                  userAnimeAnimeId === anime._id
+                  hasCurrentRelation
                     ? userAnimeRelation?.status || ''
                     : ''
                 }
@@ -432,60 +453,73 @@ const Anime = () => {
                 disabled={userAnimeLoading}
               >
                 <option value="" disabled>
-                  Select watch status
+                  {t('anime.selectWatchStatus')}
                 </option>
-                <option value="not watched">Not watched</option>
-                <option value="planned">Planned</option>
-                <option value="watching">Watching</option>
-                <option value="completed">Completed</option>
-                <option value="suspended">Suspended</option>
-                <option value="abandoned">Abandoned</option>
+
+                <option value="not watched">
+                  {t('anime.status.notWatched')}
+                </option>
+
+                <option value="planned">
+                  {t('anime.status.planned')}
+                </option>
+
+                <option value="watching">
+                  {t('anime.status.watching')}
+                </option>
+
+                <option value="completed">
+                  {t('anime.status.completed')}
+                </option>
+
+                <option value="suspended">
+                  {t('anime.status.suspended')}
+                </option>
+
+                <option value="abandoned">
+                  {t('anime.status.abandoned')}
+                </option>
               </select>
-              
+
+              {/* Favorite toggle */}
               <button
                 type="button"
                 className={styles.favoriteButton}
                 onClick={handleFavoriteToggle}
                 disabled={userAnimeLoading}
-                aria-pressed={
-                  userAnimeAnimeId === anime._id &&
-                  userAnimeRelation?.favorite_anime === true
-                }
+                aria-pressed={isFavorite}
               >
-                {userAnimeAnimeId === anime._id &&
-                userAnimeRelation?.favorite_anime === true
-                  ? '♥ Remove from favorites'
-                  : '♡ Add to favorites'}
+                {isFavorite
+                  ? t('anime.removeFromFavorites')
+                  : t('anime.addToFavorites')}
               </button>
-                
+
+              {/* Relation loading and error states */}
               {userAnimeLoading && (
-                <p>Saving or loading your list...</p>
+                <p>{t('anime.savingOrLoading')}</p>
               )}
-        
-              {actionMessage && (
-                <p role="status">{actionMessage}</p>
-              )}
-        
-              {(actionError || userAnimeError) && (
+
+              {userAnimeError && (
                 <p role="alert">
-                  {actionError || userAnimeError}
+                  {userAnimeError}
                 </p>
               )}
             </>
           )}
         </section>
-        
-        {/* =====================================================
-            COMMUNITY STATISTICS
-            ===================================================== */}
 
+        {/* Community statistics */}
         <section className={styles.statistics}>
-          <h2>Community statistics</h2>
-        
-          {statsLoading && <p>Loading statistics...</p>}
-        
+          <h2>{t('anime.communityStatistics')}</h2>
+
+          {statsLoading && (
+            <p>{t('anime.loadingStatistics')}</p>
+          )}
+
           {statsError && (
-            <p>Could not load community statistics: {statsError}</p>
+            <p role="alert">
+              {t('anime.statisticsError')}: {statsError}
+            </p>
           )}
 
           {!statsLoading &&
@@ -494,83 +528,112 @@ const Anime = () => {
             statsAnimeId === anime._id && (
               <>
                 <p>
-                  Total users on list: <strong>{stats.total}</strong>
+                  {t('anime.totalUsersOnList')}:{' '}
+                  <strong>{stats.total}</strong>
                 </p>
-            
+
                 <p>
-                  Favorites: <strong>{stats.favorites}</strong>
+                  {t('anime.favorites')}:{' '}
+                  <strong>{stats.favorites}</strong>
                 </p>
-            
-                <h3>Watch status</h3>
-            
+
+                <h3>{t('anime.watchStatus')}</h3>
+
                 <ul>
-                  <li>Not watched: {stats.notWatched}</li>
-                  <li>Planned: {stats.planned}</li>
-                  <li>Watching: {stats.watching}</li>
-                  <li>Completed: {stats.completed}</li>
-                  <li>Suspended: {stats.suspended}</li>
-                  <li>Abandoned: {stats.abandoned}</li>
+                  <li>
+                    {t('anime.status.notWatched')}: {stats.notWatched}
+                  </li>
+
+                  <li>
+                    {t('anime.status.planned')}: {stats.planned}
+                  </li>
+
+                  <li>
+                    {t('anime.status.watching')}: {stats.watching}
+                  </li>
+
+                  <li>
+                    {t('anime.status.completed')}: {stats.completed}
+                  </li>
+
+                  <li>
+                    {t('anime.status.suspended')}: {stats.suspended}
+                  </li>
+
+                  <li>
+                    {t('anime.status.abandoned')}: {stats.abandoned}
+                  </li>
                 </ul>
               </>
             )}
         </section>
 
-        <p>Description: {anime.description_short}</p>
-
-        {/* Anime editing action available only to administrators */}
+        {/* Administrative actions */}
         {user?.role === 'admin' && (
-          <div>
-            <Button to={"/anime/EditAnime/" + anime.slug}>Edit</Button>
+          <div className={styles.adminActions}>
+            <Button to={`/anime/EditAnime/${anime.slug}`}>
+              {t('anime.edit')}
+            </Button>
+
             <Button to={`/character/add?animeId=${anime._id}`}>
-              Add character
+              {t('anime.addCharacter')}
             </Button>
           </div>
         )}
 
-        {/* =====================================================
-            CHARACTERS
-            ===================================================== */}
+        {/* Anime characters */}
+        <section className={styles.charactersSection}>
+          <h2>{t('anime.characters')}</h2>
 
-        {/* Renders a card for each character associated with the anime */}
-        <p>Characters:</p>
-        <div className={styles.characters}>
-          {anime.characters?.map(c => (
-            <div key={c._id}>
-              <CharacterCard character={c} />
-            </div>
-          ))}
-        </div>
+          <div className={styles.characters}>
+            {anime.characters?.length > 0 ? (
+              anime.characters.map(character => (
+                <div key={character._id}>
+                  <CharacterCard character={character} />
+                </div>
+              ))
+            ) : (
+              <p>{t('anime.noCharacters')}</p>
+            )}
+          </div>
+        </section>
 
-        {/* =====================================================
-            SEASONS
-            ===================================================== */}
+        {/* Anime seasons */}
+        <section className={styles.seasonsSection}>
+          <h2>{t('anime.seasons')}</h2>
 
-        {/* Renders a card for each season associated with the anime */}
-        <p>Seasons:</p>
-        <div>
-          {anime.seasons?.map(season => (
-            <div key={season._id}>
-              <SeasonCard season={season} />
-            </div>
-          ))}
-        </div>
+          {anime.seasons?.length > 0 ? (
+            anime.seasons.map(season => (
+              <div key={season._id}>
+                <SeasonCard season={season} />
+              </div>
+            ))
+          ) : (
+            <p>{t('anime.noSeasons')}</p>
+          )}
+        </section>
 
-        {/* =====================================================
-            REVIEWS
-            ===================================================== */}
+        {/* Anime reviews */}
+        <section className={styles.reviewsSection}>
+          <h2>{t('anime.reviews')}</h2>
 
-        {/* Renders a review card for each review associated with the anime */}
-        <p>Reviews:</p>
-        <ul>
-          {anime.reviews?.map(review => (
-            <li key={review._id}>
-              <ReviewCard review={review} />
-            </li>
-          ))}
-        </ul>
+          {anime.reviews?.length > 0 ? (
+            <ul>
+              {anime.reviews.map(review => (
+                <li key={review._id}>
+                  <ReviewCard review={review} />
+                </li>
+              ))}
+            </ul>
+          ) : (
+            <p>{t('anime.noReviews')}</p>
+          )}
+        </section>
 
-        {/* Navigation back to the home page */}
-        <Button to="/">Back to home</Button>
+        {/* Return to the home page */}
+        <Button to="/">
+          {t('common.home')}
+        </Button>
 
       </Container>
     </div>
