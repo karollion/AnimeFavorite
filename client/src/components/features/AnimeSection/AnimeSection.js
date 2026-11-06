@@ -1,84 +1,54 @@
 
 import styles from './AnimeSection.module.scss'
-import { useEffect, useRef, useState } from 'react'
+import { useState } from 'react'
 import PropTypes from 'prop-types'
+import { Swiper, SwiperSlide } from 'swiper/react'
+import 'swiper/css'
+
 import AnimeCard from '../AnimeCard/AnimeCard'
 import SkeletonAnimeCard from '../AnimeCard/SkeletonAnimeCard'
 import Button from '../../common/Button/Button'
 import { useTranslation } from 'react-i18next'
 
-
 const AnimeSection = ({ title, animes }) => {
-  const sliderRef = useRef(null)
   const { t } = useTranslation()
 
+  const [swiperInstance, setSwiperInstance] = useState(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
 
-  /*
-   * Sprawdza, czy lista kart może zostać przesunięta
-   * w lewo lub w prawo. Dzięki temu strzałki pojawiają się
-   * tylko wtedy, gdy rzeczywiście można przewijać zawartość.
-   */
-  useEffect(() => {
-    const slider = sliderRef.current
-
-    if (!slider) return
-
-    const updateArrows = () => {
-      setCanScrollLeft(slider.scrollLeft > 1)
-
-      setCanScrollRight(
-        slider.scrollLeft + slider.clientWidth < slider.scrollWidth - 1
-      )
-    }
-
-    updateArrows()
-
-    slider.addEventListener('scroll', updateArrows)
-    window.addEventListener('resize', updateArrows)
-
-    const resizeObserver = new ResizeObserver(updateArrows)
-    resizeObserver.observe(slider)
-
-    return () => {
-      slider.removeEventListener('scroll', updateArrows)
-      window.removeEventListener('resize', updateArrows)
-      resizeObserver.disconnect()
-    }
-  }, [animes?.length])
-
-  /*
-   * Przesuwa slider o większość jego widocznej szerokości,
-   * dzięki czemu użytkownik może wygodnie przeglądać kolejne karty.
-   */
-
-  const scrollSlider = direction => {
-    const slider = sliderRef.current
-  
-    if (!slider) return
-  
-    const firstSlide = slider.querySelector(`.${styles.slide}`)
-  
-    if (!firstSlide) return
-  
-    const slideWidth = firstSlide.getBoundingClientRect().width
-    const track = slider.querySelector(`.${styles.track}`)
-    const trackStyles = window.getComputedStyle(track)
-    const gap = parseFloat(trackStyles.columnGap) || 0
-  
-    slider.scrollBy({
-      left: direction * (slideWidth + gap),
-      behavior: 'smooth',
-    })
-  }
-
-
   const isLoading = !animes?.length
 
+  /*
+   * Displays skeleton cards while the anime list is loading.
+   */
   const displayedAnimes = isLoading
-    ? Array.from({ length: 10 }, (_, i) => i)
+    ? Array.from({ length: 8 }, (_, index) => index)
     : animes
+
+  /*
+   * Updates the navigation arrows according to the current
+   * Swiper position.
+   */
+  const updateNavigation = swiper => {
+    if (!swiper || swiper.destroyed) return
+
+    setCanScrollLeft(!swiper.isBeginning)
+    setCanScrollRight(!swiper.isEnd)
+  }
+
+  /*
+   * Moves the slider by exactly one card.
+   */
+  const scrollSlider = direction => {
+    if (!swiperInstance || swiperInstance.destroyed) return
+
+    if (direction === 'left') {
+      swiperInstance.slidePrev()
+    } else {
+      swiperInstance.slideNext()
+    }
+  }
 
   return (
     <section className={styles.root}>
@@ -89,35 +59,65 @@ const AnimeSection = ({ title, animes }) => {
           <button
             type="button"
             className={`${styles.arrow} ${styles.arrowLeft}`}
-            onClick={() => scrollSlider(-1)}
+            onClick={() => scrollSlider('left')}
             aria-label={t('animeSection.btnLariaLabel')}
           >
             &#10094;
           </button>
         )}
 
-        <div className={styles.slider} ref={sliderRef}>
-          <div className={styles.track}>
-            {displayedAnimes.map((anime, index) => (
-              <div
-                className={styles.slide}
-                key={isLoading ? `skeleton-${index}` : anime._id}
-              >
-                {isLoading ? (
-                  <SkeletonAnimeCard />
-                ) : (
-                  <AnimeCard anime={anime} />
-                )}
-              </div>
-            ))}
-          </div>
-        </div>
+        <Swiper
+          className={styles.slider}
+          spaceBetween={16}
+          slidesPerView={4}
+          slidesPerGroup={1}
+          watchOverflow={true}
+          grabCursor={true}
+          onSwiper={swiper => {
+            setSwiperInstance(swiper)
+            updateNavigation(swiper)
+          }}
+          onSlideChange={updateNavigation}
+          onResize={updateNavigation}
+          onUpdate={updateNavigation}
+          breakpoints={{
+            0: {
+              slidesPerView: 1,
+              spaceBetween: 12,
+            },
+            576: {
+              slidesPerView: 2,
+              spaceBetween: 16,
+            },
+            768: {
+              slidesPerView: 3,
+              spaceBetween: 16,
+            },
+            1200: {
+              slidesPerView: 4,
+              spaceBetween: 16,
+            },
+          }}
+        >
+          {displayedAnimes.map((anime, index) => (
+            <SwiperSlide
+              key={isLoading ? `skeleton-${index}` : anime._id}
+              className={styles.slide}
+            >
+              {isLoading ? (
+                <SkeletonAnimeCard />
+              ) : (
+                <AnimeCard anime={anime} />
+              )}
+            </SwiperSlide>
+          ))}
+        </Swiper>
 
         {canScrollRight && (
           <button
             type="button"
             className={`${styles.arrow} ${styles.arrowRight}`}
-            onClick={() => scrollSlider(1)}
+            onClick={() => scrollSlider('right')}
             aria-label={t('animeSection.btnRariaLabel')}
           >
             &#10095;
