@@ -13,7 +13,10 @@
     "myanimes": "My animes",
     "addnew": "Add new",
     "showMore": "Show more",
-    "edit": "Edit"
+    "edit": "Edit",
+    "success": "Success",
+    "error": "Error",
+    "ok": "OK"
   },
   "settings": {
     "title": "SETTINGS",
@@ -57,20 +60,29 @@
     "topRated": "TOP RATED",
     "random": "RANDOM",
     "movies": "MOVIES",
-    "tvSeries": "TV SERIES"
+    "tvSeries": "TV SERIES",
+    "loadError": "Failed to load home page content. Please try again."
   },
   "footer": {
     "createdBy": "Created by",
     "portfolioTitle": "Author's portfolio website"
   },
   "profile": {
-    "title": "Profil użytkownika",
-    "login": "Login: ",
-    "role": "Role: ",
-    "email": "Email: ",
-    "birthYear": "Birth year: ",
-    "description": "Description: ",
-    "favoriteCharacters": "Favorite characters:"
+    "title": "User Profile",
+    "loginRequired": "Please log in to view your profile.",
+    "avatarAlt": "{{login}}'s avatar",
+    "login": "Login:",
+    "role": "Role:",
+    "email": "Email:",
+    "birthYear": "Birth year:",
+    "description": "Description:",
+    "favoriteCharacters": "Favorite Characters",
+    "noFavoriteCharacters": "You haven't added any favorite characters yet.",
+    "notSpecified": "Not specified",
+    "roles": {
+      "admin": "Administrator",
+      "user": "User"
+    }
   },
   "genres": {
     "action": "Action",
@@ -81,6 +93,7 @@
     "sciFi": "Science Fiction"
   },
   "anime": {
+    "notFound": "Anime not found.",
     "searchPlaceholder": "Enter an anime title...",
     "noResults": "No anime found.",
     "loadError": "Failed to load anime data.",
@@ -157,5 +170,137 @@
       "Special": "Special",
       "Music": "Music Video"
     }
+  },
+  "search": {
+    "inputLabel": "Anime title",
+    "placeholder": "Enter at least 2 characters...",
+    "minCharacters": "Enter at least 2 characters to search.",
+    "view": "View",
+    "sortBy": "Sort by",
+    "previous": "Previous",
+    "next": "Next",
+    "page": "Page {{current}} of {{total}}",
+    "noResults": "No anime found.",
+    "loadFailed": "Failed to load search results."
+  },
+  "profileEdit": {
+    "title": "Edit Profile",
+    "loginRequired": "Please log in to edit your profile.",
+    "avatarTitle": "Avatar",
+    "chooseAvatar": "Choose a new avatar",
+    "avatarAlt": "{{login}}'s avatar",
+    "uploadAvatar": "Upload avatar",
+    "avatarUploadSuccess": "Avatar updated successfully.",
+    "avatarUploadFailed": "Failed to upload avatar.",
+    "email": "Email",
+    "emailPlaceholder": "Enter email",
+    "birthYear": "Birth year",
+    "notSpecified": "Not specified",
+    "description": "Description",
+    "descriptionPlaceholder": "Tell us something about yourself",
+    "descriptionLimit": "Maximum 1000 characters.",
+    "saving": "Saving...",
+    "saveChanges": "Save changes",
+    "saveSuccess": "Profile updated successfully.",
+    "saveFailed": "Failed to save profile. Check your data and try again.",
+    "validation": {
+      "emailRequired": "Email is required.",
+      "emailTooLong": "Email cannot exceed 254 characters.",
+      "emailInvalid": "Enter a valid email address.",
+      "birthYearInvalid": "Select a valid birth year.",
+      "descriptionTooLong": "Description cannot exceed 1000 characters."
+    }
+  },
+  "myAnimes": {
+    "title": "My Animes",
+    "loginRequired": "Please log in to view your anime collections.",
+    "view": "View",
+    "sortBy": "Sort by",
+    "tabs": {
+      "favorites": "Favorites",
+      "watching": "Watching",
+      "completed": "Completed",
+      "planned": "Planned",
+      "suspended": "Suspended",
+      "abandoned": "Abandoned"
+    }
+  },
+  "logout": {
+    "loading": "Logging out...",
+    "errorTitle": "Logout failed",
+    "failed": "An error occurred while logging out. Please try again."
+  },
+  "login": {
+    "title": "Log in"
+  },
+  "editCharacter": {
+    "title": "Edit Character",
+    "loading": "Loading character...",
+    "notFound": "Character not found.",
+    "unavailable": "Character data could not be loaded.",
+    "back": "Go back",
+    "detailsTitle": "Character Details",
+    "saveChanges": "Save changes",
+    "saveSuccess": "Character details have been saved successfully.",
+    "saveFailed": "Failed to update character.",
+    "loadFailed": "Failed to load character.",
+    "photoTitle": "Character Photo",
+    "choosePhoto": "Choose a new photo",
+    "photoAlt": "{{name}}'s photo",
+    "uploadPhoto": "Upload photo",
+    "photoSuccess": "Character photo has been updated successfully.",
+    "photoFailed": "Failed to upload character photo."
+  },
+  "editAnime": {
+    "title": "Edit anime",
+    "loading": "Loading anime...",
+    "notFound": "Anime not found.",
+    "saveChanges": "Save changes",
+    "saveSuccess": "Anime details have been saved successfully.",
+    "saveFailed": "Failed to update anime.",
+    "coverTitle": "Anime Cover",
+    "chooseCover": "Choose a new cover",
+    "coverAlt": "{{title}} cover",
+    "uploadCover": "Upload cover",
+    "coverSuccess": "Anime cover has been updated successfully.",
+    "coverFailed": "Failed to upload anime cover."
+  },
+  "character": {
+    "loading": "Loading character...",
+    "notFound": "Character not found.",
+    "photoAlt": "Character photo",
+    "firstName": "First name",
+    "lastName": "Last name",
+    "species": "Species",
+    "age": "Age",
+    "originWorld": "Origin world",
+    "description": "Description",
+    "editCharacter": "Edit character",
+    "backToHome": "Back to home",
+    "gender": {
+      "label": "Gender",
+      "male": "Male",
+      "female": "Female",
+      "unknown": "Unknown"
+    },
+    "role": {
+      "label": "Role",
+      "main": "Main",
+      "support": "Supporting",
+      "side": "Side"
+    }
+  },
+  "addCharacter": {
+    "title": "Add new character",
+    "submit": "Add character",
+    "missingAnimeId": "Cannot create a character without an anime ID. Open this page from a specific anime.",
+    "saveSuccess": "Character has been created successfully.",
+    "saveFailed": "Failed to add character."
+  },
+  "addAnime": {
+    "title": "Add new anime",
+    "submit": "Add anime",
+    "saveSuccess": "Anime has been added successfully.",
+    "saveFailed": "Failed to add anime."
   }
 }

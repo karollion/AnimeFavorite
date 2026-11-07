@@ -1,80 +1,83 @@
-/* =====================================================
-   Logout Page
-   ===================================================== */
 
 /**
  * @file Logout.js
- * @description Page component responsible for initiating the user logout process.
- *              Dispatches the logoutRequest action when the component mounts
- *              and displays a logout message while the process is handled.
+ * @description Page component responsible for logging out the authenticated user.
+ *              Dispatches the logout action when the component mounts and
+ *              displays the current logout status.
  */
 
+// Styles
 import styles from './Logout.module.scss'
 
-/* =====================================================
-   REDUX STATE MANAGEMENT
-   ===================================================== */
+// React
+import { useEffect, useRef, useState } from 'react'
 
+// Redux
 import { useDispatch } from 'react-redux'
 import { logoutRequest } from '../../../redux/reducers/userRedux'
 
-/* =====================================================
-   REACT HOOKS
-   ===================================================== */
+// Routing
+import { useNavigate } from 'react-router-dom'
 
-import { useEffect } from 'react'
+// Translations and messages
+import { useTranslation } from 'react-i18next'
+import { useMessage } from '../../../context/MessageContext'
 
-/* =====================================================
-   COMPONENTS
-   ===================================================== */
-
+// UI components
 import Container from '../../common/container/Container'
 
-/* =====================================================
-   LOGOUT COMPONENT
-   ===================================================== */
-
-/**
- * @component
- * @description Renders the logout page and initiates the logout action
- *              through Redux when the component mounts.
- *
- * @returns {JSX.Element} The logout page.
- */
 const Logout = () => {
+  const { t } = useTranslation()
+  const { showMessage } = useMessage()
 
-  /* =====================================================
-     REDUX DISPATCH
-     ===================================================== */
-
-  /**
-   * Redux dispatch function used to trigger the logout action.
-   */
   const dispatch = useDispatch()
+  const navigate = useNavigate()
 
-  /* =====================================================
-     LOGOUT ACTION
-     ===================================================== */
+  // Prevents the logout request from being triggered more than once.
+  const logoutStarted = useRef(false)
+
+  // Controls the message displayed on the page.
+  const [logoutFailed, setLogoutFailed] = useState(false)
 
   /**
-   * Dispatches the logoutRequest action when the component mounts.
-   *
-   * @dependency dispatch - Redux dispatch function.
+   * Executes the logout action once when the component mounts.
    */
   useEffect(() => {
-    dispatch(logoutRequest())
-  }, [dispatch])
+    if (logoutStarted.current) return
 
-  /* =====================================================
-     LOGOUT PAGE CONTENT
-     ===================================================== */
+    logoutStarted.current = true
+
+    const handleLogout = async () => {
+      try {
+        await dispatch(logoutRequest())
+        navigate('/', { replace: true })
+      } catch (error) {
+        setLogoutFailed(true)
+
+        await showMessage({
+          title: t('common.error'),
+          message: t('logout.failed'),
+          mode: 'alert',
+          confirmText: t('common.ok'),
+        })
+
+        navigate('/', { replace: true })
+      }
+    }
+
+    handleLogout()
+  }, [dispatch, navigate, showMessage, t])
 
   return (
     <div className={styles.root}>
       <Container>
 
-        {/* Message displayed while the logout process is handled */}
-        <h1>Logout...</h1>
+        {/* Logout status message */}
+        <h1>
+          {logoutFailed
+            ? t('logout.errorTitle')
+            : t('logout.loading')}
+        </h1>
 
       </Container>
     </div>

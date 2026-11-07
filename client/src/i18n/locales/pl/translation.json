@@ -13,7 +13,10 @@
     "addnew": "Dodaj nowe",
     "loading": "Ładowanie...",
     "showMore": "Pokaż więcej",
-    "edit": "Edytuj"
+    "edit": "Edytuj",
+    "success": "Sukces",
+    "error": "Błąd",
+    "ok": "OK"
   },
   "settings": {
     "title": "USTAWIENIA",
@@ -57,7 +60,8 @@
     "topRated": "NAJWYŻEJ OCENIANE",
     "random": "LOSOWE",
     "movies": "FILMY",
-    "tvSeries": "SERIALE TV"
+    "tvSeries": "SERIALE TV",
+    "loadError": "Nie udało się pobrać zawartości strony głównej. Spróbuj ponownie."
   },
   "animeSection": {
     "btnLariaLabel": "Poprzednie anime",
@@ -69,12 +73,20 @@
   },
   "profile": {
     "title": "Profil użytkownika",
-    "login": "Login: ",
-    "role": "Rola: ",
-    "email": "Email: ",
-    "birthYear": "Rok urodzenia: ",
-    "description": "Opis: ",
-    "favoriteCharacters": "Ulubione postacie:"
+    "loginRequired": "Zaloguj się, aby zobaczyć swój profil.",
+    "avatarAlt": "Avatar użytkownika {{login}}",
+    "login": "Login:",
+    "role": "Rola:",
+    "email": "E-mail:",
+    "birthYear": "Rok urodzenia:",
+    "description": "Opis:",
+    "favoriteCharacters": "Ulubione postacie",
+    "noFavoriteCharacters": "Nie masz jeszcze żadnych ulubionych postaci.",
+    "notSpecified": "Nie podano",
+    "roles": {
+      "admin": "Administrator",
+      "user": "Użytkownik"
+    }
   },
   "genres": {
     "action": "Akcja",
@@ -85,6 +97,7 @@
     "sciFi": "Science fiction"
   },
   "anime": {
+    "notFound": "Nie znaleziono anime.",
     "searchPlaceholder": "Wpisz tytuł anime...",
     "noResults": "Nie znaleziono anime.",
     "loadError": "Nie udało się pobrać danych anime.",
@@ -161,6 +174,138 @@
       "Special": "Odcinek specjalny",
       "Music": "Teledysk"
     }
+  },
+  "search": {
+    "inputLabel": "Tytuł anime",
+    "placeholder": "Wpisz co najmniej 2 znaki...",
+    "minCharacters": "Wpisz co najmniej 2 znaki, aby rozpocząć wyszukiwanie.",
+    "view": "Widok",
+    "sortBy": "Sortuj według",
+    "previous": "Poprzednia",
+    "next": "Następna",
+    "page": "Strona {{current}} z {{total}}",
+    "noResults": "Nie znaleziono anime.",
+    "loadFailed": "Nie udało się pobrać wyników wyszukiwania."
+  },
+  "profileEdit": {
+    "title": "Edytuj profil",
+    "loginRequired": "Zaloguj się, aby edytować swój profil.",
+    "avatarTitle": "Avatar",
+    "chooseAvatar": "Wybierz nowy avatar",
+    "avatarAlt": "Avatar użytkownika {{login}}",
+    "uploadAvatar": "Prześlij avatar",
+    "avatarUploadSuccess": "Avatar został pomyślnie zaktualizowany.",
+    "avatarUploadFailed": "Nie udało się przesłać avatara.",
+    "email": "Adres e-mail",
+    "emailPlaceholder": "Wpisz adres e-mail",
+    "birthYear": "Rok urodzenia",
+    "notSpecified": "Nie podano",
+    "description": "Opis",
+    "descriptionPlaceholder": "Napisz coś o sobie",
+    "descriptionLimit": "Maksymalnie 1000 znaków.",
+    "saving": "Zapisywanie...",
+    "saveChanges": "Zapisz zmiany",
+    "saveSuccess": "Profil został pomyślnie zaktualizowany.",
+    "saveFailed": "Nie udało się zapisać profilu. Sprawdź wprowadzone dane i spróbuj ponownie.",
+    "validation": {
+      "emailRequired": "Adres e-mail jest wymagany.",
+      "emailTooLong": "Adres e-mail nie może przekraczać 254 znaków.",
+      "emailInvalid": "Wprowadź prawidłowy adres e-mail.",
+      "birthYearInvalid": "Wybierz prawidłowy rok urodzenia.",
+      "descriptionTooLong": "Opis nie może przekraczać 1000 znaków."
+    }
+  },
+  "myAnimes": {
+    "title": "Moje anime",
+    "loginRequired": "Zaloguj się, aby zobaczyć swoje kolekcje anime.",
+    "view": "Widok",
+    "sortBy": "Sortuj według",
+    "tabs": {
+      "favorites": "Ulubione",
+      "watching": "Oglądane",
+      "completed": "Ukończone",
+      "planned": "Planowane",
+      "suspended": "Zawieszone",
+      "abandoned": "Porzucone"
+    }
+  },
+  "logout": {
+    "loading": "Logging out...",
+    "errorTitle": "Wylogowanie nie powiodło się",
+    "failed": "Wystąpił błąd podczas wylogowywania. Spróbuj ponownie."
+  },
+  "login": {
+    "title": "Logowanie"
+  },
+  "editCharacter": {
+    "title": "Edytuj postać",
+    "loading": "Ładowanie postaci...",
+    "notFound": "Nie znaleziono postaci.",
+    "unavailable": "Nie udało się pobrać danych postaci.",
+    "back": "Wróć",
+    "detailsTitle": "Dane postaci",
+    "saveChanges": "Zapisz zmiany",
+    "saveSuccess": "Dane postaci zostały pomyślnie zapisane.",
+    "saveFailed": "Nie udało się zaktualizować postaci.",
+    "loadFailed": "Nie udało się pobrać postaci.",
+    "photoTitle": "Zdjęcie postaci",
+    "choosePhoto": "Wybierz nowe zdjęcie",
+    "photoAlt": "Zdjęcie postaci {{name}}",
+    "uploadPhoto": "Prześlij zdjęcie",
+    "photoSuccess": "Zdjęcie postaci zostało pomyślnie zaktualizowane.",
+    "photoFailed": "Nie udało się przesłać zdjęcia postaci."
+  },
+  "editAnime": {
+    "title": "Edytuj anime",
+    "loading": "Ładowanie anime...",
+    "notFound": "Nie znaleziono anime.",
+    "saveChanges": "Zapisz zmiany",
+    "saveSuccess": "Dane anime zostały pomyślnie zapisane.",
+    "saveFailed": "Nie udało się zaktualizować anime.",
+    "coverTitle": "Okładka anime",
+    "chooseCover": "Wybierz nową okładkę",
+    "coverAlt": "Okładka anime {{title}}",
+    "uploadCover": "Prześlij okładkę",
+    "coverSuccess": "Okładka anime została pomyślnie zaktualizowana.",
+    "coverFailed": "Nie udało się przesłać okładki anime."
+  },
+  "character": {
+    "loading": "Ładowanie postaci...",
+    "notFound": "Nie znaleziono postaci.",
+    "photoAlt": "Zdjęcie postaci",
+    "firstName": "Imię",
+    "lastName": "Nazwisko",
+    "species": "Gatunek",
+    "age": "Wiek",
+    "originWorld": "Świat pochodzenia",
+    "description": "Opis",
+    "editCharacter": "Edytuj postać",
+    "backToHome": "Powrót do strony głównej",
+    "gender": {
+      "label": "Płeć",
+      "male": "Mężczyzna",
+      "female": "Kobieta",
+      "unknown": "Nieznana"
+    },
+    "role": {
+      "label": "Rola",
+      "main": "Główna",
+      "support": "Drugoplanowa",
+      "side": "Epizodyczna"
+    }
+  },
+  "addCharacter": {
+    "title": "Dodaj nową postać",
+    "submit": "Dodaj postać",
+    "missingAnimeId": "Nie można utworzyć postaci bez identyfikatora anime. Otwórz tę stronę z poziomu wybranego anime.",
+    "saveSuccess": "Postać została pomyślnie dodana.",
+    "saveFailed": "Nie udało się dodać postaci."
+  },
+  "addAnime": {
+    "title": "Dodaj nowe anime",
+    "submit": "Dodaj anime",
+    "saveSuccess": "Anime zostało pomyślnie dodane.",
+    "saveFailed": "Nie udało się dodać anime."
   }
 }
 

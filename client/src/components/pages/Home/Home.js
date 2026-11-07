@@ -1,136 +1,124 @@
-/* =====================================================
-   Home Page
-   ===================================================== */
-
 /**
  * @file Home.js
  * @description Main page component of the application.
  *              Fetches home page data through Redux and displays anime
- *              collections grouped by category, including newest releases,
- *              top-rated anime, random selections, movies, and TV series.
+ *              collections grouped by category.
  */
 
+// Styles
 import styles from './Home.module.scss'
 
-/* =====================================================
-   REACT HOOKS AND REDUX STATE MANAGEMENT
-   ===================================================== */
-
+// React
 import { useEffect } from 'react'
+
+// Redux
 import { useDispatch, useSelector } from 'react-redux'
 import { fetchHome } from '../../../redux/reducers/homeSliceRedux'
+
+// Translations and messages
 import { useTranslation } from 'react-i18next'
+import { useMessage } from '../../../context/MessageContext'
 
-/* =====================================================
-   COMPONENTS
-   ===================================================== */
-
+// UI components
 import AnimeSection from '../../features/AnimeSection/AnimeSection'
 import Container from '../../common/container/Container'
 
-/* =====================================================
-   HOME COMPONENT
-   ===================================================== */
-
-/**
- * @component
- * @description Renders the main page with multiple anime collections.
- *              Retrieves home page data from the Redux store and dispatches
- *              a request to fetch the collections when the component mounts.
- *
- * @returns {JSX.Element} The home page containing anime sections.
- */
 const Home = () => {
-   const { t } = useTranslation()
+  const { t } = useTranslation()
+  const { showMessage } = useMessage()
 
-  /* =====================================================
-     REDUX STATE AND DISPATCH
-     ===================================================== */
-
-  /**
-   * Redux dispatch function used to trigger the home page data request.
-   */
   const dispatch = useDispatch()
 
-  /**
-   * Anime collections and loading state retrieved from the home Redux slice.
-   *
-   * @property {Array} newest - Newest anime entries.
-   * @property {Array} topRated - Highest-rated anime entries.
-   * @property {Array} films - Anime movies.
-   * @property {Array} tvSeries - Anime TV series.
-   * @property {Array} random - Randomly selected anime entries.
-   * @property {boolean} loading - Indicates whether home page data is loading.
-   */
+  // Home page data and request status from Redux.
   const {
     newest,
     topRated,
     films,
     tvSeries,
     random,
-    //loading,
+    loading,
+    error,
   } = useSelector(state => state.home)
 
-  /* =====================================================
-     DATA FETCHING
-     ===================================================== */
-
   /**
-   * Fetches home page data when the component mounts.
-   *
-   * @dependency dispatch - Redux dispatch function.
+   * Fetches home page collections when the component mounts.
    */
   useEffect(() => {
     dispatch(fetchHome())
   }, [dispatch])
 
-  /* =====================================================
-     LOADING HANDLING
-     ===================================================== */
-
   /**
-   * Optional loading indicator.
-   * Currently disabled; can be enabled to display a loading message
-   * while home page data is being fetched.
+   * Displays an error message when the home page request fails.
+   * The Redux error state prevents duplicate notifications.
    */
-  // if (loading) return <p>Loading...</p>
+  useEffect(() => {
+    if (!error) return
 
-  /* =====================================================
-     HOME PAGE CONTENT
-     ===================================================== */
+    showMessage({
+      title: t('common.error'),
+      message: t('homePage.loadError'),
+      mode: 'alert',
+      confirmText: t('common.ok'),
+    })
+  }, [error, showMessage, t])
+
+  // Display a loading message while the initial request is pending.
+  if (loading) {
+    return (
+      <div className={styles.root}>
+        <Container>
+          <p>{t('common.loading')}</p>
+        </Container>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.root}>
       <Container>
-        <div>
-         
-          {/* Displays the newest anime entries */}
-          <AnimeSection title={t('homePage.newAnimes')} animes={newest} />
 
-          {/* Displays the highest-rated anime entries */}
-          <AnimeSection title={t('homePage.topRated')} animes={topRated} />
+        {/* Newest anime releases */}
+        <AnimeSection
+          title={t('homePage.newAnimes')}
+          animes={newest}
+        />
 
-          {/* Displays randomly selected anime entries */}
-          <AnimeSection title={t('homePage.random')} animes={random} />
+        {/* Highest-rated anime */}
+        <AnimeSection
+          title={t('homePage.topRated')}
+          animes={topRated}
+        />
 
-          {/* Displays anime movies */}
-          <AnimeSection title={t('homePage.movies')} animes={films} />
+        {/* Random anime selection */}
+        <AnimeSection
+          title={t('homePage.random')}
+          animes={random}
+        />
 
-          {/* Displays anime TV series */}
-          <AnimeSection title={t('homePage.tvSeries')} animes={tvSeries} />
+        {/* Anime movies */}
+        <AnimeSection
+          title={t('homePage.movies')}
+          animes={films}
+        />
 
-          <section>
-            <p>!!! Dokonczyć tłumaczenia wszystkich stron, i przerabianie motywów wszsystkich scss !!!</p>
-            <p>!!! Zrobic podstrony do sekcji w home po kliknieciu pokaz wiecej !!!</p>
-            <p>!!! Sprawdzic rewiew i season rating i ich powiazania , chyba trzeba dodac rating sezonu!!!</p>
-            <p>!!! Usuwanie anime, dodawanie sezonów</p>
-            <p>!!! dodanie okienek gdzie trzeba</p>
-          </section>
+        {/* Anime TV series */}
+        <AnimeSection
+          title={t('homePage.tvSeries')}
+          animes={tvSeries}
+        />
 
-        </div>
       </Container>
+      
+      <section>
+        <p>!!! Dokonczyć tłumaczenia wszystkich stron, i przerabianie motywów wszsystkich scss !!!</p>
+        <p>!!! Zrobic podstrony do sekcji w home po kliknieciu pokaz wiecej !!!</p>
+        <p>!!! Sprawdzic rewiew i season rating i ich powiazania , chyba trzeba dodac rating sezonu!!!</p>
+        <p>!!! Usuwanie anime, dodawanie sezonów</p>
+        <p>!!! dodanie okienek gdzie trzeba</p>
+      </section>
     </div>
   )
 }
 
 export default Home
+

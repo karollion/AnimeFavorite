@@ -1,230 +1,263 @@
-
-/* =====================================================
-   EDIT CHARACTER PAGE
-   ===================================================== */
-
 /**
  * @file EditCharacter.js
- * @description Loads and edits an existing character.
- *              Text data and photo are updated independently.
+ * @description Page component for editing an existing character.
+ *              Allows updating character details and uploading a photo
+ *              independently.
  */
 
-import { useEffect, useState } from "react";
-import { useDispatch, useSelector } from "react-redux";
-import { useNavigate, useParams } from "react-router-dom";
+// Styles
+import styles from './EditCharacter.module.scss'
 
-import styles from "./EditCharacter.module.scss";
-import Container from "../../common/container/Container";
-import CharacterForm from "../../features/CharacterForm/CharacterForm";
-import ImageUpload from "../../features/ImageUpload/ImageUpload";
+// React
+import { useEffect, useState } from 'react'
 
+// Redux
+import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchCharacterById,
   getSelectedCharacter,
   updateCharacterRequest,
   updateCharacterPhotoRequest,
-} from "../../../redux/reducers/charactersRedux";
+} from '../../../redux/reducers/charactersRedux'
 
-/* =====================================================
-   EDIT CHARACTER COMPONENT
-   ===================================================== */
+// Routing
+import { useNavigate, useParams } from 'react-router-dom'
+
+// Translations and messages
+import { useTranslation } from 'react-i18next'
+import { useMessage } from '../../../context/MessageContext'
+
+// UI components
+import Container from '../../common/container/Container'
+import Button from '../../common/Button/Button'
+import CharacterForm from '../../features/CharacterForm/CharacterForm'
+import ImageUpload from '../../features/ImageUpload/ImageUpload'
 
 const EditCharacter = () => {
-  const dispatch = useDispatch();
-  const navigate = useNavigate();
-  const { id } = useParams();
+  const { t } = useTranslation()
+  const { showMessage } = useMessage()
 
-  const selectedCharacter = useSelector(getSelectedCharacter);
-  const character =
-    selectedCharacter?._id === id ? selectedCharacter : null;
+  const dispatch = useDispatch()
+  const navigate = useNavigate()
+  const { id } = useParams()
 
-  const [isLoading, setIsLoading] = useState(true);
-  const [isSaving, setIsSaving] = useState(false);
-  const [isUploading, setIsUploading] = useState(false);
-  const [error, setError] = useState("");
-  const [success, setSuccess] = useState("");
+  // Retrieve the selected character from Redux.
+  const selectedCharacter = useSelector(getSelectedCharacter)
 
-  /* =====================================================
-     FETCH CHARACTER
-     ===================================================== */
+  // Prevent displaying a previously selected character with a different ID.
+  const character = selectedCharacter?._id === id
+    ? selectedCharacter
+    : null
 
+  // Request and upload states.
+  const [isLoading, setIsLoading] = useState(true)
+  const [isSaving, setIsSaving] = useState(false)
+  const [isUploading, setIsUploading] = useState(false)
+  const [loadFailed, setLoadFailed] = useState(false)
+
+  /**
+   * Loads the character selected for editing.
+   * Prevents state updates after the component has been unmounted.
+   */
   useEffect(() => {
-    let isMounted = true;
+    let isMounted = true
 
     const loadCharacter = async () => {
-      setIsLoading(true);
-      setError("");
-      setSuccess("");
+      setIsLoading(true)
+      setLoadFailed(false)
 
       try {
-        await dispatch(fetchCharacterById(id));
-      } catch (err) {
+        await dispatch(fetchCharacterById(id))
+      } catch (error) {
         if (isMounted) {
-          setError(
-            err.response?.data?.message ||
-            "Failed to load character."
-          );
+          setLoadFailed(true)
+          setIsLoading(false)
+
+          await showMessage({
+            title: t('common.error'),
+            message: error.response?.data?.message ||
+              t('editCharacter.loadFailed'),
+            mode: 'alert',
+            confirmText: t('common.ok'),
+          })
         }
       } finally {
         if (isMounted) {
-          setIsLoading(false);
+          setIsLoading(false)
         }
       }
-    };
+    }
 
     if (id) {
-      loadCharacter();
+      loadCharacter()
     } else {
-      setError("Character ID is missing.");
-      setIsLoading(false);
+      setLoadFailed(true)
+      setIsLoading(false)
     }
 
     return () => {
-      isMounted = false;
-    };
-  }, [dispatch, id]);
+      isMounted = false
+    }
+  }, [dispatch, id, showMessage, t])
 
-  /* =====================================================
-     UPDATE CHARACTER DATA
-     ===================================================== */
-
+  /**
+   * Updates the character's text information.
+   *
+   * @param {Object} data - Updated character form values.
+   */
   const handleUpdateCharacter = async data => {
-    if (!id) return;
+    if (!id) return
 
-    setIsSaving(true);
-    setError("");
-    setSuccess("");
+    setIsSaving(true)
 
     try {
-      await dispatch(updateCharacterRequest(id, data));
+      await dispatch(updateCharacterRequest(id, data))
 
-      setSuccess("Character details have been saved.");
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        "Failed to update character."
-      );
+      await showMessage({
+        title: t('common.success'),
+        message: t('editCharacter.saveSuccess'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
+    } catch (error) {
+      await showMessage({
+        title: t('common.error'),
+        message: error.response?.data?.message ||
+          t('editCharacter.saveFailed'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
+  }
 
-  /* =====================================================
-     UPLOAD CHARACTER PHOTO
-     ===================================================== */
-
+  /**
+   * Uploads a new character photo independently of the text form.
+   *
+   * @param {File} file - Selected image file.
+   */
   const handleUploadPhoto = async file => {
-    if (!id) return;
+    if (!id) return
 
-    setIsUploading(true);
-    setError("");
-    setSuccess("");
+    setIsUploading(true)
 
     try {
-      await dispatch(updateCharacterPhotoRequest(id, file));
+      await dispatch(updateCharacterPhotoRequest(id, file))
 
-      setSuccess("Character photo has been updated.");
-    } catch (err) {
-      setError(
-        err.response?.data?.message ||
-        "Failed to upload character photo."
-      );
+      await showMessage({
+        title: t('common.success'),
+        message: t('editCharacter.photoSuccess'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
+    } catch (error) {
+      await showMessage({
+        title: t('common.error'),
+        message: error.response?.data?.message ||
+          t('editCharacter.photoFailed'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
 
-      throw err;
+      // Propagate the error so ImageUpload can handle the failed request.
+      throw error
     } finally {
-      setIsUploading(false);
+      setIsUploading(false)
     }
-  };
+  }
 
-  /* =====================================================
-     PAGE STATES
-     ===================================================== */
+  /**
+   * Navigates back to the previous page.
+   */
+  const handleGoBack = () => {
+    navigate(-1)
+  }
 
+  // Display a loading indicator while the character is being fetched.
   if (isLoading) {
     return (
       <div className={styles.root}>
         <Container>
-          <p>Loading character...</p>
+          <p>{t('editCharacter.loading')}</p>
         </Container>
       </div>
-    );
+    )
   }
 
+  // Handle missing or unavailable character data.
   if (!character) {
     return (
       <div className={styles.root}>
         <Container>
-          <h1>Edit character</h1>
+
+          <h1 className={styles.title}>
+            {t('editCharacter.title')}
+          </h1>
 
           <p className="text-danger" role="alert">
-            {error || "Character not found."}
+            {loadFailed
+              ? t('editCharacter.unavailable')
+              : t('editCharacter.notFound')}
           </p>
 
-          <button
-            type="button"
-            className="btn btn-secondary"
-            onClick={() => navigate(-1)}
-          >
-            Back
-          </button>
+          <Button action={handleGoBack}>
+            {t('editCharacter.back')}
+          </Button>
+
         </Container>
       </div>
-    );
+    )
   }
-
-  /* =====================================================
-     PAGE LAYOUT
-     ===================================================== */
 
   return (
     <div className={styles.root}>
       <Container>
-        <h1>Edit character</h1>
 
-        {error && (
-          <p className="text-danger" role="alert">
-            {error}
-          </p>
-        )}
+        {/* Main page heading */}
+        <h1 className={styles.title}>
+          {t('editCharacter.title')}
+        </h1>
 
-        {success && (
-          <p className="text-success" role="status">
-            {success}
-          </p>
-        )}
-
-        {/* CHARACTER TEXT DATA */}
+        {/* Character text information */}
         <section className={styles.formSection}>
-          <h2>Character details</h2>
+
+          <h2>
+            {t('editCharacter.detailsTitle')}
+          </h2>
 
           <CharacterForm
             character={character}
             onSubmit={handleUpdateCharacter}
-            submitText="Save changes"
+            submitText={t('editCharacter.saveChanges')}
             isSaving={isSaving}
             backTo={`/character/${character._id}`}
           />
+
         </section>
 
-        {/* CHARACTER PHOTO */}
+        {/* Character photo management */}
         <section className={styles.photoSection}>
 
           <ImageUpload
-            title="Character Photo"
-            label="Choose a new photo"
+            title={t('editCharacter.photoTitle')}
+            label={t('editCharacter.choosePhoto')}
             currentImage={character.photo}
-            currentImageAlt={`${character.firstName} photo`}
+            currentImageAlt={t('editCharacter.photoAlt', {
+              name: character.firstName,
+            })}
             onUpload={handleUploadPhoto}
             isUploading={isUploading}
             maxSizeMB={2}
-            uploadButtonLabel="Upload photo"
-            successMessage="Character photo updated successfully."
+            uploadButtonLabel={t('editCharacter.uploadPhoto')}
+            successMessage={t('editCharacter.photoSuccess')}
           />
-          
+
         </section>
+
       </Container>
     </div>
-  );
-};
+  )
+}
 
-export default EditCharacter;
+export default EditCharacter

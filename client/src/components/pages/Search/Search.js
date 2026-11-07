@@ -1,90 +1,140 @@
-import { useEffect, useState } from 'react';
-import { useSelector } from 'react-redux';
-import { Col, Form } from 'react-bootstrap';
-import { useTranslation } from 'react-i18next';
-
-import styles from './Search.module.scss';
-
-import api from '../../../utils/axios';
-import { useSearchParams } from 'react-router-dom';
-import { getUser } from '../../../redux/reducers/userRedux';
-
-import Container from '../../common/container/Container';
-import Button from '../../common/Button/Button';
-import StatsList from '../../features/StatsList/StatsList';
 
 /**
- * Search page
+ * @file Search.js
+ * @description Allows users to search for anime, change the
+ * results layout, sort entries and navigate between pages.
  *
- * Wyszukuje anime po tytule, a następnie pozwala zmienić sposób
- * prezentowania i sortowania wyników.
+ * User preferences provide the default view and sorting method.
+ * Changes made locally on this page do not modify saved preferences.
+ */
+
+// React
+import { useEffect, useState } from 'react'
+
+// Redux
+import { useSelector } from 'react-redux'
+import { getUser } from '../../../redux/reducers/userRedux'
+
+// React Bootstrap
+import { Col, Form } from 'react-bootstrap'
+
+// Routing
+import { useSearchParams } from 'react-router-dom'
+
+// Translations
+import { useTranslation } from 'react-i18next'
+
+// Styles
+import styles from './Search.module.scss'
+
+// API
+import api from '../../../utils/axios'
+
+// Context
+import { useMessage } from '../../../context/MessageContext'
+
+// Components
+import Container from '../../common/container/Container'
+import Button from '../../common/Button/Button'
+import StatsList from '../../features/StatsList/StatsList'
+
+/**
+ * @component
+ * @description Renders the anime search page.
  *
- * Ustawienia zapisane w profilu są wartościami domyślnymi.
- * Lokalne przełączenie widoku lub sortowania nie zapisuje zmian
- * w preferencjach użytkownika.
+ * Features:
+ * - Debounced anime search.
+ * - Grid and list result layouts.
+ * - Sorting by rating, release date or title.
+ * - Pagination.
+ * - Default settings loaded from the authenticated user's profile.
+ *
+ * @returns {JSX.Element} The search page.
  */
 const Search = () => {
-  const { t } = useTranslation();
-  const user = useSelector(getUser);
+  const user = useSelector(getUser)
 
-  const [searchParams] = useSearchParams();
-  const queryFromUrl = searchParams.get('q') || '';
-  const [query, setQuery] = useState(queryFromUrl);
+  const { t } = useTranslation()
+  const { showMessage } = useMessage()
 
-  const [results, setResults] = useState([]);
-  const [loading, setLoading] = useState(false);
-  const [error, setError] = useState('');
-  const [page, setPage] = useState(1);
-  const [totalPages, setTotalPages] = useState(1);
-  const [hasSearched, setHasSearched] = useState(false);
+  const [searchParams] = useSearchParams()
+
+  // Read the initial search query from the URL.
+  const queryFromUrl = searchParams.get('q') || ''
+
+  // Search and pagination state.
+  const [query, setQuery] = useState(queryFromUrl)
+  const [results, setResults] = useState([])
+  const [loading, setLoading] = useState(false)
+  const [error, setError] = useState(false)
+
+  const [page, setPage] = useState(1)
+  const [totalPages, setTotalPages] = useState(1)
+  const [hasSearched, setHasSearched] = useState(false)
 
   /*
-   * null oznacza, że użytkownik nie zmienił ustawienia na tej stronie.
-   * Wtedy korzystamy z wartości zapisanej w Settings.
+   * Local overrides take precedence over saved user preferences.
+   * A null value means that the user has not changed the setting
+   * during the current page session.
    */
-  const [viewOverride, setViewOverride] = useState(null);
-  const [sortOverride, setSortOverride] = useState(null);
+  const [viewOverride, setViewOverride] = useState(null)
+  const [sortOverride, setSortOverride] = useState(null)
 
-  const defaultView =
-    user?.preferences?.ui?.defaultView === 'list' ? 'list' : 'grid';
+  // Resolve the default layout from the user's saved preferences.
+  const savedView = user?.preferences?.ui?.defaultView
 
-  const savedSort = user?.preferences?.behavior?.defaultSort;
+  const defaultView = savedView === 'list'
+    ? 'list'
+    : 'grid'
+
+  // Resolve the default sorting method from user preferences.
+  const savedSort = user?.preferences?.behavior?.defaultSort
 
   const defaultSort = ['rating', 'newest', 'title'].includes(savedSort)
     ? savedSort
-    : 'newest';
+    : 'newest'
 
-  const view = viewOverride ?? defaultView;
-  const sort = sortOverride ?? defaultSort;
-
-  useEffect(() => {
-    setQuery(queryFromUrl);
-    setPage(1);
-  }, [queryFromUrl]);
+  // Apply local overrides when available.
+  const view = viewOverride ?? defaultView
+  const sort = sortOverride ?? defaultSort
 
   /*
-   * Wyszukiwanie jest opóźnione o 300 ms, aby nie wysyłać zapytania
-   * do serwera po każdym pojedynczym znaku.
-   *
-   * Endpoint getAll obsługuje wyszukiwanie, sortowanie i paginację.
+   * Synchronizes the search field with the query parameter.
+   * This also resets pagination when the URL query changes.
    */
   useEffect(() => {
-    const normalizedQuery = query.trim();
+    setQuery(queryFromUrl)
+    setPage(1)
+  }, [queryFromUrl])
 
+  /*
+   * Performs a debounced search.
+   *
+   * Requests are delayed by 300 ms to avoid sending an API
+   * request after every individual keystroke.
+   *
+   * The cleanup function prevents outdated requests from
+   * updating component state or displaying error messages.
+   */
+  useEffect(() => {
+    const normalizedQuery = query.trim()
+
+    // Do not search for queries shorter than two characters.
     if (normalizedQuery.length < 2) {
-      setResults([]);
-      setLoading(false);
-      setError('');
-      setTotalPages(1);
-      setHasSearched(false);
-      return undefined;
+      setResults([])
+      setLoading(false)
+      setError(false)
+      setTotalPages(1)
+      setHasSearched(false)
+
+      return undefined
     }
 
-    let cancelled = false;
+    let cancelled = false
 
-    setLoading(true);
-    setError('');
-    setHasSearched(true);
+    setLoading(true)
+    setError(false)
+    setHasSearched(true)
 
     const timeoutId = setTimeout(async () => {
       try {
@@ -95,113 +145,181 @@ const Search = () => {
             page,
             limit: 20,
           },
-        });
+        })
 
-        if (cancelled) return;
+        // Ignore the response if the request is no longer relevant.
+        if (cancelled) return
 
-        setResults(response.data.items || []);
-        setTotalPages(response.data.totalPages || 1);
+        setResults(response.data.items || [])
+        setTotalPages(response.data.totalPages || 1)
       } catch (requestError) {
-        if (cancelled) return;
+        // Ignore errors from outdated requests.
+        if (cancelled) return
 
-        setResults([]);
-        setError(
-          requestError.response?.data?.message ||
-          'Failed to load search results.'
-        );
+        setResults([])
+        setError(true)
+
+        // Display API errors using the global message component.
+        await showMessage({
+          title: t('common.error'),
+          message: t('search.loadFailed'),
+          mode: 'alert',
+          confirmText: t('common.ok'),
+        })
       } finally {
         if (!cancelled) {
-          setLoading(false);
+          setLoading(false)
         }
       }
-    }, 300);
+    }, 300)
 
+    // Cancel the pending request handler when dependencies change.
     return () => {
-      cancelled = true;
-      clearTimeout(timeoutId);
-    };
-  }, [query, sort, page]);
+      cancelled = true
+      clearTimeout(timeoutId)
+    }
+  }, [query, sort, page, showMessage, t])
 
-  /*
-   * Nowa fraza wyszukiwania zaczyna się od pierwszej strony.
+  /**
+   * Updates the search query and resets pagination.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} event
    */
   const handleQueryChange = event => {
-    setQuery(event.target.value);
-    setPage(1);
-  };
+    setQuery(event.target.value)
+    setPage(1)
+  }
+
+  /**
+   * Changes the results layout.
+   * The selected value is stored locally and does not modify
+   * the user's saved preferences.
+   *
+   * @param {React.ChangeEvent<HTMLSelectElement>} event
+   */
+  const handleViewChange = event => {
+    setViewOverride(event.target.value)
+  }
+
+  /**
+   * Changes the sorting method and returns to the first page.
+   *
+   * @param {React.ChangeEvent<HTMLSelectElement>} event
+   */
+  const handleSortChange = event => {
+    setSortOverride(event.target.value)
+    setPage(1)
+  }
+
+  /**
+   * Moves to the previous results page.
+   */
+  const handlePreviousPage = () => {
+    setPage(current => Math.max(1, current - 1))
+  }
+
+  /**
+   * Moves to the next results page.
+   */
+  const handleNextPage = () => {
+    setPage(current => Math.min(totalPages, current + 1))
+  }
 
   return (
     <div className={styles.root}>
       <Container>
-        <h1 className={styles.title}>Search</h1>
 
+        {/* Page heading */}
+        <h1 className={styles.title}>
+          {t('common.search')}
+        </h1>
+
+        {/* Search input */}
         <Form
           className={styles.searchForm}
           onSubmit={event => event.preventDefault()}
         >
           <Form.Group controlId="animeSearch">
-            <Form.Label>Anime title</Form.Label>
+            <Form.Label>
+              {t('search.inputLabel')}
+            </Form.Label>
 
             <Form.Control
               type="search"
               value={query}
               onChange={handleQueryChange}
-              placeholder="Enter at least 2 characters..."
+              placeholder={t('search.placeholder')}
               autoComplete="off"
             />
           </Form.Group>
         </Form>
 
+        {/* Search result controls */}
         <div className={styles.toolbar}>
+
+          {/* Results layout */}
           <div className={styles.control}>
-            <Form.Label htmlFor="searchView">View</Form.Label>
+            <Form.Label htmlFor="searchView">
+              {t('search.view')}
+            </Form.Label>
 
             <Form.Select
               id="searchView"
               value={view}
-              onChange={event => setViewOverride(event.target.value)}
+              onChange={handleViewChange}
             >
-              <option value="grid">Grid</option>
-              <option value="list">List</option>
+              <option value="grid">
+                {t('settings.grid')}
+              </option>
+
+              <option value="list">
+                {t('settings.list')}
+              </option>
             </Form.Select>
           </div>
 
+          {/* Results sorting */}
           <div className={styles.control}>
-            <Form.Label htmlFor="searchSort">Sort by</Form.Label>
+            <Form.Label htmlFor="searchSort">
+              {t('search.sortBy')}
+            </Form.Label>
 
             <Form.Select
               id="searchSort"
               value={sort}
-              onChange={event => {
-                setSortOverride(event.target.value);
-                setPage(1);
-              }}
+              onChange={handleSortChange}
             >
-              <option value="rating">Rating</option>
-              <option value="newest">Newest</option>
-              <option value="title">Name (A–Z)</option>
+              <option value="rating">
+                {t('settings.defrating')}
+              </option>
+
+              <option value="newest">
+                {t('settings.defnewest')}
+              </option>
+
+              <option value="title">
+                {t('settings.deftitle')} (A–Z)
+              </option>
             </Form.Select>
           </div>
+
         </div>
 
+        {/* Minimum search query length */}
         {query.trim().length < 2 && (
           <p className={styles.message}>
-            Enter at least 2 characters to search.
+            {t('search.minCharacters')}
           </p>
         )}
 
-        {error && (
-          <p className={styles.error} role="alert">
-            {error}
-          </p>
-        )}
-
+        {/* No results information */}
         {hasSearched && !loading && !error && results.length === 0 && (
           <p className={styles.message}>
-            No anime found.
+            {t('search.noResults')}
           </p>
         )}
 
+        {/* Search results */}
         {(loading || results.length > 0) && (
           <StatsList
             stats={results}
@@ -211,38 +329,44 @@ const Search = () => {
           />
         )}
 
-        {!loading && totalPages > 1 && (
+        {/* Pagination */}
+        {!loading && !error && totalPages > 1 && (
           <div className={styles.pagination}>
+
             <Button
-              action={() => setPage(current => Math.max(1, current - 1))}
+              action={handlePreviousPage}
               active={page > 1}
             >
-              Previous
+              {t('search.previous')}
             </Button>
 
             <span>
-              Page {page} of {totalPages}
+              {t('search.page', {
+                current: page,
+                total: totalPages,
+              })}
             </span>
 
             <Button
-              action={() =>
-                setPage(current => Math.min(totalPages, current + 1))
-              }
+              action={handleNextPage}
               active={page < totalPages}
             >
-              Next
+              {t('search.next')}
             </Button>
+
           </div>
         )}
 
+        {/* Return to the home page */}
         <Col xs="12" className="d-flex justify-content-center my-3">
           <Button to="/">
             {t('common.home')}
           </Button>
         </Col>
+
       </Container>
     </div>
-  );
-};
+  )
+}
 
-export default Search;
+export default Search

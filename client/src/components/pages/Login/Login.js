@@ -1,49 +1,34 @@
-/* =====================================================
-   Login Page
-   ===================================================== */
 
 /**
  * @file Login.js
  * @description Page component for user authentication.
  *              Provides a page layout with a heading and the reusable
- *              LoginForm component for entering login credentials.
+ *              LoginForm component.
  */
 
+// Styles
 import styles from './Login.module.scss'
 
-/* =====================================================
-   COMPONENTS
-   ===================================================== */
+// Translations
+import { useTranslation } from 'react-i18next'
 
+// UI components
 import Container from '../../common/container/Container'
 import LoginForm from '../../features/LoginForm/LoginForm'
 
-/* =====================================================
-   LOGIN COMPONENT
-   ===================================================== */
-
-/**
- * @component
- * @description Renders the user login page.
- *              Uses the shared LoginForm component to handle
- *              the authentication form and its associated actions.
- *
- * @returns {JSX.Element} The login page.
- */
 const Login = () => {
-
-  /* =====================================================
-     PAGE LAYOUT
-     ===================================================== */
+  const { t } = useTranslation()
 
   return (
     <div className={styles.root}>
       <Container>
 
-        {/* Page heading */}
-        <h1>Login</h1>
+        {/* Main page heading */}
+        <h1>
+          {t('login.title')}
+        </h1>
 
-        {/* Form for entering user authentication credentials */}
+        {/* User authentication form */}
         <LoginForm />
 
       </Container>

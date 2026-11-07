@@ -1,29 +1,21 @@
-/* =====================================================
-   Edit Anime Page
-   ===================================================== */
-
 /**
  * @file EditAnime.js
- * @description Page component for editing an existing anime entity.
- *              Fetches anime data by slug and displays its title together
- *              with the reusable AnimeForm component pre-filled with
- *              the selected anime's data.
+ * @description Allows administrators to edit an existing anime entry.
+ *              Fetches anime data by slug and provides functionality
+ *              for updating anime details and its cover image.
  */
 
-import styles from './EditAnime.module.scss'
-
-/* =====================================================
-   ROUTING AND REACT HOOKS
-   ===================================================== */
-
+import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
 import { useParams } from 'react-router-dom'
-import { useState, useEffect } from 'react';
+import { useTranslation } from 'react-i18next'
+
+import styles from './EditAnime.module.scss'
 
 /* =====================================================
    REDUX STATE MANAGEMENT
    ===================================================== */
 
-import { useDispatch, useSelector } from 'react-redux'
 import {
   fetchAnimeBySlug,
   getSelectedAnime,
@@ -31,7 +23,13 @@ import {
   getAnimesError,
   updateAnimeRequest,
   updateAnimeCoverRequest,
-} from '../../../redux/reducers/animesRedux';
+} from '../../../redux/reducers/animesRedux'
+
+/* =====================================================
+   CONTEXT
+   ===================================================== */
+
+import { useMessage } from '../../../context/MessageContext'
 
 /* =====================================================
    COMPONENTS
@@ -39,7 +37,7 @@ import {
 
 import AnimeForm from '../../features/AnimeForm/AnimeForm'
 import Container from '../../common/container/Container'
-import ImageUpload from '../../features/ImageUpload/ImageUpload';
+import ImageUpload from '../../features/ImageUpload/ImageUpload'
 
 /* =====================================================
    EDIT ANIME COMPONENT
@@ -47,140 +45,214 @@ import ImageUpload from '../../features/ImageUpload/ImageUpload';
 
 /**
  * @component
- * @description Renders the page for editing an existing anime entry.
- *              Retrieves the anime slug from the URL, fetches the
- *              corresponding anime data through Redux, and passes the
- *              selected anime to AnimeForm for editing.
+ * @description Fetches and displays an anime entry for editing.
+ *              Allows updating anime information and uploading
+ *              a replacement cover image.
  *
  * @returns {JSX.Element} The edit anime page.
  */
 const EditAnime = () => {
-   const [isSaving, setIsSaving] = useState(false);
-   const [saveError, setSaveError] = useState('');
-   const [isUploadingCover, setIsUploadingCover] = useState(false);
+  const { slug } = useParams()
 
-   const { slug } = useParams()
-   const dispatch = useDispatch()
+  const dispatch = useDispatch()
 
-   const loading = useSelector(getAnimesLoading)
-   const anime = useSelector(getSelectedAnime)
-   const error = useSelector(getAnimesError)
+  const { t } = useTranslation()
+  const { showMessage } = useMessage()
 
-   /* =====================================================
-      DATA FETCHING
-      ===================================================== */
+  /* =====================================================
+     LOCAL STATE
+     ===================================================== */
 
-   /**
-    * Fetches anime details whenever the URL slug changes.
-    * Skips the request if no slug is available.
-    *
-    * @dependency dispatch - Redux dispatch function.
-    * @dependency slug - Identifier of the anime to be edited.
-    */
-   useEffect(() => {
-     if (!slug) return
-     dispatch(fetchAnimeBySlug(slug))
-   }, [dispatch, slug])
+  // Tracks the anime details update process.
+  const [isSaving, setIsSaving] = useState(false)
 
-   /* =====================================================
-      LOADING AND ERROR HANDLING
-      ===================================================== */
+  // Tracks the cover image upload process.
+  const [isUploadingCover, setIsUploadingCover] = useState(false)
 
-   if (loading) return <p>Loading...</p>;
+  /* =====================================================
+     REDUX SELECTORS
+     ===================================================== */
 
-   if (error) return <p>Error: {error}</p>;
+  const loading = useSelector(getAnimesLoading)
+  const anime = useSelector(getSelectedAnime)
+  const error = useSelector(getAnimesError)
 
-   if (!anime) return <p>Anime not found.</p>;
-
-   const handleEditAnime = async (data, cover) => {
-      setIsSaving(true);
-      setSaveError('');
-
-      try {
-        await dispatch(updateAnimeRequest({
-          ...data,
-          _id: anime._id,
-        }));
-
-        if (cover) {
-          await dispatch(updateAnimeCoverRequest(anime._id, cover));
-        }
-
-        // Ponownie pobierz dane, w tym aktualną okładkę.
-        await dispatch(fetchAnimeBySlug(slug));
-      } catch (err) {
-        setSaveError(
-          err.response?.data?.message ||
-          'Failed to update anime.'
-        );
-      } finally {
-        setIsSaving(false);
-      }
-    };
-
-    /* =====================================================
-   ANIME COVER UPLOAD HANDLER
-   ===================================================== */
+  /* =====================================================
+     DATA FETCHING
+     ===================================================== */
 
   /**
-   * Uploads a replacement cover image through the dedicated
-   * Redux request and refreshes the selected anime data.
+   * Fetches anime details whenever the URL slug changes.
+   * Skips the request if no slug is available.
    *
-   * @param {File} cover - Selected image file.
+   * @dependency dispatch - Redux dispatch function.
+   * @dependency slug - Slug identifying the requested anime.
+   */
+  useEffect(() => {
+    if (!slug) return
+
+    dispatch(fetchAnimeBySlug(slug))
+  }, [dispatch, slug])
+
+  /* =====================================================
+     ANIME UPDATE HANDLER
+     ===================================================== */
+
+  /**
+   * Updates anime information and optionally uploads a new cover.
+   * Refreshes the selected anime after successful updates.
+   *
+   * @param {Object} data - Updated anime form data.
+   * @param {File|null} cover - Optional replacement cover image.
+   * @returns {Promise<void>}
+   */
+  const handleEditAnime = async (data, cover) => {
+    if (!anime?._id) return
+
+    setIsSaving(true)
+
+    try {
+      // Update the anime information.
+      await dispatch(updateAnimeRequest({
+        ...data,
+        _id: anime._id,
+      }))
+
+      // Upload a replacement cover if provided by the form.
+      if (cover) {
+        await dispatch(updateAnimeCoverRequest(anime._id, cover))
+      }
+
+      // Fetch the updated anime data.
+      await dispatch(fetchAnimeBySlug(slug))
+
+      // Notify the user about the successful update.
+      await showMessage({
+        title: t('common.success'),
+        message: t('editAnime.saveSuccess'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
+    } catch (err) {
+      // Display the server error or a translated fallback message.
+      await showMessage({
+        title: t('common.error'),
+        message:
+          err.response?.data?.message ||
+          t('editAnime.saveFailed'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
+    } finally {
+      setIsSaving(false)
+    }
+  }
+
+  /* =====================================================
+     ANIME COVER UPLOAD HANDLER
+     ===================================================== */
+
+  /**
+   * Uploads a replacement cover image and refreshes anime data.
+   *
+   * @param {File} cover - Selected cover image file.
    * @returns {Promise<void>}
    */
   const handleUploadCover = async cover => {
-    if (!anime?._id || !cover) return;
+    if (!anime?._id || !cover) return
 
-    setIsUploadingCover(true);
-console.log(cover)
+    setIsUploadingCover(true)
+
     try {
-      // Upload the new cover image.
-      await dispatch(updateAnimeCoverRequest(anime._id, cover));
+      // Upload the replacement cover image.
+      await dispatch(updateAnimeCoverRequest(anime._id, cover))
 
       // Refresh the anime to display the updated cover.
-      await dispatch(fetchAnimeBySlug(slug));
+      await dispatch(fetchAnimeBySlug(slug))
+
+      // Notify the user about the successful upload.
+      await showMessage({
+        title: t('common.success'),
+        message: t('editAnime.coverSuccess'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
+    } catch (err) {
+      // Display the server error or a translated fallback message.
+      await showMessage({
+        title: t('common.error'),
+        message:
+          err.response?.data?.message ||
+          t('editAnime.coverFailed'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
+
+      // Propagate the error to the ImageUpload component.
+      throw err
     } finally {
-      // Always reset the upload indicator.
-      setIsUploadingCover(false);
+      setIsUploadingCover(false)
     }
-  };
+  }
 
-   /* =====================================================
-      EDIT ANIME FORM
-      ===================================================== */
+  /* =====================================================
+     LOADING AND ERROR HANDLING
+     ===================================================== */
 
-   return (
-     <div className={styles.root}>
-       <Container>
+  // Display a loading message while fetching anime data.
+  if (loading) {
+    return <p>{t('editAnime.loading')}</p>
+  }
 
-         {/* Page heading */}
-        <h1>Edit anime</h1>
+  // Display an error if the anime request has failed.
+  if (error) {
+    return (
+      <p>
+        {t('common.error')}: {error}
+      </p>
+    )
+  }
+
+  // Display a fallback message if the requested anime does not exist.
+  if (!anime) {
+    return <p>{t('editAnime.notFound')}</p>
+  }
+
+  /* =====================================================
+     EDIT ANIME FORM
+     ===================================================== */
+
+  return (
+    <div className={styles.root}>
+      <Container>
+
+        {/* Page heading */}
+        <h1>{t('editAnime.title')}</h1>
 
         {/* Title of the anime currently being edited */}
         <h3>{anime.title}</h3>
 
-        {/* Form initialized with the selected anime's data */}
-        {saveError && <p className="text-danger">{saveError}</p>}
+        {/* Anime details editing form */}
+        <AnimeForm
+          anime={anime}
+          onSubmit={handleEditAnime}
+          submitText={t('editAnime.saveChanges')}
+          isSaving={isSaving}
+        />
 
-          <AnimeForm
-            anime={anime}
-            onSubmit={handleEditAnime}
-            submitText="Save changes"
-            isSaving={isSaving}
-          />
-
-          <ImageUpload
-            title="Anime cover"
-            label="Choose a new cover"
-            currentImage={anime.anime_cover}
-            currentImageAlt={`${anime.title} cover`}
-            onUpload={handleUploadCover}
-            isUploading={isUploadingCover}
-            maxSizeMB={2}
-            uploadButtonLabel="Upload cover"
-            successMessage="Anime cover updated successfully."
-          />
+        {/* Separate anime cover upload section */}
+        <ImageUpload
+          title={t('editAnime.coverTitle')}
+          label={t('editAnime.chooseCover')}
+          currentImage={anime.anime_cover}
+          currentImageAlt={t('editAnime.coverAlt', {
+            title: anime.title,
+          })}
+          onUpload={handleUploadCover}
+          isUploading={isUploadingCover}
+          maxSizeMB={2}
+          uploadButtonLabel={t('editAnime.uploadCover')}
+        />
 
       </Container>
     </div>

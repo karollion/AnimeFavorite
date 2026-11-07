@@ -1,128 +1,152 @@
-/* =====================================================
-   User Profile Page
-   ===================================================== */
 
 /**
  * @file Profile.js
  * @description Page component for displaying the authenticated user's profile.
- *              Displays personal information, avatar, favorite characters
+ *              Displays personal information, avatar, and favorite characters.
  */
 
+// Styles
 import styles from './Profile.module.scss'
 
-/* =====================================================
-   ANIMATION AND UI LIBRARIES
-   ===================================================== */
-
-import { Col } from 'react-bootstrap'
+// React and translations
 import { useTranslation } from 'react-i18next'
 
-/* =====================================================
-   REDUX STATE MANAGEMENT
-   ===================================================== */
-
+// Redux
 import { useSelector } from 'react-redux'
-import {
-  getUser,
-} from '../../../redux/reducers/userRedux'
+import { getUser } from '../../../redux/reducers/userRedux'
 
-/* =====================================================
-   COMPONENTS AND ASSETS
-   ===================================================== */
-
-import noImage from '../../../assets/no-image.png'
+// UI components
+import { Col } from 'react-bootstrap'
 import Container from '../../common/container/Container'
 import Button from '../../common/Button/Button'
 import CharacterCard from '../../features/CharacterCard/CharacterCard'
 
-/* =====================================================
-   PROFILE COMPONENT
-   ===================================================== */
+// Assets
+import noImage from '../../../assets/no-image.png'
 
-/**
- * @component
- * @description Renders the user's profile.
- *              Retrieves user information from Redux.
- *
- * @returns {JSX.Element} The user profile page.
- */
 const Profile = () => {
   const { t } = useTranslation()
 
-  /* =====================================================
-     REDUX STATE
-     ===================================================== */
-
-  /**
-   * Currently authenticated user's profile data.
-   * Includes personal information and favorite characters.
-   */
+  // Currently authenticated user's profile data.
   const user = useSelector(getUser)
 
-  /* =====================================================
-     PROFILE INFORMATION
-     ===================================================== */
+  /**
+   * Replaces a failed avatar image with the default fallback.
+   * Disables the error handler to prevent an infinite retry loop.
+   *
+   * @param {Event} event - Image error event.
+   */
+  const handleImageError = event => {
+    event.currentTarget.onerror = null
+    event.currentTarget.src = noImage
+  }
+
+  // Authentication guard.
+  if (!user) {
+    return (
+      <div className={styles.root}>
+        <Container>
+          <h1>{t('profile.title')}</h1>
+          <p>{t('profile.loginRequired')}</p>
+        </Container>
+      </div>
+    )
+  }
+
+  // Prepare profile values with translated fallbacks.
+  const role = t(`profile.roles.${user.role}`, {
+    defaultValue: user.role || t('profile.notSpecified'),
+  })
+
+  const birthYear = user.birth_year ?? t('profile.notSpecified')
+
+  const description = user.description?.trim()
+    ? user.description
+    : t('profile.notSpecified')
+
+  const favoriteCharacters = user.favorite_characters || []
 
   return (
     <div className={styles.root}>
       <Container>
 
         {/* Main page heading */}
-        <h1>{t('profile.title')}</h1>
+        <h1 className={styles.title}>
+          {t('profile.title')}
+        </h1>
 
         {/* User avatar and personal information */}
         <div className={styles.about}>
 
-          {/* Displays the user avatar or a fallback image */}
+          {/* User avatar with a fallback image */}
           <img
             src={user.avatar || noImage}
-            alt={user.login || 'Avatar użytkownika'}
+            alt={t('profile.avatarAlt', {
+              login: user.login || '',
+            })}
             className={styles.img}
-            onError={(event) => {
-              // Nie próbuj ponownie ładować obrazka, który już jest fallbackiem.
-              if (event.currentTarget.src !== new URL(noImage, window.location.href).href) {
-                event.currentTarget.src = noImage;
-              }
-            }}
+            onError={handleImageError}
           />
 
           <div>
 
             {/* Navigation to the profile editing page */}
-            <Button to="/ProfileEdit">{t('common.edit')}</Button>
+            <Button to="/ProfileEdit">
+              {t('common.edit')}
+            </Button>
 
-            {/* Basic user account information */}
-            <p>{t('profile.login')}{user.login}</p>
-            <p>{t('profile.role')}{user.role}</p>
-            <p>{t('profile.email')}{user.email}</p>
-            <p>{t('profile.birthYear')}{user.birth_year}</p>
-            <p>{t('profile.description')}{user.description}</p>
+            {/* Basic account information */}
+            <p>
+              {t('profile.login')} {user.login || t('profile.notSpecified')}
+            </p>
+
+            <p>
+              {t('profile.role')} {role}
+            </p>
+
+            <p>
+              {t('profile.email')} {user.email || t('profile.notSpecified')}
+            </p>
+
+            <p>
+              {t('profile.birthYear')} {birthYear}
+            </p>
+
+            <p>
+              {t('profile.description')} {description}
+            </p>
 
           </div>
         </div>
 
-        {/* =====================================================
-            FAVORITE CHARACTERS
-            ===================================================== */}
+        {/* Favorite characters section */}
+        <section className={styles.favoriteSection}>
 
-        {/* Displays the characters marked as favorites by the user */}
-        <p>{t('profile.favoriteCharacters')}</p>
+          <h2>
+            {t('profile.favoriteCharacters')}
+          </h2>
 
-        <div className={styles.characters}>
-          {user.favorite_characters?.map(c => (
-            <div key={c._id}>
-              <CharacterCard character={c} />
+          {favoriteCharacters.length > 0 ? (
+            <div className={styles.characters}>
+              {favoriteCharacters.map(character => (
+                <div key={character._id}>
+                  <CharacterCard character={character} />
+                </div>
+              ))}
             </div>
-          ))}
-        </div>
+          ) : (
+            <p>
+              {t('profile.noFavoriteCharacters')}
+            </p>
+          )}
 
-        {/* =====================================================
-            PAGE NAVIGATION
-            ===================================================== */}
+        </section>
 
         {/* Navigation back to the home page */}
         <Col xs="12" className="d-flex justify-content-center my-3">
-          <Button to="/">{t('common.home')}</Button>
+          <Button to="/">
+            {t('common.home')}
+          </Button>
         </Col>
 
       </Container>

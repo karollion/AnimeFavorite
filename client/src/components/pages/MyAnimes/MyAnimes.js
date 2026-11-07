@@ -1,187 +1,191 @@
-/* =====================================================
-   User Animes Page
-   ===================================================== */
 
 /**
  * @file MyAnimes.js
- * @description Page component for displaying anime collections grouped by viewing status.
- *              
+ * @description Page component for displaying the user's anime collections.
+ *              Groups anime by viewing status and allows switching between
+ *              collections, display modes, and sorting options.
  */
 
+// Styles
 import styles from './MyAnimes.module.scss'
 
-/* =====================================================
-   ANIMATION AND UI LIBRARIES
-   ===================================================== */
-
-import { motion, AnimatePresence } from 'framer-motion'
-import { Col } from 'react-bootstrap'
-
-/* =====================================================
-   REDUX STATE MANAGEMENT
-   ===================================================== */
-
-import { useSelector } from 'react-redux'
-import {
-  getUser,
-  getUserStats
-} from '../../../redux/reducers/userRedux'
-
-/* =====================================================
-   REACT HOOKS
-   ===================================================== */
-
+// React
 import { useState } from 'react'
 
-/* =====================================================
-   COMPONENTS AND ASSETS
-   ===================================================== */
+// Animation
+import { AnimatePresence, motion } from 'framer-motion'
 
+// UI components
+import { Col } from 'react-bootstrap'
 import Container from '../../common/container/Container'
 import Button from '../../common/Button/Button'
 import StatsList from '../../features/StatsList/StatsList'
 
-/* =====================================================
-   MyAnimes COMPONENT
-   ===================================================== */
+// Redux
+import { useSelector } from 'react-redux'
+import {
+  getUser,
+  getUserStats,
+} from '../../../redux/reducers/userRedux'
 
-/**
- * @component
- * @description Renders the anime-related statistics.
- *              Retrieves statistics from Redux.
- *              Allows switching between anime collections using animated tabs.
- *
- * @returns {JSX.Element} The user animes page.
- */
+// Translations
+import { useTranslation } from 'react-i18next'
+
 const MyAnimes = () => {
-  const stats = useSelector(getUserStats);
-  const user = useSelector(getUser);
+  const { t } = useTranslation()
 
-  const [activeTab, setActiveTab] = useState('favorites');
+  // Redux state.
+  const user = useSelector(getUser)
+  const stats = useSelector(getUserStats)
 
-  // null oznacza korzystanie z ustawienia domyślnego z profilu.
-  const [viewOverride, setViewOverride] = useState(null);
-  const [sortOverride, setSortOverride] = useState(null);
+  // Active collection tab.
+  const [activeTab, setActiveTab] = useState('favorites')
 
-  const defaultView =
-    user?.preferences?.ui?.defaultView === 'list' ? 'list' : 'grid';
+  // Local overrides for profile display preferences.
+  // Null means that the saved profile preference is used.
+  const [viewOverride, setViewOverride] = useState(null)
+  const [sortOverride, setSortOverride] = useState(null)
 
-  const savedSort = user?.preferences?.behavior?.defaultSort;
+  // Default display preferences from the user's profile.
+  const savedView = user?.preferences?.ui?.defaultView
+  const defaultView = savedView === 'list' ? 'list' : 'grid'
 
+  const savedSort = user?.preferences?.behavior?.defaultSort
   const defaultSort = ['rating', 'newest', 'title'].includes(savedSort)
     ? savedSort
-    : 'newest';
+    : 'newest'
 
-  const view = viewOverride ?? defaultView;
-  const sort = sortOverride ?? defaultSort;
+  // Effective display settings.
+  const view = viewOverride ?? defaultView
+  const sort = sortOverride ?? defaultSort
 
-  /* =====================================================
-     PROFILE INFORMATION
-     ===================================================== */
+  /**
+   * Defines available anime collections.
+   * Each collection contains its identifier, translation key,
+   * and corresponding Redux statistics data.
+   */
+  const tabs = [
+    {
+      id: 'favorites',
+      label: t('myAnimes.tabs.favorites'),
+      count: stats?.favoriteAnime?.length ?? 0,
+      anime: stats?.favoriteAnime || [],
+    },
+    {
+      id: 'watching',
+      label: t('myAnimes.tabs.watching'),
+      count: stats?.statuses?.watching?.count ?? 0,
+      anime: stats?.statuses?.watching?.anime || [],
+    },
+    {
+      id: 'completed',
+      label: t('myAnimes.tabs.completed'),
+      count: stats?.statuses?.completed?.count ?? 0,
+      anime: stats?.statuses?.completed?.anime || [],
+    },
+    {
+      id: 'planned',
+      label: t('myAnimes.tabs.planned'),
+      count: stats?.statuses?.planned?.count ?? 0,
+      anime: stats?.statuses?.planned?.anime || [],
+    },
+    {
+      id: 'suspended',
+      label: t('myAnimes.tabs.suspended'),
+      count: stats?.statuses?.suspended?.count ?? 0,
+      anime: stats?.statuses?.suspended?.anime || [],
+    },
+    {
+      id: 'abandoned',
+      label: t('myAnimes.tabs.abandoned'),
+      count: stats?.statuses?.abandoned?.count ?? 0,
+      anime: stats?.statuses?.abandoned?.anime || [],
+    },
+  ]
+
+  // Find the currently selected collection.
+  const activeCollection = tabs.find(tab => tab.id === activeTab)
+
+  // Authentication guard.
+  if (!user) {
+    return (
+      <div className={styles.root}>
+        <Container>
+          <h1>{t('myAnimes.title')}</h1>
+          <p>{t('myAnimes.loginRequired')}</p>
+        </Container>
+      </div>
+    )
+  }
 
   return (
     <div className={styles.root}>
       <Container>
 
         {/* Main page heading */}
-        <h1>User Animes</h1>
+        <h1 className={styles.title}>
+          {t('myAnimes.title')}
+        </h1>
 
-        {/* =====================================================
-            STATISTICS NAVIGATION
-            ===================================================== */}
-
-        {/* Buttons for selecting an anime collection by viewing status */}
+        {/* Anime collection navigation */}
         <div className={styles.stats_nav}>
 
-          {/* Favorite anime collection */}
-          <Button
-            action={() => setActiveTab('favorites')}
-            active={activeTab !== 'favorites'}
-          >
-            Favorites [{stats?.favoriteAnime?.length}]
-          </Button>
-
-          {/* Anime currently being watched */}
-          <Button
-            action={() => setActiveTab('watching')}
-            active={activeTab !== 'watching'}
-          >
-            Watching [{stats?.statuses?.watching?.count}]
-          </Button>
-
-          {/* Anime marked as completed */}
-          <Button
-            action={() => setActiveTab('completed')}
-            active={activeTab !== 'completed'}
-          >
-            Completed [{stats?.statuses?.completed?.count}]
-          </Button>
-
-          {/* Anime planned for future viewing */}
-          <Button
-            action={() => setActiveTab('planned')}
-            active={activeTab !== 'planned'}
-          >
-            Planned [{stats?.statuses?.planned?.count}]
-          </Button>
-
-          {/* Anime temporarily put on hold */}
-          <Button
-            action={() => setActiveTab('suspended')}
-            active={activeTab !== 'suspended'}
-          >
-            Suspended [{stats?.statuses?.suspended?.count}]
-          </Button>
-
-          {/* Anime the user has stopped watching */}
-          <Button
-            action={() => setActiveTab('abandoned')}
-            active={activeTab !== 'abandoned'}
-          >
-            Abandoned [{stats?.statuses?.abandoned?.count}]
-          </Button>
+          {tabs.map(tab => (
+            <Button
+              key={tab.id}
+              action={() => setActiveTab(tab.id)}
+              active={activeTab !== tab.id}
+            >
+              {tab.label} [{tab.count}]
+            </Button>
+          ))}
 
         </div>
 
-        {/* =====================================================
-            VIEW AND SORT CONTROLS
-            ===================================================== */}
+        {/* Display and sorting controls */}
         <div className={styles.displayControls}>
+
           <label>
-            View
+            {t('myAnimes.view')}
 
             <select
               value={view}
               onChange={event => setViewOverride(event.target.value)}
             >
-              <option value="grid">Grid</option>
-              <option value="list">List</option>
+              <option value="grid">
+                {t('settings.grid')}
+              </option>
+
+              <option value="list">
+                {t('settings.list')}
+              </option>
             </select>
           </label>
 
           <label>
-            Sort by
+            {t('myAnimes.sortBy')}
 
             <select
               value={sort}
               onChange={event => setSortOverride(event.target.value)}
             >
-              <option value="rating">Rating</option>
-              <option value="newest">Newest</option>
-              <option value="title">Name (A–Z)</option>
+              <option value="rating">
+                {t('settings.defrating')}
+              </option>
+
+              <option value="newest">
+                {t('settings.defnewest')}
+              </option>
+
+              <option value="title">
+                {t('settings.deftitle')} (A–Z)
+              </option>
             </select>
           </label>
+
         </div>
 
-        {/* =====================================================
-            ANIMATED STATISTICS CONTENT
-            ===================================================== */}
-
-        {/*
-          AnimatePresence handles exit animations when the selected tab changes.
-          The motion.div key forces the content to be recreated for each tab,
-          allowing the enter and exit animations to run.
-        */}
+        {/* Animated collection content */}
         <AnimatePresence mode="wait">
           <motion.div
             key={activeTab}
@@ -191,76 +195,21 @@ const MyAnimes = () => {
             transition={{ duration: 0.3 }}
           >
 
-            {/* Favorite anime */}
-            {activeTab === 'favorites' && (
-              <><StatsList 
-                stats={stats?.favoriteAnime || []} 
-                view={view}
-                sort={sort}
-                loading={stats == null}
-              /></>
-            )}
-
-            {/* Anime currently being watched */}
-            {activeTab === 'watching' && (
-              <><StatsList 
-                stats={stats?.statuses?.watching?.anime || []} 
-                view={view}
-                sort={sort}
-                loading={stats == null}
-              /></>
-            )}
-
-            {/* Completed anime */}
-            {activeTab === 'completed' && (
-              <><StatsList 
-                stats={stats?.statuses?.completed?.anime || []} 
-                view={view}
-                sort={sort}
-                loading={stats == null}
-              /></>
-            )}
-
-            {/* Anime planned for future viewing */}
-            {activeTab === 'planned' && (
-              <><StatsList 
-                stats={stats?.statuses?.planned?.anime || []} 
-                view={view}
-                sort={sort}
-                loading={stats == null}
-              /></>
-            )}
-
-            {/* Anime temporarily put on hold */}
-            {activeTab === 'suspended' && (
-              <><StatsList 
-                stats={stats?.statuses?.suspended?.anime || []} 
-                view={view}
-                sort={sort}
-                loading={stats == null}
-              /></>
-            )}
-
-            {/* Anime the user has stopped watching */}
-            {activeTab === 'abandoned' && (
-              <><StatsList 
-                stats={stats?.statuses?.abandoned?.anime || []} 
-                view={view}
-                sort={sort}
-                loading={stats == null}
-              /></>
-            )}
+            <StatsList
+              stats={activeCollection?.anime || []}
+              view={view}
+              sort={sort}
+              loading={stats == null}
+            />
 
           </motion.div>
         </AnimatePresence>
 
-        {/* =====================================================
-            PAGE NAVIGATION
-            ===================================================== */}
-
         {/* Navigation back to the home page */}
         <Col xs="12" className="d-flex justify-content-center my-3">
-          <Button to="/">Back to home</Button>
+          <Button to="/">
+            {t('common.home')}
+          </Button>
         </Col>
 
       </Container>

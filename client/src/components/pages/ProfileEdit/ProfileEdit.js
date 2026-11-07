@@ -1,101 +1,55 @@
-/* =====================================================
-   Profile Edit Page
-   ===================================================== */
 
 /**
  * @file ProfileEdit.js
  * @description Page component for editing the authenticated user's profile.
- *              Provides separate forms for updating profile information,
- *              uploading an avatar, and changing the account password.
- *              Uses React Hook Form for form management and validation,
- *              Redux for user data operations, and local state for
- *              save status, avatar handling, and password feedback.
+ *              Supports profile information updates, avatar uploads,
+ *              and password changes.
  */
 
-/* =====================================================
-   STYLES
-   ===================================================== */
-
+// Styles
 import styles from './ProfileEdit.module.scss'
 
-/* =====================================================
-   REACT HOOKS AND FORM MANAGEMENT
-   ===================================================== */
-
+// React
 import { useEffect, useState } from 'react'
+import { useDispatch, useSelector } from 'react-redux'
+
+// Form management
 import { useForm } from 'react-hook-form'
 
-/* =====================================================
-   UI COMPONENTS
-   ===================================================== */
-
+// UI components
 import { Row, Col, Form } from 'react-bootstrap'
 import Container from '../../common/container/Container'
 import Button from '../../common/Button/Button'
-import ImageUpload from '../../features/ImageUpload/ImageUpload';
-import PasswordChangeForm from '../../features/PasswordChangeForm/PasswordChangeForm';
+import ImageUpload from '../../features/ImageUpload/ImageUpload'
+import PasswordChangeForm from '../../features/PasswordChangeForm/PasswordChangeForm'
 
-/* =====================================================
-   REDUX STATE MANAGEMENT
-   ===================================================== */
-
-import { useDispatch, useSelector } from 'react-redux'
+// Redux
 import {
   getUser,
   updateProfileRequest,
   updateAvatarRequest,
 } from '../../../redux/reducers/userRedux'
 
-/* =====================================================
-   PROFILE EDIT COMPONENT
-   ===================================================== */
+// Translations and messages
+import { useTranslation } from 'react-i18next'
+import { useMessage } from '../../../context/MessageContext'
 
-/**
- * @component
- * @description Renders the profile editing page for the authenticated user.
- *              Supports updating personal information, uploading an avatar,
- *              and changing the account password.
- *
- * @returns {JSX.Element} The profile editing page.
- */
 const ProfileEdit = () => {
+  // Translations and global message handling.
+  const { t } = useTranslation()
+  const { showMessage } = useMessage()
 
-  /* =====================================================
-     REDUX STATE AND DISPATCH
-     ===================================================== */
-
-  /**
-   * Redux dispatch function used to trigger profile update actions.
-   */
+  // Redux state and dispatch.
   const dispatch = useDispatch()
-
-  /**
-   * Currently authenticated user's profile data.
-   */
   const user = useSelector(getUser)
 
-  /* =====================================================
-     LOCAL COMPONENT STATE
-     ===================================================== */
-     
-  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false);
-  const [saveStatus, setSaveStatus] = useState(null)
+  // Local component state.
+  const [isUploadingAvatar, setIsUploadingAvatar] = useState(false)
   const [isSaving, setIsSaving] = useState(false)
+
   const currentYear = new Date().getFullYear()
 
-  /* =====================================================
-     PROFILE FORM INITIALIZATION
-     ===================================================== */
-
-  /**
-   * React Hook Form configuration for editing profile information.
-   *
-   * @property {Function} register - Registers fields and validation rules.
-   * @property {Function} handleSubmit - Validates and submits the form.
-   * @property {Function} reset - Resets the form values and dirty state.
-   * @property {Object} errors - Validation errors for profile fields.
-   * @property {boolean} isDirty - Indicates whether registered fields changed.
-   */
+  // Profile form configuration.
   const {
     register,
     handleSubmit,
@@ -112,16 +66,9 @@ const ProfileEdit = () => {
     },
   })
 
-  /* =====================================================
-     PROFILE DATA SYNCHRONIZATION
-     ===================================================== */
-
   /**
-   * Synchronizes profile form values with the current Redux user data.
-   * Resets avatar selection and previous feedback when user data changes.
-   *
-   * @dependency user - Current authenticated user's profile data.
-   * @dependency reset - React Hook Form function for resetting field values.
+   * Synchronizes form values with the authenticated user's data.
+   * Resetting the form also clears its dirty state.
    */
   useEffect(() => {
     if (!user) return
@@ -131,89 +78,86 @@ const ProfileEdit = () => {
       birth_year: user.birth_year ?? '',
       description: user.description || '',
     })
-
-    // Clear temporary avatar selection and previous feedback.
-    setSaveStatus(null)
   }, [user, reset])
 
-  /* =====================================================
-     PROFILE UPDATE HANDLER
-     ===================================================== */
-
   /**
-   * Handles profile form submission.
-   * Updates profile fields only when they have changed and uploads
-   * the selected avatar separately through its dedicated request.
+   * Updates the user's profile information.
+   * The request is skipped when no fields have been changed.
    *
    * @param {Object} data - Validated profile form values.
-   * @param {string} data.email - Updated email address.
-   * @param {string | number} data.birth_year - Selected birth year.
-   * @param {string} data.description - Updated profile description.
    */
   const onSubmit = async data => {
-    setSaveStatus(null);
-    setIsSaving(true);
+    if (!isDirty) return
+
+    setIsSaving(true)
 
     try {
-      if (isDirty) {
-        await dispatch(updateProfileRequest({
-          email: data.email.trim(),
-          birth_year: data.birth_year === ''
-            ? null
-            : Number(data.birth_year),
-          description: data.description.trim(),
-        }));
-      }
+      await dispatch(updateProfileRequest({
+        email: data.email.trim(),
+        birth_year: data.birth_year === ''
+          ? null
+          : Number(data.birth_year),
+        description: data.description.trim(),
+      }))
 
-      setSaveStatus('success');
+      await showMessage({
+        title: t('common.success'),
+        message: t('profileEdit.saveSuccess'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
     } catch (error) {
-      setSaveStatus('error');
+      await showMessage({
+        title: t('common.error'),
+        message: t('profileEdit.saveFailed'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
     } finally {
-      setIsSaving(false);
+      setIsSaving(false)
     }
-  };
-
-  /* =====================================================
-   AVATAR UPLOAD HANDLER
-   ===================================================== */
+  }
 
   /**
-   * Uploads a new avatar independently of profile information.
+   * Uploads a new avatar independently of the profile form.
    *
    * @param {File} file - Selected avatar image.
    */
   const handleAvatarUpload = async file => {
-    setIsUploadingAvatar(true);
+    setIsUploadingAvatar(true)
 
     try {
-      await dispatch(updateAvatarRequest(file));
+      await dispatch(updateAvatarRequest(file))
+    } catch (error) {
+      await showMessage({
+        title: t('common.error'),
+        message: t('profileEdit.avatarUploadFailed'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
+
+      // Propagate the error so the ImageUpload component can handle
+      // the failed upload instead of treating it as successful.
+      throw error
     } finally {
-      setIsUploadingAvatar(false);
+      setIsUploadingAvatar(false)
     }
-  };
+  }
 
-  /* =====================================================
-     AUTHENTICATION GUARD
-     ===================================================== */
-
-  /**
-   * Prevents profile editing when no authenticated user is available.
-   * Displays a message asking the visitor to log in.
-   */
+  // Authentication guard.
   if (!user) {
     return (
       <div className={styles.root}>
         <Container className={styles.container}>
-          <h1 className={styles.title}>Edit Profile</h1>
-          <p>Please log in to edit your profile.</p>
+          <h1 className={styles.title}>
+            {t('profileEdit.title')}
+          </h1>
+
+          <p>{t('profileEdit.loginRequired')}</p>
         </Container>
       </div>
     )
   }
-
-  /* =====================================================
-     PROFILE EDIT FORM
-     ===================================================== */
 
   return (
     <div className={styles.root}>
@@ -224,66 +168,67 @@ const ProfileEdit = () => {
         <Container className={styles.container}>
 
           {/* Page heading */}
-          <h1 className={styles.title}>Edit Profile</h1>
+          <h1 className={styles.title}>
+            {t('profileEdit.title')}
+          </h1>
 
           <Row className={styles.grid}>
             <Col xs="12" lg="12">
 
-              {/* =====================================================
-                  AVATAR MANAGEMENT
-                  ===================================================== */}
-
+              {/* Avatar management */}
               <ImageUpload
-                title="Avatar"
-                label="Choose a new avatar"
+                title={t('profileEdit.avatarTitle')}
+                label={t('profileEdit.chooseAvatar')}
                 currentImage={user.avatar}
-                currentImageAlt={`${user.login}'s avatar`}
+                currentImageAlt={t('profileEdit.avatarAlt', {
+                  login: user.login,
+                })}
                 onUpload={handleAvatarUpload}
                 isUploading={isUploadingAvatar}
                 maxSizeMB={5}
-                uploadButtonLabel="Upload avatar"
-                successMessage="Avatar updated successfully."
+                uploadButtonLabel={t('profileEdit.uploadAvatar')}
+                successMessage={t('profileEdit.avatarUploadSuccess')}
               />
 
-              {/* =====================================================
-                  EMAIL FIELD
-                  ===================================================== */}
-
-              {/* Editable email address with required, length, and format validation. */}
+              {/* Email address */}
               <Form.Group className="mb-3">
-                <Form.Label>Email</Form.Label>
+                <Form.Label>
+                  {t('profileEdit.email')}
+                </Form.Label>
 
                 <Form.Control
                   type="email"
                   autoComplete="email"
                   isInvalid={!!errors.email}
                   {...register('email', {
-                    required: 'Email is required.',
+                    required: true,
                     maxLength: {
                       value: 254,
-                      message: 'Email is too long.',
                     },
                     pattern: {
                       value: /^\S+@\S+\.\S+$/,
-                      message: 'Enter a valid email address.',
                     },
                   })}
-                  placeholder="Enter email"
+                  placeholder={t('profileEdit.emailPlaceholder')}
                 />
 
-                {/* Email validation feedback */}
                 <Form.Control.Feedback type="invalid">
-                  {errors.email?.message}
+                  {errors.email?.type === 'required' &&
+                    t('profileEdit.validation.emailRequired')}
+
+                  {errors.email?.type === 'maxLength' &&
+                    t('profileEdit.validation.emailTooLong')}
+
+                  {errors.email?.type === 'pattern' &&
+                    t('profileEdit.validation.emailInvalid')}
                 </Form.Control.Feedback>
               </Form.Group>
 
-              {/* =====================================================
-                  BIRTH YEAR FIELD
-                  ===================================================== */}
-
-              {/* Selects a birth year between 1900 and the current year. */}
+              {/* Birth year */}
               <Form.Group className="mb-3">
-                <Form.Label>Birth year</Form.Label>
+                <Form.Label>
+                  {t('profileEdit.birthYear')}
+                </Form.Label>
 
                 <Form.Select
                   isInvalid={!!errors.birth_year}
@@ -294,17 +239,18 @@ const ProfileEdit = () => {
                         Number.isInteger(Number(value)) &&
                         Number(value) >= 1900 &&
                         Number(value) <= currentYear
-                      ) ||
-                      'Select a valid birth year.',
+                      ),
                   })}
                 >
                   {/* Allows the user to leave the birth year unspecified. */}
-                  <option value="">Not specified</option>
+                  <option value="">
+                    {t('profileEdit.notSpecified')}
+                  </option>
 
                   {/* Generates year options in descending order. */}
                   {Array.from(
                     { length: currentYear - 1900 + 1 },
-                    (_, i) => currentYear - i
+                    (_, index) => currentYear - index
                   ).map(year => (
                     <option key={year} value={year}>
                       {year}
@@ -312,19 +258,16 @@ const ProfileEdit = () => {
                   ))}
                 </Form.Select>
 
-                {/* Birth year validation feedback */}
                 <Form.Control.Feedback type="invalid">
-                  {errors.birth_year?.message}
+                  {t('profileEdit.validation.birthYearInvalid')}
                 </Form.Control.Feedback>
               </Form.Group>
 
-              {/* =====================================================
-                  PROFILE DESCRIPTION
-                  ===================================================== */}
-
-              {/* Editable user description with a 1000-character limit. */}
+              {/* Profile description */}
               <Form.Group className="mb-3">
-                <Form.Label>Description</Form.Label>
+                <Form.Label>
+                  {t('profileEdit.description')}
+                </Form.Label>
 
                 <Form.Control
                   as="textarea"
@@ -334,75 +277,49 @@ const ProfileEdit = () => {
                   {...register('description', {
                     maxLength: {
                       value: 1000,
-                      message: 'Description cannot exceed 1000 characters.',
                     },
                   })}
-                  placeholder="Tell us something about yourself"
+                  placeholder={t('profileEdit.descriptionPlaceholder')}
                 />
 
-                {/* Description length guidance */}
                 <div className="d-flex justify-content-between">
                   <Form.Text>
-                    Maximum 1000 characters.
+                    {t('profileEdit.descriptionLimit')}
                   </Form.Text>
                 </div>
 
-                {/* Description validation feedback */}
-                {errors.description && (
-                  <small className="text-danger">
-                    {errors.description.message}
-                  </small>
-                )}
+                <Form.Control.Feedback type="invalid">
+                  {t('profileEdit.validation.descriptionTooLong')}
+                </Form.Control.Feedback>
               </Form.Group>
 
             </Col>
           </Row>
 
-          {/* =====================================================
-              PROFILE SAVE ACTION
-              ===================================================== */}
-
-          {/* Submits profile changes and displays the current saving state. */}
+          {/* Profile save action */}
           <div className={styles.actions}>
-            <Button type="submit" active={!isSaving}>
-              {isSaving ? 'Saving...' : 'Save changes'}
+            <Button
+              type="submit"
+              active={!isSaving && isDirty}
+            >
+              {isSaving
+                ? t('profileEdit.saving')
+                : t('profileEdit.saveChanges')}
             </Button>
           </div>
-
-          {/* Profile update success feedback */}
-          {saveStatus === 'success' && (
-            <p className={styles.success} role="status">
-              Profile updated successfully.
-            </p>
-          )}
-
-          {/* Profile update error feedback */}
-          {saveStatus === 'error' && (
-            <p className={styles.error} role="alert">
-              Failed to save profile. Check your data and try again.
-            </p>
-          )}
 
         </Container>
       </Form>
 
-      {/* =====================================================
-          PASSWORD CHANGE SECTION
-          ===================================================== */}
-      
+      {/* Password change section */}
       <PasswordChangeForm />
 
-      {/* =====================================================
-          PAGE NAVIGATION
-          ===================================================== */}
-
-      {/* Navigation back to the home page */}
+      {/* Navigation */}
       <div className={styles.actions}>
         <Button to="/">
-          Back to home
+          {t('common.home')}
         </Button>
       </div>
-
     </div>
   )
 }
