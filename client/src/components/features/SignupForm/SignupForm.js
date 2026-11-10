@@ -1,14 +1,44 @@
+
+/* =====================================================
+   COMPONENTS
+   ===================================================== */
+
 import styles from './SignupForm.module.scss';
+
 import { Form } from 'react-bootstrap';
-import Button from '../../common/Button/Button';
+import PropTypes from 'prop-types';
+
 import { useForm } from 'react-hook-form';
 import { useDispatch } from 'react-redux';
 import { useNavigate } from 'react-router-dom';
-import { registerRequest } from '../../../redux/reducers/userRedux';
+import { useTranslation } from 'react-i18next';
 
-const SignupForm = ({ actionText = 'Signup' }) => {
+import Button from '../../common/Button/Button';
+
+import { registerRequest } from '../../../redux/reducers/userRedux';
+import { useMessage } from '../../../context/MessageContext';
+
+/* =====================================================
+   SIGNUP FORM COMPONENT
+   ===================================================== */
+
+/**
+ * @component
+ * @description Renders the user registration form.
+ *              Handles form validation, account creation and
+ *              registration success or error messages.
+ *
+ * @param {Object} props - Component properties.
+ * @param {string} props.actionText - Custom registration button label.
+ *
+ * @returns {JSX.Element} The rendered signup form.
+ */
+const SignupForm = ({ actionText }) => {
   const dispatch = useDispatch();
   const navigate = useNavigate();
+
+  const { t } = useTranslation();
+  const { showMessage } = useMessage();
 
   const {
     register,
@@ -17,146 +47,261 @@ const SignupForm = ({ actionText = 'Signup' }) => {
     formState: { errors },
   } = useForm({});
 
+  /* =====================================================
+     FORM SUBMISSION
+     ===================================================== */
+
+  /**
+   * Registers a new user account.
+   * Displays a success message or an error message depending
+   * on the result of the registration request.
+   *
+   * @param {Object} data - Submitted registration form values.
+   */
   const onSubmit = async data => {
     try {
-      await dispatch(registerRequest({
-        login: data.login,
-        password: data.password,
-        email: data.email,
-        birth_year: Number(data.birth_year),
-      }));
+      await dispatch(
+        registerRequest({
+          login: data.login,
+          password: data.password,
+          email: data.email,
+          birth_year: Number(data.birth_year),
+        })
+      );
+
+      await showMessage({
+        title: t('common.success'),
+        message: t('signup.registerSuccess'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      });
 
       navigate('/Login');
-    } catch (err) {
-      // tutaj komunikat
+
+    } catch (error) {
+      await showMessage({
+        title: t('common.error'),
+        message:
+          error.response?.data?.message ||
+          t('signup.registerFailed'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      });
     }
   };
 
+  /* =====================================================
+     PAGE DATA
+     ===================================================== */
+
+  // Generate the list of available birth years.
+  const currentYear = new Date().getFullYear();
+
+  const birthYears = Array.from(
+    { length: currentYear - 1900 + 1 },
+    (_, index) => currentYear - index
+  );
+
+  /* =====================================================
+     FORM LAYOUT
+     ===================================================== */
 
   return (
-    <Form onSubmit={handleSubmit(onSubmit)} className={styles.root}>
+    <Form
+      onSubmit={handleSubmit(onSubmit)}
+      className={styles.root}
+    >
 
-      {/* E-MAIL */}
+      {/* =====================================================
+         EMAIL
+         ===================================================== */}
+
       <Form.Group className="mb-3">
-        <Form.Label>Email</Form.Label>
+        <Form.Label>
+          {t('signup.email')}
+        </Form.Label>
+
         <Form.Control
           type="email"
           {...register('email', {
-            required: true,
+            required: t('signup.validation.emailRequired'),
             pattern: {
               value: /^\S+@\S+\.\S+$/,
-              message: 'Invalid email address',
+              message: t('signup.validation.emailInvalid'),
             },
           })}
-          placeholder="Enter email"
+          placeholder={t('signup.emailPlaceholder')}
         />
+
         {errors.email && (
           <small className="text-danger">
-            {errors.email.message || 'Email is required'}
+            {errors.email.message}
           </small>
         )}
       </Form.Group>
 
-      {/* LOGIN */}
+      {/* =====================================================
+         LOGIN
+         ===================================================== */}
+
       <Form.Group className="mb-3">
-        <Form.Label>Login</Form.Label>
+        <Form.Label>
+          {t('signup.login')}
+        </Form.Label>
+
         <Form.Control
-          {...register('login', { required: true, minLength: 3, maxLength: 30 })}
-          placeholder="Enter login"
+          {...register('login', {
+            required: t('signup.validation.loginRequired'),
+            minLength: {
+              value: 3,
+              message: t('signup.validation.loginMinLength'),
+            },
+            maxLength: {
+              value: 30,
+              message: t('signup.validation.loginMaxLength'),
+            },
+          })}
+          placeholder={t('signup.loginPlaceholder')}
         />
-        {errors.login?.type === 'required' && (
-          <small className="text-danger">Login is required</small>
-        )}
 
-        {errors.login?.type === 'minLength' && (
+        {errors.login && (
           <small className="text-danger">
-            Login must contain at least 3 characters
-          </small>
-        )}
-
-        {errors.login?.type === 'maxLength' && (
-          <small className="text-danger">
-            Login cannot exceed 30 characters
+            {errors.login.message}
           </small>
         )}
       </Form.Group>
 
-      {/* PASSWORD */}
+      {/* =====================================================
+         PASSWORD
+         ===================================================== */}
+
       <Form.Group className="mb-3">
-        <Form.Label>Password</Form.Label>
+        <Form.Label>
+          {t('signup.password')}
+        </Form.Label>
+
         <Form.Control
           type="password"
           {...register('password', {
-            required: true,
-            minLength: 7,
-            maxLength: 30,
+            required: t('signup.validation.passwordRequired'),
+            minLength: {
+              value: 7,
+              message: t('signup.validation.passwordMinLength'),
+            },
+            maxLength: {
+              value: 30,
+              message: t('signup.validation.passwordMaxLength'),
+            },
           })}
-          placeholder="Enter password"
+          placeholder={t('signup.passwordPlaceholder')}
         />
-        {errors.password && <small className="text-danger">Password is required</small>}
-        <p>(Between 7 and 30 characters)</p>
+
+        {errors.password && (
+          <small className="text-danger">
+            {errors.password.message}
+          </small>
+        )}
+
+        <p>
+          {t('signup.passwordLength')}
+        </p>
       </Form.Group>
 
-      {/* CONFIRM PASSWORD */}
+      {/* =====================================================
+         CONFIRM PASSWORD
+         ===================================================== */}
+
       <Form.Group className="mb-3">
-        <Form.Label>Confirm Password</Form.Label>
+        <Form.Label>
+          {t('signup.confirmPassword')}
+        </Form.Label>
+
         <Form.Control
           type="password"
           {...register('confirmPassword', {
-            required: true,
+            required: t('signup.validation.confirmPasswordRequired'),
             validate: value =>
-              value === watch('password') || 'Passwords do not match',
+              value === watch('password') ||
+              t('signup.validation.passwordMismatch'),
           })}
-          placeholder="Enter password"
+          placeholder={t('signup.confirmPasswordPlaceholder')}
         />
-        {errors.confirmPassword?.type === 'required' && (
-          <small className="text-danger">Password confirmation is required</small>
-        )}
 
-        {errors.confirmPassword?.type === 'validate' && (
+        {errors.confirmPassword && (
           <small className="text-danger">
             {errors.confirmPassword.message}
           </small>
         )}
-        <p>(Between 7 and 30 characters)</p>
+
+        <p>
+          {t('signup.passwordLength')}
+        </p>
       </Form.Group>
 
-      {/* BIRTH YEAR */}
-      <Form.Group className="mb-3">
-        <Form.Label>Birth year</Form.Label>
-        <Form.Select
-          {...register('birth_year', { required: true })}
-        >
-          <option value="">Select birth year</option>
+      {/* =====================================================
+         BIRTH YEAR
+         ===================================================== */}
 
-          {Array.from(
-            { length: new Date().getFullYear() - 1900 + 1 },
-            (_, i) => {
-              const year = new Date().getFullYear() - i;
-              return (
-                <option key={year} value={year}>
-                  {year}
-                </option>
-              );
-            }
-          )}
+      <Form.Group className="mb-3">
+        <Form.Label>
+          {t('signup.birthYear')}
+        </Form.Label>
+
+        <Form.Select
+          {...register('birth_year', {
+            required: t('signup.validation.birthYearRequired'),
+          })}
+        >
+          <option value="">
+            {t('signup.birthYearPlaceholder')}
+          </option>
+
+          {birthYears.map(year => (
+            <option key={year} value={year}>
+              {year}
+            </option>
+          ))}
         </Form.Select>
-        
+
         {errors.birth_year && (
-          <small className="text-danger">Birth year is required</small>
+          <small className="text-danger">
+            {errors.birth_year.message}
+          </small>
         )}
       </Form.Group>
 
-      {/* ACTIONS */}
+      {/* =====================================================
+         ACTIONS
+         ===================================================== */}
+
       <div className={styles.buttons}>
-          <Button type="submit">{actionText}</Button>
-          <p>Already have an account?</p>
-          <Button to="/Login">Login</Button>
-          <Button to="/">Home</Button>
+        <Button type="submit">
+          {actionText || t('signup.submit')}
+        </Button>
+
+        <p>
+          {t('signup.alreadyHaveAccount')}
+        </p>
+
+        <Button to="/Login">
+          {t('common.login')}
+        </Button>
+
+        <Button to="/">
+          {t('common.home')}
+        </Button>
       </div>
+
     </Form>
   );
-  
+};
+
+/* =====================================================
+   PROP TYPES
+   ===================================================== */
+
+SignupForm.propTypes = {
+  actionText: PropTypes.string,
 };
 
 export default SignupForm;

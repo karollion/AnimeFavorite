@@ -160,9 +160,38 @@
     "backToHome": "Wróć na stronę główną"
   },
   "signup": {
-    "title": "Rejestracja"
+    "title": "Rejestracja",
+    "submit": "Zarejestruj się",
+    "registerSuccess": "Konto zostało pomyślnie utworzone.",
+    "registerFailed": "Nie udało się utworzyć konta.",
+    "email": "Adres e-mail",
+    "emailPlaceholder": "Wprowadź adres e-mail",
+    "login": "Login",
+    "loginPlaceholder": "Wprowadź login",
+    "password": "Hasło",
+    "passwordPlaceholder": "Wprowadź hasło",
+    "confirmPassword": "Potwierdź hasło",
+    "confirmPasswordPlaceholder": "Wprowadź ponownie hasło",
+    "passwordLength": "Od 7 do 30 znaków.",
+    "birthYear": "Rok urodzenia",
+    "birthYearPlaceholder": "Wybierz rok urodzenia",
+    "alreadyHaveAccount": "Masz już konto?",
+    "validation": {
+      "emailRequired": "Adres e-mail jest wymagany.",
+      "emailInvalid": "Wprowadź prawidłowy adres e-mail.",
+      "loginRequired": "Login jest wymagany.",
+      "loginMinLength": "Login musi zawierać co najmniej 3 znaki.",
+      "loginMaxLength": "Login nie może przekraczać 30 znaków.",
+      "passwordRequired": "Hasło jest wymagane.",
+      "passwordMinLength": "Hasło musi zawierać co najmniej 7 znaków.",
+      "passwordMaxLength": "Hasło nie może przekraczać 30 znaków.",
+      "confirmPasswordRequired": "Potwierdzenie hasła jest wymagane.",
+      "passwordMismatch": "Hasła nie są identyczne.",
+      "birthYearRequired": "Rok urodzenia jest wymagany."
+    }
   },
   "animeCard": {
+    "coverAlt": "Okładka anime",
     "ageRating": "Kategoria wiekowa",
     "type": "Typ anime",
     "rating": "Średnia ocena",
@@ -216,6 +245,7 @@
     }
   },
   "myAnimes": {
+    "emptyCollection": "Nie ma jeszcze anime w tej kolekcji.",
     "title": "Moje anime",
     "loginRequired": "Zaloguj się, aby zobaczyć swoje kolekcje anime.",
     "view": "Widok",

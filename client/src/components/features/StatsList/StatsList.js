@@ -1,20 +1,35 @@
+
+/* =====================================================
+   COMPONENTS
+   ===================================================== */
+
 import styles from './StatsList.module.scss';
 import PropTypes from 'prop-types';
+import { useTranslation } from 'react-i18next';
 
 import StatCard from '../StatCard/StatCard';
 import SkeletonCard from '../StatCard/SkeletonCard';
 import AnimeCard from '../AnimeCard/AnimeCard';
 import SkeletonAnimeCard from '../AnimeCard/SkeletonAnimeCard';
 
+/* =====================================================
+   SORTING
+   ===================================================== */
+
 /**
- * Sortuje przekazaną kolekcję anime.
+ * Sorts the provided anime collection according to the selected criterion.
  *
- * rating - najwyższa ocena na początku;
- * newest - najnowszy rekord na początku;
- * title  - tytuł alfabetycznie A-Z.
+ * Supported sorting options:
+ * - rating: Highest average rating first.
+ * - newest: Most recently created anime first.
+ * - title: Alphabetical order (A-Z).
  *
- * Sortowanie tworzy nową tablicę. Nie modyfikujemy bezpośrednio
- * tablicy pochodzącej z Redux ani obiektu statystyk użytkownika.
+ * A copy of the original array is created before sorting to avoid
+ * directly modifying data received from Redux.
+ *
+ * @param {Array} animes - Anime collection to sort.
+ * @param {string} sort - Selected sorting criterion.
+ * @returns {Array} Sorted copy of the anime collection.
  */
 const sortAnimes = (animes, sort) => {
   const sorted = [...animes];
@@ -22,7 +37,9 @@ const sortAnimes = (animes, sort) => {
   switch (sort) {
     case 'rating':
       return sorted.sort(
-        (a, b) => (Number(b.rating_avg) || 0) - (Number(a.rating_avg) || 0)
+        (a, b) =>
+          (Number(b.rating_avg) || 0) -
+          (Number(a.rating_avg) || 0)
       );
 
     case 'newest':
@@ -46,16 +63,41 @@ const sortAnimes = (animes, sort) => {
   }
 };
 
+/* =====================================================
+   STATS LIST COMPONENT
+   ===================================================== */
+
+/**
+ * @component
+ * @description Displays a collection of anime statistics in either
+ *              grid or list view. Supports sorting and loading skeletons.
+ *
+ * @param {Object} props - Component properties.
+ * @param {Array} props.stats - Anime collection to display.
+ * @param {string} props.view - Display mode: "grid" or "list".
+ * @param {string} props.sort - Sorting criterion.
+ * @param {boolean} props.loading - Indicates whether the collection is loading.
+ *
+ * @returns {JSX.Element} The rendered anime collection.
+ */
 const StatsList = ({
   stats = [],
   view = 'list',
   sort = 'newest',
   loading = false,
 }) => {
-  /*
-   * Pustej tablicy nie traktujemy automatycznie jako stanu ładowania.
-   * W przeciwnym razie użytkownik z pustą kolekcją widziałby skeletony
-   * zamiast informacji, że nie ma jeszcze żadnych anime.
+  const { t } = useTranslation();
+
+  /* =====================================================
+     LOADING STATE
+     ===================================================== */
+
+  /**
+   * Displays placeholder cards while the anime collection is loading.
+   *
+   * An empty collection is not treated as a loading state.
+   * This ensures that users with no anime entries see an appropriate
+   * empty-state message instead of permanent skeletons.
    */
   if (loading) {
     return (
@@ -66,7 +108,10 @@ const StatsList = ({
       >
         {Array.from({ length: 8 }, (_, index) =>
           view === 'grid' ? (
-            <div className={styles.gridItem} key={`skeleton-${index}`}>
+            <div
+              className={styles.gridItem}
+              key={`skeleton-${index}`}
+            >
               <SkeletonAnimeCard />
             </div>
           ) : (
@@ -77,14 +122,28 @@ const StatsList = ({
     );
   }
 
+  /* =====================================================
+     EMPTY STATE
+     ===================================================== */
+
+  /**
+   * Displays a translated message when the collection contains no anime.
+   */
   if (!stats.length) {
     return (
       <p className={styles.empty}>
-        No anime in this collection yet.
+        {t('myAnimes.emptyCollection')}
       </p>
     );
   }
 
+  /* =====================================================
+     ANIME COLLECTION
+     ===================================================== */
+
+  /**
+   * Sorts the collection before rendering it.
+   */
   const sortedAnimes = sortAnimes(stats, sort);
 
   return (
@@ -105,6 +164,10 @@ const StatsList = ({
     </div>
   );
 };
+
+/* =====================================================
+   PROP TYPES
+   ===================================================== */
 
 StatsList.propTypes = {
   stats: PropTypes.array,

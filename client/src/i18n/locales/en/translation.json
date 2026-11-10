@@ -156,9 +156,38 @@
     "backToHome": "Back to home"
   },
   "signup": {
-    "title": "Signup"
+    "title": "Signup",
+    "submit": "Sign up",
+    "registerSuccess": "Your account has been created successfully.",
+    "registerFailed": "Failed to create your account.",
+    "email": "Email",
+    "emailPlaceholder": "Enter email",
+    "login": "Login",
+    "loginPlaceholder": "Enter login",
+    "password": "Password",
+    "passwordPlaceholder": "Enter password",
+    "confirmPassword": "Confirm password",
+    "confirmPasswordPlaceholder": "Confirm your password",
+    "passwordLength": "Between 7 and 30 characters.",
+    "birthYear": "Birth year",
+    "birthYearPlaceholder": "Select birth year",
+    "alreadyHaveAccount": "Already have an account?",
+    "validation": {
+      "emailRequired": "Email is required.",
+      "emailInvalid": "Enter a valid email address.",
+      "loginRequired": "Login is required.",
+      "loginMinLength": "Login must contain at least 3 characters.",
+      "loginMaxLength": "Login cannot exceed 30 characters.",
+      "passwordRequired": "Password is required.",
+      "passwordMinLength": "Password must contain at least 7 characters.",
+      "passwordMaxLength": "Password cannot exceed 30 characters.",
+      "confirmPasswordRequired": "Password confirmation is required.",
+      "passwordMismatch": "Passwords do not match.",
+      "birthYearRequired": "Birth year is required."
+    }
   },
   "animeCard": {
+    "coverAlt": "Anime cover",
     "ageRating": "Age rating",
     "type": "Anime type",
     "rating": "Average rating",
@@ -212,6 +241,7 @@
     }
   },
   "myAnimes": {
+    "emptyCollection": "No anime in this collection yet.",
     "title": "My Animes",
     "loginRequired": "Please log in to view your anime collections.",
     "view": "View",
