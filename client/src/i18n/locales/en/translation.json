@@ -362,6 +362,8 @@
     "notes": "Additional notes:"
   },
   "reviewCard": {
+    "spoilerNotice": "Spoiler — hover or focus to reveal",
+    "spoilerAccessibleLabel": "Spoiler review. Focus to reveal the content.",
     "user": "User:",
     "rating": "Rating given by the user:",
     "text": "Review:",

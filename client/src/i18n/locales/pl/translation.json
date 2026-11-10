@@ -366,6 +366,8 @@
     "notes": "Dodatkowe informacje:"
   },
   "reviewCard": {
+    "spoilerNotice": "Spoiler — najedź kursorem, aby zobaczyć",
+    "spoilerAccessibleLabel": "Recenzja zawiera spoilery. Ustaw fokus, aby zobaczyć treść.",
     "user": "Użytkownik:",
     "rating": "Ocena użytkownika:",
     "text": "Recenzja:",

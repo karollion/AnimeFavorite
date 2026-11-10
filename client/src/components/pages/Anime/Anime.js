@@ -791,15 +791,16 @@ const Anime = () => {
         {/* Anime reviews */}
         <section className={styles.reviewsSection}>
           <h2>{t('anime.reviews')}</h2>
-
+                
           {selectedAnime.reviews?.length > 0 ? (
-            <ul>
+            <div className={styles.reviewsList}>
               {selectedAnime.reviews.map(review => (
-                <li key={review._id}>
-                  <ReviewCard review={review} />
-                </li>
+                <ReviewCard
+                  review={review}
+                  key={review._id}
+                />
               ))}
-            </ul>
+            </div>
           ) : (
             <p>{t('anime.noReviews')}</p>
           )}

@@ -130,4 +130,23 @@
 	    opacity: 0.6;
 	  }
 	}
+
+	/* =====================================================
+	   REVIEWS
+	   ===================================================== */
+	
+	.reviewsSection {
+	  margin: 2rem 0;
+	
+	  h2 {
+	    margin-bottom: 1rem;
+	  }
+	}
+	
+	.reviewsList {
+	  display: flex;
+	  flex-direction: column;
+	  gap: 1rem;
+	  width: 100%;
+	}
 }
