@@ -19,7 +19,7 @@ import { getUser } from '../../../redux/reducers/userRedux'
 import { Col } from 'react-bootstrap'
 import Container from '../../common/container/Container'
 import Button from '../../common/Button/Button'
-import CharacterCard from '../../features/CharacterCard/CharacterCard'
+import CharacterSection from '../../features/CharacterSection/CharacterSection'
 
 // Assets
 import noImage from '../../../assets/no-image.png'
@@ -63,8 +63,6 @@ const Profile = () => {
   const description = user.description?.trim()
     ? user.description
     : t('profile.notSpecified')
-
-  const favoriteCharacters = user.favorite_characters || []
 
   return (
     <div className={styles.root}>
@@ -121,25 +119,11 @@ const Profile = () => {
 
         {/* Favorite characters section */}
         <section className={styles.favoriteSection}>
-
-          <h2>
-            {t('profile.favoriteCharacters')}
-          </h2>
-
-          {favoriteCharacters.length > 0 ? (
-            <div className={styles.characters}>
-              {favoriteCharacters.map(character => (
-                <div key={character._id}>
-                  <CharacterCard character={character} />
-                </div>
-              ))}
-            </div>
-          ) : (
-            <p>
-              {t('profile.noFavoriteCharacters')}
-            </p>
-          )}
-
+          {/* Anime characters */}
+            <CharacterSection
+              title={t('profile.favoriteCharacters')}
+              characters={user.favorite_characters || []}
+            />
         </section>
 
         {/* Navigation back to the home page */}
