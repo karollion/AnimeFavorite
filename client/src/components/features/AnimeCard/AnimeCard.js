@@ -1,31 +1,41 @@
 
+/* =====================================================
+   Anime Card
+   ===================================================== */
+
 /**
  * @file AnimeCard.js
  * @description Displays an anime card with its cover,
  * age rating, type and average rating.
  */
 
-// Styles
+/* =====================================================
+   STYLES
+   ===================================================== */
+
 import styles from './AnimeCard.module.scss'
 
-// PropTypes
+/* =====================================================
+   DEPENDENCIES
+   ===================================================== */
+
 import PropTypes from 'prop-types'
-
-// Routing
 import { Link } from 'react-router-dom'
-
-// Translations
 import { useTranslation } from 'react-i18next'
 
-// Assets
+/* =====================================================
+   ASSETS
+   ===================================================== */
+
 import noImage from '../../../assets/no-image.png'
 
+/* =====================================================
+   COMPONENT
+   ===================================================== */
+
 /**
- * AnimeCard component.
- *
- * Displays basic anime information and allows users
- * to navigate to the anime details page by clicking
- * anywhere on the card.
+ * Displays basic anime information and provides navigation
+ * to the anime details page.
  *
  * @component
  * @param {Object} props - Component properties.
@@ -35,16 +45,27 @@ import noImage from '../../../assets/no-image.png'
 const AnimeCard = ({ anime }) => {
   const { t } = useTranslation()
 
+  /* =====================================================
+     IMAGE HANDLING
+     ===================================================== */
+
   /**
    * Replaces a missing or unavailable anime cover
    * with the default placeholder image.
    *
+   * Prevents an infinite error loop if the fallback
+   * image is also unavailable.
+   *
    * @param {React.SyntheticEvent<HTMLImageElement>} event
    */
-  const handleImageError = event => {
+  const handleImageError = (event) => {
     event.currentTarget.onerror = null
     event.currentTarget.src = noImage
   }
+
+  /* =====================================================
+     ANIME TYPE TRANSLATION
+     ===================================================== */
 
   /**
    * Translates the anime type when a matching translation exists.
@@ -54,20 +75,24 @@ const AnimeCard = ({ anime }) => {
     ? t(`animeCard.types.${anime.type}`, {
         defaultValue: anime.type,
       })
-    : ''
+    : '—'
+
+  /* =====================================================
+     RENDER
+     ===================================================== */
 
   return (
     <Link
       to={`/anime/${anime.slug}`}
       className={styles.cardLink}
-      aria-label={anime.title}
+      aria-label={anime.title || t('animeCard.unknownTitle')}
     >
       <div className={styles.card}>
 
         {/* Anime cover */}
         <img
           src={anime.anime_cover || noImage}
-          alt={anime.title || ''}
+          alt={anime.title || t('animeCard.coverAlt')}
           className={styles.img}
           onError={handleImageError}
         />
@@ -78,7 +103,9 @@ const AnimeCard = ({ anime }) => {
           {/* Basic anime information */}
           <div className={styles.top}>
             <p title={t('animeCard.ageRating')}>
-              {anime.age_rating != null ? `${anime.age_rating}+` : ''}
+              {anime.age_rating != null
+                ? `${anime.age_rating}+`
+                : '—'}
             </p>
 
             <p title={t('animeCard.type')}>
@@ -93,7 +120,7 @@ const AnimeCard = ({ anime }) => {
           {/* Anime title */}
           <div className={styles.bottom}>
             <span className={styles.animeTitle}>
-              {anime.title}
+              {anime.title || t('animeCard.unknownTitle')}
             </span>
           </div>
 
@@ -102,6 +129,10 @@ const AnimeCard = ({ anime }) => {
     </Link>
   )
 }
+
+/* =====================================================
+   PROP TYPES
+   ===================================================== */
 
 AnimeCard.propTypes = {
   anime: PropTypes.object.isRequired,

@@ -1,6 +1,6 @@
 
 /* =====================================================
-   IMAGE UPLOAD
+   Image Upload
    ===================================================== */
 
 /**
@@ -9,45 +9,84 @@
  *              validating and uploading an image.
  */
 
-import { useEffect, useId, useState } from 'react';
-import { Form } from 'react-bootstrap';
-import Button from '../../common/Button/Button';
-import styles from './ImageUpload.module.scss';
+/* =====================================================
+   REACT HOOKS AND FORM MANAGEMENT
+   ===================================================== */
+
+import { useEffect, useId, useRef, useState } from 'react'
+import { useTranslation } from 'react-i18next'
+import PropTypes from 'prop-types'
+
+/* =====================================================
+   UI COMPONENTS
+   ===================================================== */
+
+import { Form } from 'react-bootstrap'
+import Button from '../../common/Button/Button'
+
+/* =====================================================
+   MESSAGE CONTEXT
+   ===================================================== */
+
+import { useMessage } from '../../../context/MessageContext'
+
+/* =====================================================
+   STYLES
+   ===================================================== */
+
+import styles from './ImageUpload.module.scss'
+
+/* =====================================================
+   IMAGE UPLOAD COMPONENT
+   ===================================================== */
 
 /**
  * @component
  * @description Provides a reusable image upload interface.
- *              The actual API request is supplied through onUpload.
+ *
+ * The actual API request is supplied through the onUpload callback.
  *
  * @param {Object} props
- * @param {string} props.currentImage - URL of the current image.
- * @param {string} props.currentImageAlt - Alternative text for the current image.
- * @param {string} props.title - Section heading.
- * @param {string} props.label - File input label.
+ * @param {string} [props.currentImage] - URL of the current image.
+ * @param {string} [props.currentImageAlt] - Alternative text for the current image.
+ * @param {string} [props.title] - Section heading.
+ * @param {string} [props.label] - File input label.
  * @param {Function} props.onUpload - Callback receiving the selected File.
- * @param {boolean} props.isUploading - Indicates an active upload.
- * @param {number} props.maxSizeMB - Maximum allowed image size in MB.
- * @param {string} props.uploadButtonLabel - Upload button text.
- * @param {string} props.successMessage - Message displayed after success.
+ * @param {boolean} [props.isUploading] - Indicates an active upload.
+ * @param {number} [props.maxSizeMB] - Maximum allowed image size in MB.
+ * @param {string} [props.uploadButtonLabel] - Upload button text.
+ * @param {string} [props.successMessage] - Custom success message.
  *
- * @returns {JSX.Element}
+ * @returns {JSX.Element} Image upload interface.
  */
 const ImageUpload = ({
   currentImage = '',
-  currentImageAlt = 'Current image',
-  title = 'Image',
-  label = 'Choose an image',
+  currentImageAlt,
+  title,
+  label,
   onUpload,
   isUploading = false,
   maxSizeMB = 2,
-  uploadButtonLabel = 'Upload image',
-  successMessage = 'Image uploaded successfully.',
+  uploadButtonLabel,
+  successMessage,
 }) => {
-  const inputId = useId();
-  const [selectedFile, setSelectedFile] = useState(null);
-  const [previewUrl, setPreviewUrl] = useState('');
-  const [error, setError] = useState('');
-  const [status, setStatus] = useState(null);
+  /* =====================================================
+     HOOKS AND INITIALIZATION
+     ===================================================== */
+
+  const { t } = useTranslation()
+  const { showMessage } = useMessage()
+
+  const inputId = useId()
+  const fileInputRef = useRef(null)
+
+  /* =====================================================
+     LOCAL COMPONENT STATE
+     ===================================================== */
+
+  const [selectedFile, setSelectedFile] = useState(null)
+  const [previewUrl, setPreviewUrl] = useState('')
+  const [error, setError] = useState('')
 
   /* =====================================================
      IMAGE PREVIEW
@@ -60,15 +99,16 @@ const ImageUpload = ({
    */
   useEffect(() => {
     if (!selectedFile) {
-      setPreviewUrl('');
-      return;
+      setPreviewUrl('')
+      return undefined
     }
 
-    const objectUrl = URL.createObjectURL(selectedFile);
-    setPreviewUrl(objectUrl);
+    const objectUrl = URL.createObjectURL(selectedFile)
 
-    return () => URL.revokeObjectURL(objectUrl);
-  }, [selectedFile]);
+    setPreviewUrl(objectUrl)
+
+    return () => URL.revokeObjectURL(objectUrl)
+  }, [selectedFile])
 
   /* =====================================================
      FILE VALIDATION
@@ -76,37 +116,43 @@ const ImageUpload = ({
 
   /**
    * Validates the selected file before allowing upload.
+   *
    * Supported formats: JPEG, PNG and WebP.
+   *
+   * @param {React.ChangeEvent<HTMLInputElement>} event
    */
-  const handleFileChange = event => {
-    const file = event.target.files?.[0] || null;
+  const handleFileChange = (event) => {
+    const file = event.target.files?.[0] || null
 
-    setSelectedFile(null);
-    setError('');
-    setStatus(null);
+    setSelectedFile(null)
+    setError('')
 
-    if (!file) return;
+    if (!file) return
 
     const allowedTypes = [
       'image/jpeg',
       'image/png',
       'image/webp',
-    ];
+    ]
 
+    // Check whether the selected file has a supported image format.
     if (!allowedTypes.includes(file.type)) {
-      setError('Choose a JPG, PNG or WebP image.');
-      event.target.value = '';
-      return;
+      setError(t('imageUpload.validation.invalidFormat'))
+      event.target.value = ''
+      return
     }
 
+    // Check whether the selected file exceeds the size limit.
     if (file.size > maxSizeMB * 1024 * 1024) {
-      setError(`The image must not exceed ${maxSizeMB} MB.`);
-      event.target.value = '';
-      return;
+      setError(
+        t('imageUpload.validation.maxSize', { maxSizeMB })
+      )
+      event.target.value = ''
+      return
     }
 
-    setSelectedFile(file);
-  };
+    setSelectedFile(file)
+  }
 
   /* =====================================================
      IMAGE UPLOAD
@@ -115,68 +161,92 @@ const ImageUpload = ({
   /**
    * Passes the selected file to the callback supplied
    * by the parent component.
+   *
+   * Displays a success or error message through MessageContext.
    */
   const handleUpload = async () => {
-    if (!selectedFile || typeof onUpload !== 'function') return;
+    if (!selectedFile || typeof onUpload !== 'function') return
 
-    setError('');
-    setStatus(null);
+    setError('')
 
     try {
-      await onUpload(selectedFile);
+      await onUpload(selectedFile)
 
-      setSelectedFile(null);
+      // Clear the selected file after a successful upload.
+      setSelectedFile(null)
 
-      // Reset the file input so the same file can be selected again.
-      const fileInput = document.getElementById(inputId);
-      if (fileInput) fileInput.value = '';
+      // Reset the input so the same file can be selected again.
+      if (fileInputRef.current) {
+        fileInputRef.current.value = ''
+      }
 
-      setStatus({
-        type: 'success',
-        message: successMessage,
-      });
+      // Display upload confirmation.
+      await showMessage({
+        title: t('common.success'),
+        message:
+          successMessage || t('imageUpload.uploadSuccess'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
     } catch (uploadError) {
-      setStatus({
-        type: 'error',
+      // Display the server error message or a translated fallback.
+      await showMessage({
+        title: t('common.error'),
         message:
           uploadError.response?.data?.message ||
           uploadError.message ||
-          'Failed to upload image.',
-      });
+          t('imageUpload.uploadFailed'),
+        mode: 'alert',
+        confirmText: t('common.ok'),
+      })
     }
-  };
+  }
 
   /* =====================================================
-     RENDER
+     COMPONENT RENDER
      ===================================================== */
 
   return (
     <section className={styles.root}>
-      <h2>{title}</h2>
+      {/* Section heading */}
+      <h2>
+        {title || t('imageUpload.title')}
+      </h2>
 
-      {/* Current image */}
+      {/* Currently uploaded image */}
       {currentImage ? (
         <div className={styles.imagePreview}>
-          <p>Current image:</p>
-          <img src={currentImage} alt={currentImageAlt} />
+          <p>{t('imageUpload.currentImage')}</p>
+
+          <img
+            src={currentImage}
+            alt={currentImageAlt || t('imageUpload.currentImageAlt')}
+          />
         </div>
       ) : (
-        <p>No image uploaded.</p>
+        <p>{t('imageUpload.noImage')}</p>
       )}
 
-      {/* Selected image preview */}
+      {/* Preview of the newly selected image */}
       {previewUrl && (
         <div className={styles.imagePreview}>
-          <p>Selected image:</p>
-          <img src={previewUrl} alt="Preview" />
+          <p>{t('imageUpload.selectedImage')}</p>
+
+          <img
+            src={previewUrl}
+            alt={t('imageUpload.previewAlt')}
+          />
         </div>
       )}
 
-      {/* File selection */}
+      {/* Image file selection */}
       <Form.Group className="mb-3">
-        <Form.Label>{label}</Form.Label>
+        <Form.Label htmlFor={inputId}>
+          {label || t('imageUpload.chooseImage')}
+        </Form.Label>
 
         <Form.Control
+          ref={fileInputRef}
           id={inputId}
           type="file"
           accept="image/jpeg,image/png,image/webp"
@@ -190,7 +260,7 @@ const ImageUpload = ({
         </Form.Control.Feedback>
 
         <Form.Text>
-          JPG, PNG or WebP. Maximum size: {maxSizeMB} MB.
+          {t('imageUpload.allowedFormats', { maxSizeMB })}
         </Form.Text>
       </Form.Group>
 
@@ -200,24 +270,28 @@ const ImageUpload = ({
         active={!!selectedFile && !isUploading}
         action={handleUpload}
       >
-        {isUploading ? 'Uploading...' : uploadButtonLabel}
+        {isUploading
+          ? t('imageUpload.uploading')
+          : uploadButtonLabel || t('imageUpload.uploadButton')}
       </Button>
-
-      {/* Upload feedback */}
-      {status && (
-        <p
-          className={
-            status.type === 'success'
-              ? styles.success
-              : styles.error
-          }
-          role={status.type === 'success' ? 'status' : 'alert'}
-        >
-          {status.message}
-        </p>
-      )}
     </section>
-  );
-};
+  )
+}
 
-export default ImageUpload;
+/* =====================================================
+   PROP TYPES
+   ===================================================== */
+
+ImageUpload.propTypes = {
+  currentImage: PropTypes.string,
+  currentImageAlt: PropTypes.string,
+  title: PropTypes.string,
+  label: PropTypes.string,
+  onUpload: PropTypes.func.isRequired,
+  isUploading: PropTypes.bool,
+  maxSizeMB: PropTypes.number,
+  uploadButtonLabel: PropTypes.string,
+  successMessage: PropTypes.string,
+}
+
+export default ImageUpload

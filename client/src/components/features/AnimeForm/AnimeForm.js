@@ -1,3 +1,4 @@
+
 /* =====================================================
    ANIME FORM
    ===================================================== */
@@ -8,11 +9,19 @@
  *              Cover uploads are handled separately by AnimeCoverUpload.
  */
 
-import styles from './AnimeForm.module.scss';
-import { useEffect } from 'react';
-import { Form, Row, Col } from 'react-bootstrap';
-import Button from '../../common/Button/Button';
-import { useForm } from 'react-hook-form';
+import styles from './AnimeForm.module.scss'
+
+import { useEffect } from 'react'
+import { Form, Row, Col } from 'react-bootstrap'
+import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import PropTypes from 'prop-types'
+
+import Button from '../../common/Button/Button'
+
+/* =====================================================
+   ANIME FORM COMPONENT
+   ===================================================== */
 
 /**
  * @component
@@ -21,20 +30,18 @@ import { useForm } from 'react-hook-form';
  * @param {Object} props
  * @param {Object|null} props.anime - Anime data used to populate edit fields.
  * @param {Function} props.onSubmit - Callback receiving the anime payload.
- * @param {string} props.submitText - Submit button label.
+ * @param {string} props.submitText - Optional submit button label.
  * @param {boolean} props.isSaving - Indicates whether the form is saving.
- * @param {boolean} props.showCoverUpload - Reserved for controlling
- *        cover-related UI in the parent. Cover uploads are intentionally
- *        handled by a separate component.
  *
  * @returns {JSX.Element}
  */
 const AnimeForm = ({
   anime = null,
   onSubmit,
-  submitText = 'Save',
+  submitText,
   isSaving = false,
 }) => {
+  const { t } = useTranslation()
 
   /* =====================================================
      FORM INITIALIZATION
@@ -56,12 +63,16 @@ const AnimeForm = ({
       categories: '',
       description_short: '',
     },
-  });
+  })
 
   /* =====================================================
      FORM DATA SYNCHRONIZATION
      ===================================================== */
 
+  /**
+   * Populates the form when an existing anime is loaded.
+   * Resets to empty values when creating a new anime.
+   */
   useEffect(() => {
     reset({
       title: anime?.title || '',
@@ -72,8 +83,8 @@ const AnimeForm = ({
       genres: anime?.genres?.join(', ') || '',
       categories: anime?.categories?.join(', ') || '',
       description_short: anime?.description_short || '',
-    });
-  }, [anime, reset]);
+    })
+  }, [anime, reset])
 
   /* =====================================================
      FORM SUBMISSION
@@ -81,29 +92,32 @@ const AnimeForm = ({
 
   /**
    * Converts form values into the payload expected by the API.
+   * Genres and categories are converted into arrays.
    * No image file is included in this request.
+   *
+   * @param {Object} data - Validated form data.
    */
-  const handleFormSubmit = async data => {
+  const handleFormSubmit = async (data) => {
+    if (typeof onSubmit !== 'function') {
+      console.error('AnimeForm requires an onSubmit function.')
+      return
+    }
+
     const payload = {
       ...data,
       age_rating: Number(data.age_rating),
       genres: data.genres
         .split(',')
-        .map(value => value.trim())
+        .map((value) => value.trim())
         .filter(Boolean),
       categories: data.categories
         .split(',')
-        .map(value => value.trim())
+        .map((value) => value.trim())
         .filter(Boolean),
-    };
-
-    if (typeof onSubmit !== 'function') {
-      console.error('AnimeForm requires an onSubmit function.');
-      return;
     }
 
-    await onSubmit(payload);
-  };
+    await onSubmit(payload)
+  }
 
   /* =====================================================
      FORM RENDERING
@@ -116,22 +130,22 @@ const AnimeForm = ({
     >
       {/* TITLE */}
       <Form.Group className="mb-3">
-        <Form.Label>Title *</Form.Label>
+        <Form.Label>{t('animeForm.title')} *</Form.Label>
 
         <Form.Control
           {...register('title', {
-            required: 'Title is required.',
+            required: t('animeForm.validation.titleRequired'),
             minLength: {
               value: 5,
-              message: 'Title must have at least 5 characters.',
+              message: t('animeForm.validation.titleMinLength'),
             },
             maxLength: {
               value: 70,
-              message: 'Title cannot exceed 70 characters.',
+              message: t('animeForm.validation.titleMaxLength'),
             },
           })}
           isInvalid={!!errors.title}
-          placeholder="Enter title"
+          placeholder={t('animeForm.placeholders.title')}
         />
 
         <Form.Control.Feedback type="invalid">
@@ -141,21 +155,21 @@ const AnimeForm = ({
 
       {/* ORIGINAL TITLE */}
       <Form.Group className="mb-3">
-        <Form.Label>Original title</Form.Label>
+        <Form.Label>{t('animeForm.originalTitle')}</Form.Label>
 
         <Form.Control
           {...register('original_title', {
             minLength: {
               value: 2,
-              message: 'Original title must have at least 2 characters.',
+              message: t('animeForm.validation.originalTitleMinLength'),
             },
             maxLength: {
               value: 70,
-              message: 'Original title cannot exceed 70 characters.',
+              message: t('animeForm.validation.originalTitleMaxLength'),
             },
           })}
           isInvalid={!!errors.original_title}
-          placeholder="Original title"
+          placeholder={t('animeForm.placeholders.originalTitle')}
         />
 
         <Form.Control.Feedback type="invalid">
@@ -165,23 +179,24 @@ const AnimeForm = ({
 
       {/* AGE RATING */}
       <Form.Group className="mb-3">
-        <Form.Label>Age rating *</Form.Label>
+        <Form.Label>{t('animeForm.ageRating')} *</Form.Label>
 
         <Form.Control
           type="number"
           {...register('age_rating', {
-            required: 'Age rating is required.',
+            required: t('animeForm.validation.ageRatingRequired'),
             valueAsNumber: true,
             min: {
               value: 0,
-              message: 'Minimum age rating is 0.',
+              message: t('animeForm.validation.ageRatingMin'),
             },
             max: {
               value: 21,
-              message: 'Maximum age rating is 21.',
+              message: t('animeForm.validation.ageRatingMax'),
             },
-            validate: value =>
-              Number.isInteger(value) || 'Enter a whole number.',
+            validate: (value) =>
+              Number.isInteger(value) ||
+              t('animeForm.validation.ageRatingInteger'),
           })}
           isInvalid={!!errors.age_rating}
         />
@@ -193,17 +208,19 @@ const AnimeForm = ({
 
       {/* TYPE */}
       <Form.Group className="mb-3">
-        <Form.Label>Type *</Form.Label>
+        <Form.Label>{t('animeForm.type')} *</Form.Label>
 
         <Form.Select
           {...register('type', {
-            required: 'Choose an anime type.',
+            required: t('animeForm.validation.typeRequired'),
           })}
           isInvalid={!!errors.type}
         >
-          <option value="">-- choose --</option>
+          <option value="">
+            {t('animeForm.typePlaceholder')}
+          </option>
           <option value="TV">TV</option>
-          <option value="Movie">Movie</option>
+          <option value="Movie">{t('animeForm.types.movie')}</option>
           <option value="OVA">OVA</option>
           <option value="ONA">ONA</option>
         </Form.Select>
@@ -215,16 +232,17 @@ const AnimeForm = ({
 
       {/* WORLD */}
       <Form.Group className="mb-3">
-        <Form.Label>World</Form.Label>
+        <Form.Label>{t('animeForm.world')}</Form.Label>
 
         <Form.Control
           {...register('world', {
             maxLength: {
               value: 30,
-              message: 'World cannot exceed 30 characters.',
+              message: t('animeForm.validation.worldMaxLength'),
             },
           })}
           isInvalid={!!errors.world}
+          placeholder={t('animeForm.placeholders.world')}
         />
 
         <Form.Control.Feedback type="invalid">
@@ -234,17 +252,17 @@ const AnimeForm = ({
 
       {/* GENRES */}
       <Form.Group className="mb-3">
-        <Form.Label>Genres *</Form.Label>
+        <Form.Label>{t('animeForm.genres')} *</Form.Label>
 
         <Form.Control
           {...register('genres', {
-            required: 'Enter at least one genre.',
-            validate: value =>
-              value.split(',').some(item => item.trim()) ||
-              'Enter at least one genre.',
+            required: t('animeForm.validation.genresRequired'),
+            validate: (value) =>
+              value.split(',').some((item) => item.trim()) ||
+              t('animeForm.validation.genresRequired'),
           })}
           isInvalid={!!errors.genres}
-          placeholder="action, fantasy, drama"
+          placeholder={t('animeForm.placeholders.genres')}
         />
 
         <Form.Control.Feedback type="invalid">
@@ -254,17 +272,17 @@ const AnimeForm = ({
 
       {/* CATEGORIES */}
       <Form.Group className="mb-3">
-        <Form.Label>Categories *</Form.Label>
+        <Form.Label>{t('animeForm.categories')} *</Form.Label>
 
         <Form.Control
           {...register('categories', {
-            required: 'Enter at least one category.',
-            validate: value =>
-              value.split(',').some(item => item.trim()) ||
-              'Enter at least one category.',
+            required: t('animeForm.validation.categoriesRequired'),
+            validate: (value) =>
+              value.split(',').some((item) => item.trim()) ||
+              t('animeForm.validation.categoriesRequired'),
           })}
           isInvalid={!!errors.categories}
-          placeholder="shounen, seinen"
+          placeholder={t('animeForm.placeholders.categories')}
         />
 
         <Form.Control.Feedback type="invalid">
@@ -274,19 +292,20 @@ const AnimeForm = ({
 
       {/* SHORT DESCRIPTION */}
       <Form.Group className="mb-3">
-        <Form.Label>Short description *</Form.Label>
+        <Form.Label>{t('animeForm.shortDescription')} *</Form.Label>
 
         <Form.Control
           as="textarea"
           rows={4}
           {...register('description_short', {
-            required: 'Description is required.',
+            required: t('animeForm.validation.descriptionRequired'),
             minLength: {
               value: 10,
-              message: 'Description must have at least 10 characters.',
+              message: t('animeForm.validation.descriptionMinLength'),
             },
           })}
           isInvalid={!!errors.description_short}
+          placeholder={t('animeForm.placeholders.description')}
         />
 
         <Form.Control.Feedback type="invalid">
@@ -297,17 +316,32 @@ const AnimeForm = ({
       {/* FORM ACTIONS */}
       <Row className="mt-4">
         <Col className="d-flex gap-3">
-          <Button to="/">Back to home</Button>
+          <Button to="/">
+            {t('animeForm.backToHome')}
+          </Button>
         </Col>
 
         <Col className="text-end">
           <Button type="submit" active={!isSaving}>
-            {isSaving ? 'Saving...' : submitText}
+            {isSaving
+              ? t('animeForm.saving')
+              : submitText || t('common.save')}
           </Button>
         </Col>
       </Row>
     </Form>
-  );
-};
+  )
+}
 
-export default AnimeForm;
+/* =====================================================
+   PROP TYPES
+   ===================================================== */
+
+AnimeForm.propTypes = {
+  anime: PropTypes.object,
+  onSubmit: PropTypes.func.isRequired,
+  submitText: PropTypes.string,
+  isSaving: PropTypes.bool,
+}
+
+export default AnimeForm

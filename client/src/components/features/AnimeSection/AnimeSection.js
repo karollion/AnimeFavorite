@@ -1,46 +1,87 @@
 
+/* =====================================================
+   ANIME SECTION
+   ===================================================== */
+
+/**
+ * @file AnimeSection.js
+ * @description Displays a horizontal, responsive anime carousel
+ *              with navigation arrows and loading skeletons.
+ */
+
 import styles from './AnimeSection.module.scss'
+
 import { useState } from 'react'
+import { useTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
+
 import { Swiper, SwiperSlide } from 'swiper/react'
 import 'swiper/css'
 
 import AnimeCard from '../AnimeCard/AnimeCard'
 import SkeletonAnimeCard from '../AnimeCard/SkeletonAnimeCard'
 import Button from '../../common/Button/Button'
-import { useTranslation } from 'react-i18next'
 
+/* =====================================================
+   ANIME SECTION COMPONENT
+   ===================================================== */
+
+/**
+ * @component
+ * @description Renders an anime carousel with responsive slide settings.
+ *
+ * @param {string} props.title - Section heading.
+ * @param {Array} props.animes - List of anime objects.
+ */
 const AnimeSection = ({ title, animes }) => {
   const { t } = useTranslation()
+
+  /* =====================================================
+     SWIPER STATE
+     ===================================================== */
 
   const [swiperInstance, setSwiperInstance] = useState(null)
   const [canScrollLeft, setCanScrollLeft] = useState(false)
   const [canScrollRight, setCanScrollRight] = useState(false)
 
+  /* =====================================================
+     LOADING STATE
+     ===================================================== */
+
+  /**
+   * Displays skeleton cards when no anime data is available.
+   * Note: An empty array is treated as a loading state here,
+   * preserving the original component behavior.
+   */
   const isLoading = !animes?.length
 
-  /*
-   * Displays skeleton cards while the anime list is loading.
-   */
   const displayedAnimes = isLoading
     ? Array.from({ length: 8 }, (_, index) => index)
     : animes
 
-  /*
-   * Updates the navigation arrows according to the current
-   * Swiper position.
+  /* =====================================================
+     NAVIGATION HANDLING
+     ===================================================== */
+
+  /**
+   * Updates navigation arrow visibility according to
+   * the current Swiper position.
+   *
+   * @param {Object} swiper - Swiper instance.
    */
-  const updateNavigation = swiper => {
+  const updateNavigation = (swiper) => {
     if (!swiper || swiper.destroyed) return
 
     setCanScrollLeft(!swiper.isBeginning)
     setCanScrollRight(!swiper.isEnd)
   }
 
-  /*
-   * Moves the slider by exactly one card.
+  /**
+   * Moves the carousel by one slide.
+   *
+   * @param {'left'|'right'} direction - Navigation direction.
    */
-  const scrollSlider = direction => {
+  const scrollSlider = (direction) => {
     if (!swiperInstance || swiperInstance.destroyed) return
 
     if (direction === 'left') {
@@ -50,12 +91,17 @@ const AnimeSection = ({ title, animes }) => {
     }
   }
 
+  /* =====================================================
+     COMPONENT RENDERING
+     ===================================================== */
+
   return (
     <section className={styles.root}>
       <h2 className={styles.title}>{title}</h2>
 
       <div className={styles.sliderWrapper}>
-        {canScrollLeft && (
+        {/* PREVIOUS SLIDE BUTTON */}
+        {canScrollLeft && !isLoading && (
           <button
             type="button"
             className={`${styles.arrow} ${styles.arrowLeft}`}
@@ -66,14 +112,15 @@ const AnimeSection = ({ title, animes }) => {
           </button>
         )}
 
+        {/* ANIME CAROUSEL */}
         <Swiper
           className={styles.slider}
           spaceBetween={16}
           slidesPerView={4}
           slidesPerGroup={1}
-          watchOverflow={true}
-          grabCursor={true}
-          onSwiper={swiper => {
+          watchOverflow
+          grabCursor
+          onSwiper={(swiper) => {
             setSwiperInstance(swiper)
             updateNavigation(swiper)
           }}
@@ -113,7 +160,8 @@ const AnimeSection = ({ title, animes }) => {
           ))}
         </Swiper>
 
-        {canScrollRight && (
+        {/* NEXT SLIDE BUTTON */}
+        {canScrollRight && !isLoading && (
           <button
             type="button"
             className={`${styles.arrow} ${styles.arrowRight}`}
@@ -125,14 +173,21 @@ const AnimeSection = ({ title, animes }) => {
         )}
       </div>
 
-      <Button to="/">{t('common.showMore')}</Button>
+      {/* SHOW MORE BUTTON */}
+      <Button to="/">
+        {t('common.showMore')}
+      </Button>
     </section>
   )
 }
 
+/* =====================================================
+   PROP TYPES
+   ===================================================== */
+
 AnimeSection.propTypes = {
   title: PropTypes.string.isRequired,
-  animes: PropTypes.array.isRequired,
+  animes: PropTypes.arrayOf(PropTypes.object).isRequired,
 }
 
 export default AnimeSection

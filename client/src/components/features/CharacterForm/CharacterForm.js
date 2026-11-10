@@ -9,12 +9,79 @@
  *              Photo uploads are handled separately in EditCharacter.
  */
 
-import styles from "./CharacterForm.module.scss";
-import { useEffect } from "react";
-import { Form, Row, Col } from "react-bootstrap";
-import { useForm } from "react-hook-form";
+import styles from './CharacterForm.module.scss'
 
-import Button from "../../common/Button/Button";
+import { useEffect } from 'react'
+import { Form, Row, Col } from 'react-bootstrap'
+import { useForm } from 'react-hook-form'
+import { useTranslation } from 'react-i18next'
+import PropTypes from 'prop-types'
+
+import Button from '../../common/Button/Button'
+
+/* =====================================================
+   SPECIES OPTIONS
+   ===================================================== */
+
+/**
+ * Defines the available species grouped by category.
+ * Translation keys are used for labels, while values remain unchanged
+ * to preserve compatibility with the API.
+ */
+const speciesGroups = [
+  {
+    key: 'common',
+    options: [
+      'Human', 'Demon', 'Angel', 'Elf', 'Dark Elf', 'Dwarf',
+      'Beastkin', 'Animal', 'Monster', 'Dragon', 'Dragonkin',
+      'Vampire', 'Werewolf', 'Spirit', 'Ghost', 'God', 'Goddess',
+      'Demi-God', 'Fairy', 'Witch', 'Wizard', 'Undead', 'Skeleton',
+      'Zombie', 'Slime', 'Golem', 'Doll', 'Robot', 'Alien', 'Cyborg',
+      'Artificial Human', 'Mermaid', 'Merman', 'Nekomata', 'Kitsune',
+      'Oni', 'Tengu', 'Kappa', 'Yokai', 'Shinigami', 'Homunculus',
+      'Succubus', 'Incubus', 'Phoenix', 'Leviathan', 'Titan', 'Giant',
+      'Cyclops', 'Ogre', 'Orc', 'Goblin', 'Troll', 'Lizardman',
+      'Merfolk', 'Plant', 'Living Armor', 'Eldritch Being',
+    ],
+  },
+  {
+    key: 'humanHybrids',
+    options: [
+      'Human/Demon', 'Human/Angel', 'Human/Elf', 'Human/Dark Elf',
+      'Human/Dragon', 'Human/Dragonkin', 'Human/Beastkin',
+      'Human/Vampire', 'Human/Werewolf', 'Human/Spirit', 'Human/God',
+      'Human/Fairy', 'Human/Monster', 'Human/Alien', 'Human/Youkai',
+      'Human/Artificial',
+    ],
+  },
+  {
+    key: 'otherHybrids',
+    options: [
+      'Demon/Angel', 'Elf/Dragon', 'Elf/Beastkin', 'Demon/Dragon',
+      'Demon/Vampire', 'Angel/God', 'Beastkin/Dragon',
+      'Vampire/Werewolf', 'Monster/Human', 'Multiple Species',
+    ],
+  },
+  {
+    key: 'specialCases',
+    options: [
+      'Reincarnated Being', 'Transformed Human', 'Possessed Human',
+      'Unknown', 'Other',
+    ],
+  },
+]
+
+/**
+ * Converts a species value into its corresponding translation key.
+ *
+ * @param {string} value - Original species value.
+ * @returns {string} Translation key suffix.
+ */
+const getSpeciesTranslationKey = (value) =>
+  value
+    .toLowerCase()
+    .replace(/[^a-z0-9]+/g, '_')
+    .replace(/^_|_$/g, '')
 
 /* =====================================================
    CHARACTER FORM COMPONENT
@@ -27,18 +94,20 @@ import Button from "../../common/Button/Button";
  * @param {Object|null} props.character - Character being edited.
  * @param {string} props.animeId - Parent anime ID for a new character.
  * @param {Function} props.onSubmit - Receives the validated payload.
- * @param {string} props.submitText - Submit button label.
+ * @param {string} props.submitText - Optional submit button label.
  * @param {boolean} props.isSaving - Indicates an active save request.
  * @param {string} props.backTo - URL for the back button.
  */
 const CharacterForm = ({
   character = null,
-  animeId = "",
+  animeId = '',
   onSubmit,
-  submitText = "Save",
+  submitText,
   isSaving = false,
-  backTo = "/",
+  backTo = '/',
 }) => {
+  const { t } = useTranslation()
+
   /* =====================================================
      FORM INITIALIZATION
      ===================================================== */
@@ -50,16 +119,16 @@ const CharacterForm = ({
     formState: { errors },
   } = useForm({
     defaultValues: {
-      firstName: "",
-      lastName: "",
-      gender: "unknown",
-      role: "side",
-      description: "",
-      species: "",
-      age: "",
-      originWorld: "",
+      firstName: '',
+      lastName: '',
+      gender: 'unknown',
+      role: 'side',
+      species: '',
+      description: '',
+      age: '',
+      originWorld: '',
     },
-  });
+  })
 
   /* =====================================================
      FORM DATA SYNCHRONIZATION
@@ -71,16 +140,16 @@ const CharacterForm = ({
    */
   useEffect(() => {
     reset({
-      firstName: character?.firstName || "",
-      lastName: character?.lastName || "",
-      gender: character?.gender || "unknown",
-      role: character?.role || "side",
-      description: character?.description || "",
-      species: character?.species || "",
-      age: character?.age ?? "",
-      originWorld: character?.originWorld || "",
-    });
-  }, [character, reset]);
+      firstName: character?.firstName || '',
+      lastName: character?.lastName || '',
+      gender: character?.gender || 'unknown',
+      role: character?.role || 'side',
+      species: character?.species || '',
+      description: character?.description || '',
+      age: character?.age ?? '',
+      originWorld: character?.originWorld || '',
+    })
+  }, [character, reset])
 
   /* =====================================================
      FORM SUBMISSION
@@ -89,34 +158,37 @@ const CharacterForm = ({
   /**
    * Adds the parent anime ID to the payload.
    * No photo is included in this request.
+   *
+   * @param {Object} data - Validated form data.
    */
-  const handleFormSubmit = async data => {
+  const handleFormSubmit = async (data) => {
     const assignedAnimeId =
       animeId ||
-      (typeof character?.anime === "object"
+      (typeof character?.anime === 'object'
         ? character.anime?._id
-        : character?.anime);
+        : character?.anime)
 
     if (!assignedAnimeId) {
-      console.error("CharacterForm requires an anime ID.");
-      return;
+      console.error('CharacterForm requires an anime ID.')
+      return
+    }
+
+    if (typeof onSubmit !== 'function') {
+      console.error('CharacterForm requires an onSubmit function.')
+      return
     }
 
     const payload = {
       ...data,
       anime: assignedAnimeId,
-      age: data.age === "" || data.age === undefined
-        ? undefined
-        : Number(data.age),
-    };
-
-    if (typeof onSubmit !== "function") {
-      console.error("CharacterForm requires an onSubmit function.");
-      return;
+      age:
+        data.age === '' || data.age === undefined
+          ? undefined
+          : Number(data.age),
     }
 
-    await onSubmit(payload);
-  };
+    await onSubmit(payload)
+  }
 
   /* =====================================================
      FORM RENDERING
@@ -129,22 +201,22 @@ const CharacterForm = ({
     >
       {/* FIRST NAME */}
       <Form.Group className="mb-3">
-        <Form.Label>First name *</Form.Label>
+        <Form.Label>{t('characterForm.firstName')} *</Form.Label>
 
         <Form.Control
-          {...register("firstName", {
-            required: "First name is required.",
+          {...register('firstName', {
+            required: t('characterForm.validation.firstNameRequired'),
             minLength: {
               value: 2,
-              message: "First name must have at least 2 characters.",
+              message: t('characterForm.validation.firstNameMinLength'),
             },
             maxLength: {
               value: 60,
-              message: "First name cannot exceed 60 characters.",
+              message: t('characterForm.validation.firstNameMaxLength'),
             },
           })}
           isInvalid={!!errors.firstName}
-          placeholder="Enter first name"
+          placeholder={t('characterForm.placeholders.firstName')}
         />
 
         <Form.Control.Feedback type="invalid">
@@ -154,17 +226,17 @@ const CharacterForm = ({
 
       {/* LAST NAME */}
       <Form.Group className="mb-3">
-        <Form.Label>Last name</Form.Label>
+        <Form.Label>{t('characterForm.lastName')}</Form.Label>
 
         <Form.Control
-          {...register("lastName", {
+          {...register('lastName', {
             maxLength: {
               value: 60,
-              message: "Last name cannot exceed 60 characters.",
+              message: t('characterForm.validation.lastNameMaxLength'),
             },
           })}
           isInvalid={!!errors.lastName}
-          placeholder="Enter last name"
+          placeholder={t('characterForm.placeholders.lastName')}
         />
 
         <Form.Control.Feedback type="invalid">
@@ -174,17 +246,23 @@ const CharacterForm = ({
 
       {/* GENDER */}
       <Form.Group className="mb-3">
-        <Form.Label>Gender *</Form.Label>
+        <Form.Label>{t('characterForm.gender')} *</Form.Label>
 
         <Form.Select
-          {...register("gender", {
-            required: "Choose a gender value.",
+          {...register('gender', {
+            required: t('characterForm.validation.genderRequired'),
           })}
           isInvalid={!!errors.gender}
         >
-          <option value="unknown">Unknown</option>
-          <option value="male">Male</option>
-          <option value="female">Female</option>
+          <option value="unknown">
+            {t('characterForm.genderOptions.unknown')}
+          </option>
+          <option value="male">
+            {t('characterForm.genderOptions.male')}
+          </option>
+          <option value="female">
+            {t('characterForm.genderOptions.female')}
+          </option>
         </Form.Select>
 
         <Form.Control.Feedback type="invalid">
@@ -194,17 +272,23 @@ const CharacterForm = ({
 
       {/* CHARACTER ROLE */}
       <Form.Group className="mb-3">
-        <Form.Label>Character role *</Form.Label>
+        <Form.Label>{t('characterForm.role')} *</Form.Label>
 
         <Form.Select
-          {...register("role", {
-            required: "Choose a character role.",
+          {...register('role', {
+            required: t('characterForm.validation.roleRequired'),
           })}
           isInvalid={!!errors.role}
         >
-          <option value="main">Main</option>
-          <option value="support">Support</option>
-          <option value="side">Side</option>
+          <option value="main">
+            {t('characterForm.roleOptions.main')}
+          </option>
+          <option value="support">
+            {t('characterForm.roleOptions.support')}
+          </option>
+          <option value="side">
+            {t('characterForm.roleOptions.side')}
+          </option>
         </Form.Select>
 
         <Form.Control.Feedback type="invalid">
@@ -214,119 +298,32 @@ const CharacterForm = ({
 
       {/* SPECIES */}
       <Form.Group className="mb-3">
-        <Form.Label>Species *</Form.Label>
+        <Form.Label>{t('characterForm.species')} *</Form.Label>
 
         <Form.Select
-          {...register("species", {
-            required: "Choose a character species.",
+          {...register('species', {
+            required: t('characterForm.validation.speciesRequired'),
           })}
           isInvalid={!!errors.species}
         >
-          <option value="">-- choose species --</option>
+          <option value="">
+            {t('characterForm.speciesPlaceholder')}
+          </option>
 
-          {/* COMMON SPECIES */}
-          <optgroup label="Common species">
-            <option value="Human">Human</option>
-            <option value="Demon">Demon</option>
-            <option value="Angel">Angel</option>
-            <option value="Elf">Elf</option>
-            <option value="Dark Elf">Dark Elf</option>
-            <option value="Dwarf">Dwarf</option>
-            <option value="Beastkin">Beastkin</option>
-            <option value="Animal">Animal</option>
-            <option value="Monster">Monster</option>
-            <option value="Dragon">Dragon</option>
-            <option value="Dragonkin">Dragonkin</option>
-            <option value="Vampire">Vampire</option>
-            <option value="Werewolf">Werewolf</option>
-            <option value="Spirit">Spirit</option>
-            <option value="Ghost">Ghost</option>
-            <option value="God">God / Deity</option>
-            <option value="Goddess">Goddess</option>
-            <option value="Demi-God">Demi-God</option>
-            <option value="Fairy">Fairy</option>
-            <option value="Witch">Witch</option>
-            <option value="Wizard">Wizard / Mage</option>
-            <option value="Undead">Undead</option>
-            <option value="Skeleton">Skeleton</option>
-            <option value="Zombie">Zombie</option>
-            <option value="Slime">Slime</option>
-            <option value="Golem">Golem</option>
-            <option value="Doll">Doll / Puppet</option>
-            <option value="Robot">Robot / Android</option>
-            <option value="Alien">Alien</option>
-            <option value="Cyborg">Cyborg</option>
-            <option value="Artificial Human">Artificial Human</option>
-            <option value="Mermaid">Mermaid</option>
-            <option value="Merman">Merman</option>
-            <option value="Nekomata">Nekomata</option>
-            <option value="Kitsune">Kitsune</option>
-            <option value="Oni">Oni</option>
-            <option value="Tengu">Tengu</option>
-            <option value="Kappa">Kappa</option>
-            <option value="Yokai">Yōkai</option>
-            <option value="Shinigami">Shinigami</option>
-            <option value="Homunculus">Homunculus</option>
-            <option value="Succubus">Succubus</option>
-            <option value="Incubus">Incubus</option>
-            <option value="Phoenix">Phoenix</option>
-            <option value="Leviathan">Leviathan</option>
-            <option value="Titan">Titan</option>
-            <option value="Giant">Giant</option>
-            <option value="Cyclops">Cyclops</option>
-            <option value="Ogre">Ogre</option>
-            <option value="Orc">Orc</option>
-            <option value="Goblin">Goblin</option>
-            <option value="Troll">Troll</option>
-            <option value="Lizardman">Lizardman</option>
-            <option value="Merfolk">Merfolk</option>
-            <option value="Plant">Plant-based being</option>
-            <option value="Living Armor">Living Armor</option>
-            <option value="Eldritch Being">Eldritch Being</option>
-          </optgroup>
-
-          {/* HUMAN HYBRIDS */}
-          <optgroup label="Human hybrids">
-            <option value="Human/Demon">Human / Demon</option>
-            <option value="Human/Angel">Human / Angel</option>
-            <option value="Human/Elf">Human / Elf</option>
-            <option value="Human/Dark Elf">Human / Dark Elf</option>
-            <option value="Human/Dragon">Human / Dragon</option>
-            <option value="Human/Dragonkin">Human / Dragonkin</option>
-            <option value="Human/Beastkin">Human / Beastkin</option>
-            <option value="Human/Vampire">Human / Vampire</option>
-            <option value="Human/Werewolf">Human / Werewolf</option>
-            <option value="Human/Spirit">Human / Spirit</option>
-            <option value="Human/God">Human / God</option>
-            <option value="Human/Fairy">Human / Fairy</option>
-            <option value="Human/Monster">Human / Monster</option>
-            <option value="Human/Alien">Human / Alien</option>
-            <option value="Human/Youkai">Human / Yōkai</option>
-            <option value="Human/Artificial">Human / Artificial being</option>
-          </optgroup>
-
-          {/* OTHER HYBRIDS */}
-          <optgroup label="Other hybrids">
-            <option value="Demon/Angel">Demon / Angel</option>
-            <option value="Elf/Dragon">Elf / Dragon</option>
-            <option value="Elf/Beastkin">Elf / Beastkin</option>
-            <option value="Demon/Dragon">Demon / Dragon</option>
-            <option value="Demon/Vampire">Demon / Vampire</option>
-            <option value="Angel/God">Angel / God</option>
-            <option value="Beastkin/Dragon">Beastkin / Dragon</option>
-            <option value="Vampire/Werewolf">Vampire / Werewolf</option>
-            <option value="Monster/Human">Monster / Human</option>
-            <option value="Multiple Species">Multiple species</option>
-          </optgroup>
-
-          {/* SPECIAL CASES */}
-          <optgroup label="Special cases">
-            <option value="Reincarnated Being">Reincarnated being</option>
-            <option value="Transformed Human">Transformed human</option>
-            <option value="Possessed Human">Possessed human</option>
-            <option value="Unknown">Unknown</option>
-            <option value="Other">Other</option>
-          </optgroup>
+          {speciesGroups.map((group) => (
+            <optgroup
+              key={group.key}
+              label={t(`characterForm.speciesGroups.${group.key}`)}
+            >
+              {group.options.map((species) => (
+                <option key={species} value={species}>
+                  {t(
+                    `characterForm.speciesOptions.${getSpeciesTranslationKey(species)}`
+                  )}
+                </option>
+              ))}
+            </optgroup>
+          ))}
         </Form.Select>
 
         <Form.Control.Feedback type="invalid">
@@ -334,31 +331,30 @@ const CharacterForm = ({
         </Form.Control.Feedback>
       </Form.Group>
 
-
       {/* AGE */}
       <Form.Group className="mb-3">
-        <Form.Label>Age</Form.Label>
+        <Form.Label>{t('characterForm.age')}</Form.Label>
 
         <Form.Control
           type="number"
-          {...register("age", {
-            setValueAs: value =>
-              value === "" ? undefined : Number(value),
+          {...register('age', {
+            setValueAs: (value) =>
+              value === '' ? undefined : Number(value),
             min: {
               value: 0,
-              message: "Age cannot be negative.",
+              message: t('characterForm.validation.ageMin'),
             },
             max: {
               value: 10000,
-              message: "Age cannot exceed 10000.",
+              message: t('characterForm.validation.ageMax'),
             },
-            validate: value =>
+            validate: (value) =>
               value === undefined ||
               Number.isInteger(value) ||
-              "Enter a whole number.",
+              t('characterForm.validation.ageInteger'),
           })}
           isInvalid={!!errors.age}
-          placeholder="Enter age"
+          placeholder={t('characterForm.placeholders.age')}
         />
 
         <Form.Control.Feedback type="invalid">
@@ -368,17 +364,17 @@ const CharacterForm = ({
 
       {/* ORIGIN WORLD */}
       <Form.Group className="mb-3">
-        <Form.Label>Origin world</Form.Label>
+        <Form.Label>{t('characterForm.originWorld')}</Form.Label>
 
         <Form.Control
-          {...register("originWorld", {
+          {...register('originWorld', {
             maxLength: {
               value: 100,
-              message: "Origin world cannot exceed 100 characters.",
+              message: t('characterForm.validation.originWorldMaxLength'),
             },
           })}
           isInvalid={!!errors.originWorld}
-          placeholder="Enter origin world or universe"
+          placeholder={t('characterForm.placeholders.originWorld')}
         />
 
         <Form.Control.Feedback type="invalid">
@@ -388,19 +384,19 @@ const CharacterForm = ({
 
       {/* DESCRIPTION */}
       <Form.Group className="mb-3">
-        <Form.Label>Description / biography</Form.Label>
+        <Form.Label>{t('characterForm.description')}</Form.Label>
 
         <Form.Control
           as="textarea"
           rows={5}
-          {...register("description", {
+          {...register('description', {
             maxLength: {
               value: 5000,
-              message: "Description cannot exceed 5000 characters.",
+              message: t('characterForm.validation.descriptionMaxLength'),
             },
           })}
           isInvalid={!!errors.description}
-          placeholder="Enter character description"
+          placeholder={t('characterForm.placeholders.description')}
         />
 
         <Form.Control.Feedback type="invalid">
@@ -411,17 +407,34 @@ const CharacterForm = ({
       {/* FORM ACTIONS */}
       <Row className="mt-4">
         <Col>
-          <Button to={backTo}>Back</Button>
+          <Button to={backTo}>
+            {t('characterForm.back')}
+          </Button>
         </Col>
 
         <Col className="text-end">
           <Button type="submit" active={!isSaving}>
-            {isSaving ? "Saving..." : submitText}
+            {isSaving
+              ? t('characterForm.saving')
+              : submitText || t('common.save')}
           </Button>
         </Col>
       </Row>
     </Form>
-  );
-};
+  )
+}
 
-export default CharacterForm;
+/* =====================================================
+   PROP TYPES
+   ===================================================== */
+
+CharacterForm.propTypes = {
+  character: PropTypes.object,
+  animeId: PropTypes.string,
+  onSubmit: PropTypes.func.isRequired,
+  submitText: PropTypes.string,
+  isSaving: PropTypes.bool,
+  backTo: PropTypes.string,
+}
+
+export default CharacterForm
