@@ -49,8 +49,7 @@ import { useMessage } from '../../../context/MessageContext'
    ===================================================== */
 
 import noImage from '../../../assets/no-image.png'
-
-import CharacterCard from '../../features/CharacterCard/CharacterCard'
+import CharacterSection from '../../features/CharacterSection/CharacterSection'
 import SeasonCard from '../../features/SeasonCard/SeasonCard'
 import ReviewCard from '../../features/ReviewCard/ReviewCard'
 
@@ -757,21 +756,10 @@ const Anime = () => {
         )}
 
         {/* Anime characters */}
-        <section className={styles.charactersSection}>
-          <h2>{t('anime.characters')}</h2>
-
-          <div className={styles.characters}>
-            {selectedAnime.characters?.length > 0 ? (
-              selectedAnime.characters.map(character => (
-                <div key={character._id}>
-                  <CharacterCard character={character} />
-                </div>
-              ))
-            ) : (
-              <p>{t('anime.noCharacters')}</p>
-            )}
-          </div>
-        </section>
+        <CharacterSection
+          title={t('anime.characters')}
+          characters={selectedAnime.characters || []}
+        />
 
         {/* Anime seasons */}
         <section className={styles.seasonsSection}>
@@ -791,7 +779,7 @@ const Anime = () => {
         {/* Anime reviews */}
         <section className={styles.reviewsSection}>
           <h2>{t('anime.reviews')}</h2>
-                
+
           {selectedAnime.reviews?.length > 0 ? (
             <div className={styles.reviewsList}>
               {selectedAnime.reviews.map(review => (

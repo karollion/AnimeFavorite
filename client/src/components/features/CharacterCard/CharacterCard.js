@@ -5,13 +5,12 @@
 
 /**
  * @file CharacterCard.js
- * @description Displays a character card with basic information
- *              and a link to the character details page.
+ * @description Displays a character card with an image, role,
+ *              name and a link to the character details page.
  */
 
 import styles from './CharacterCard.module.scss'
 
-import { Col } from 'react-bootstrap'
 import { Link } from 'react-router-dom'
 import { useTranslation } from 'react-i18next'
 import PropTypes from 'prop-types'
@@ -24,7 +23,7 @@ import noImage from '../../../assets/no-image.png'
 
 /**
  * @component
- * @description Renders a character's image and basic information.
+ * @description Renders a clickable character card.
  *
  * @param {Object} props.character - Character data.
  */
@@ -35,8 +34,13 @@ const CharacterCard = ({ character }) => {
      DISPLAY VALUES
      ===================================================== */
 
+  const firstName = character.firstName || ''
+  const lastName = character.lastName || ''
+
+  const fullName = `${firstName} ${lastName}`.trim() || '—'
+
   /**
-   * Translates character role and gender values.
+   * Translates the character role.
    * Falls back to the original value if no translation exists.
    */
   const role = character.role
@@ -46,39 +50,53 @@ const CharacterCard = ({ character }) => {
     : '—'
 
   /* =====================================================
+     IMAGE HANDLING
+     ===================================================== */
+
+  /**
+   * Replaces the character image with a fallback
+   * if the original image cannot be loaded.
+   *
+   * @param {Event} event - Image error event.
+   */
+  const handleImageError = (event) => {
+    event.currentTarget.onerror = null
+    event.currentTarget.src = noImage
+  }
+
+  /* =====================================================
      COMPONENT RENDERING
      ===================================================== */
 
   return (
-    <Col xs="12" sm="6" md="3" lg="2" className="mb-4">
-      <div className={styles.card}>
+    <Link
+      to={`/character/${character._id}`}
+      className={styles.cardLink}
+      aria-label={t('characterCard.openCharacter', {
+        name: fullName,
+      })}
+    >
+      <article className={styles.card}>
         {/* CHARACTER IMAGE */}
-        <div
-          className={styles.img}
-          role="img"
-          aria-label={t('characterCard.imageAlt', {
-            name: character.firstName,
-          })}
-          style={{
-            backgroundImage: `url(${character.photo || noImage})`,
-          }}
-        />
-
-        {/* CHARACTER INFORMATION */}
-        <div className={styles.top}>
-          <p>{character.firstName || '—'}</p>
-          <p>{role}</p>
+        <div className={styles.imageWrapper}>
+          <img
+            src={character.photo || noImage}
+            alt={t('characterCard.imageAlt', {
+              name: fullName,
+            })}
+            className={styles.image}
+            onError={handleImageError}
+            loading="lazy"
+          />
         </div>
-      </div>
 
-      {/* CHARACTER DETAILS LINK */}
-      <Link
-        to={`/character/${character._id}`}
-        className={styles.btn}
-      >
-        {character.firstName || t('characterCard.details')}
-      </Link>
-    </Col>
+        {/* CHARACTER ROLE */}
+        <p className={styles.role}>{role}</p>
+
+        {/* CHARACTER NAME */}
+        <h3 className={styles.name}>{fullName}</h3>
+      </article>
+    </Link>
   )
 }
 

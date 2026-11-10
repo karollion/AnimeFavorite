@@ -553,6 +553,7 @@
     }
   },
   "characterCard": {
+    "openCharacter": "Open character: {{name}}",
     "imageAlt": "{{name}} character image",
     "details": "Character details",
     "roles": {
@@ -606,5 +607,9 @@
       "descriptionRequired": "Description is required.",
       "descriptionMinLength": "Description must have at least 10 characters."
     }
+  },
+  "characterSection": {
+    "btnLariaLabel": "Show previous characters",
+    "btnRariaLabel": "Show next characters"
   }
 }

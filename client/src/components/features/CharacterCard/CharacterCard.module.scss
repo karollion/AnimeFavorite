@@ -1,25 +1,92 @@
+
 @import '../../../styles/settings.scss';
 
+.cardLink {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  color: inherit;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color, #d98b42);
+    outline-offset: 4px;
+    border-radius: 10px;
+  }
+}
+
 .card {
-  position: relative;
+  display: flex;
+  flex-direction: column;
+  align-items: center;
+
+  width: 100%;
+  height: 100%;
+  min-width: 0;
+
+  padding: 10px;
+
+  color: var(--color-text);
+  background-color: var(--color-surface, transparent);
+
   border: 2px solid $char-card-border-color;
   border-radius: 10px;
 
-  display: flex;
-  flex-direction: column;
-  justify-content: space-between;
-  
+  transition:
+    transform 0.2s ease,
+    border-color 0.2s ease,
+    box-shadow 0.2s ease;
 
-  color: $color-light;
-
-  cursor: pointer;
-
-  .img {
-    width: 100px;
-    height: 100px;
-    overflow: hidden;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
+  &:hover {
+    transform: translateY(-4px);
+    border-color: var(--primary-color, #d98b42);
+    box-shadow: 0 4px 12px rgba(0, 0, 0, 0.2);
   }
+}
+
+.imageWrapper {
+  width: 100%;
+  aspect-ratio: 1 / 1;
+  overflow: hidden;
+
+  border-radius: 6px;
+  background-color: var(--color-surface-secondary, rgba(128, 128, 128, 0.12));
+}
+
+.image {
+  display: block;
+
+  width: 100%;
+  height: 100%;
+
+  object-fit: cover;
+  object-position: center;
+}
+
+.role {
+  margin: 0.75rem 0 0.25rem;
+
+  font-size: 0.8rem;
+  font-weight: 600;
+  text-align: center;
+
+  color: var(--color-text-muted, #888);
+}
+
+.name {
+  margin: 0;
+
+  width: 100%;
+
+  font-size: 1rem;
+  font-weight: 700;
+  text-align: center;
+
+  overflow-wrap: anywhere;
 }

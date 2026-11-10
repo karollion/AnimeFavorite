@@ -557,6 +557,7 @@
     }
   },
   "characterCard": {
+    "openCharacter": "Otwórz postać: {{name}}",
     "imageAlt": "Zdjęcie postaci {{name}}",
     "details": "Szczegóły postaci",
     "roles": {
@@ -610,6 +611,10 @@
       "descriptionRequired": "Opis jest wymagany.",
       "descriptionMinLength": "Opis musi zawierać co najmniej 10 znaków."
     }
+  },
+  "characterSection": {
+    "btnLariaLabel": "Pokaż poprzednie postacie",
+    "btnRariaLabel": "Pokaż następne postacie"
   }
 }
 
