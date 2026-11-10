@@ -1,47 +1,79 @@
 
 /* =====================================================
-   COMPONENTS
-   ===================================================== */
-
-import styles from './SeasonCard.module.scss';
-
-import { Col } from 'react-bootstrap';
-import PropTypes from 'prop-types';
-import { useTranslation } from 'react-i18next';
-
-import noImage from '../../../assets/no-image.png';
-
-/* =====================================================
-   SEASON CARD COMPONENT
+   SEASON CARD
    ===================================================== */
 
 /**
+ * @file SeasonCard.js
+ * @description Displays a season card with its cover,
+ *              release year, rating and title.
+ */
+
+/* =====================================================
+   STYLES
+   ===================================================== */
+
+import styles from './SeasonCard.module.scss'
+
+/* =====================================================
+   DEPENDENCIES
+   ===================================================== */
+
+import PropTypes from 'prop-types'
+import { useTranslation } from 'react-i18next'
+
+/* =====================================================
+   ASSETS
+   ===================================================== */
+
+import noImage from '../../../assets/no-image.png'
+import { Link } from 'react-router-dom'
+
+/* =====================================================
+   COMPONENT
+   ===================================================== */
+
+/**
+ * Displays basic season information.
+ *
  * @component
- * @description Displays information about an anime season,
- *              including its cover, title, episode count,
- *              rating and release details.
- *
  * @param {Object} props - Component properties.
- * @param {Object} props.season - Season data to display.
- *
- * @returns {JSX.Element} The rendered season card.
+ * @param {Object} props.season - Season data.
+ * @returns {JSX.Element} The season card.
  */
 const SeasonCard = ({ season }) => {
-  const { t } = useTranslation();
+  const { t } = useTranslation()
 
   /* =====================================================
-     COMPONENT DATA
+     IMAGE HANDLING
      ===================================================== */
 
-  // Use a fallback image when the season cover is unavailable.
-  const cover = season.season_cover || noImage;
+  /**
+   * Replaces a missing or unavailable season cover
+   * with the default placeholder image.
+   *
+   * Prevents an infinite error loop if the fallback
+   * image is also unavailable.
+   *
+   * @param {React.SyntheticEvent<HTMLImageElement>} event
+   */
+  const handleImageError = (event) => {
+    event.currentTarget.onerror = null
+    event.currentTarget.src = noImage
+  }
 
+  /* =====================================================
+     RELEASE YEAR
+     ===================================================== */
 
   /**
-   * Returns a formatted date in MM.YYYYr. format.
+   * Extracts the release year from a date value.
    * Returns an em dash when the date is missing or invalid.
+   *
+   * @param {string|Date} date - Season release date.
+   * @returns {string|number} Release year or fallback value.
    */
-  const formatReleaseDate = (date) => {
+  const getReleaseYear = (date) => {
     if (!date) return '—'
 
     const parsedDate = new Date(date)
@@ -50,81 +82,69 @@ const SeasonCard = ({ season }) => {
       return '—'
     }
 
-    const month = String(parsedDate.getMonth() + 1).padStart(2, '0')
-    const year = parsedDate.getFullYear()
-
-    return `${month}.${year}r.`
+    return parsedDate.getFullYear()
   }
-
-  /**
-   * Returns a display value or an em dash when the value is empty.
-   */
-  const getDisplayValue = (value) => {
-    return value !== null && value !== undefined && value !== ''
-      ? value
-      : '—'
-  }
-
 
   /* =====================================================
-     CARD LAYOUT
+     DISPLAY VALUES
+     ===================================================== */
+
+  const title = season.title || t('seasonCard.unknownTitle')
+  const rating = season.rating ?? '—'
+  const releaseYear = getReleaseYear(season.release_date)
+
+  /* =====================================================
+     RENDER
      ===================================================== */
 
   return (
-    <Col xs="12" sm="6" md="3" lg="2" className="mb-4">
-      <div className={styles.card}>
-
+    <Link
+      to={`/seasons/${season._id}`}
+      className={styles.cardLink}
+      aria-label={t('seasonCard.openSeason', {
+        name: title,
+      })}
+    >
+      <article className={styles.card}>
         {/* Season cover */}
-        <div
+        <img
+          src={season.season_cover || noImage}
+          alt={t('seasonCard.coverAlt', { title })}
           className={styles.img}
-          style={{
-            backgroundImage: `url(${cover})`,
-          }}
+          onError={handleImageError}
+          loading="lazy"
         />
 
-        {/* Season information */}
-        <div className={styles.top}>
+        {/* Season information panel */}
+        <div className={styles.infoPanel}>
+          {/* Release year and rating */}
+          <div className={styles.top}>
+            <span
+              className={styles.releaseYear}
+              title={t('seasonCard.releaseYear')}
+            >
+              {releaseYear}
+            </span>
 
-          <p>
-            {t('seasonCard.seasonNumber')}{' '}
-            {getDisplayValue(season.season_number)}
-          </p>
+            <span
+              className={styles.rating}
+              title={t('seasonCard.rating')}
+            >
+              {rating}
+            </span>
+          </div>
 
-          <p>
-            {t('seasonCard.title')}{' '}
-            {getDisplayValue(season.title)}
-          </p>
-
-          <p>
-            {t('seasonCard.episodesCount')}{' '}
-            {getDisplayValue(season.episodes_count)}
-          </p>
-
-          <p>
-            {t('seasonCard.rating')}{' '}
-            {getDisplayValue(season.rating)}
-          </p>
-
-          <p>
-            {t('seasonCard.year')}{' '}
-            {getDisplayValue(season.year)}
-          </p>
-
-          <p>
-            {t('seasonCard.releaseDate')} 
-            {formatReleaseDate(season.release_date)}
-          </p>
-
-          <p>
-            {t('seasonCard.notes')}{' '}
-            {getDisplayValue(season.notes)}
-          </p>
-
+          {/* Season title */}
+          <div className={styles.bottom}>
+            <h3 className={styles.seasonTitle}>
+              {title}
+            </h3>
+          </div>
         </div>
-      </div>
-    </Col>
-  );
-};
+      </article>
+    </Link>
+  )
+}
 
 /* =====================================================
    PROP TYPES
@@ -132,6 +152,6 @@ const SeasonCard = ({ season }) => {
 
 SeasonCard.propTypes = {
   season: PropTypes.object.isRequired,
-};
+}
 
-export default SeasonCard;
+export default SeasonCard

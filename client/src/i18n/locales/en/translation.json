@@ -353,6 +353,7 @@
     "saveFailed": "Failed to add anime."
   },
   "seasonCard": {
+    "openSeason": "Open season: {{name}}",
     "seasonNumber": "Season number:",
     "title": "Title:",
     "episodesCount": "Number of episodes:",

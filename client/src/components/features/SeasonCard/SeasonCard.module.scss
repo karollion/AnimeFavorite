@@ -1,25 +1,133 @@
+
 @import '../../../styles/settings.scss';
+
+.cardLink {
+  display: block;
+  width: 100%;
+  height: 100%;
+
+  color: inherit;
+  text-decoration: none;
+
+  &:hover,
+  &:focus-visible {
+    text-decoration: none;
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color, #d98b42);
+    outline-offset: 4px;
+    border-radius: 10px;
+  }
+}
 
 .card {
   position: relative;
-  border: 2px solid $season-card-border-color;
-  border-radius: 10px;
+
+  width: 100%;
+  aspect-ratio: 2 / 3;
+
+  overflow: hidden;
+  border-radius: 12px;
+
+  transition: box-shadow 0.3s ease;
+
+  &:hover {
+    box-shadow:
+      0 0 12px rgba(255, 255, 255, 0.15),
+      0 0 24px rgba(255, 255, 255, 0.10);
+  }
+}
+
+/* Season cover */
+
+.img {
+  position: absolute;
+  z-index: 1;
+
+  width: 100%;
+  height: 100%;
+
+  left: 0;
+  top: 0;
+
+  object-fit: cover;
+  object-position: center;
+
+  pointer-events: none;
+}
+
+/* Information panel */
+
+.infoPanel {
+  position: absolute;
+  z-index: 2;
+
+  left: 0;
+  bottom: 0;
+
+  width: 100%;
+  min-height: 82px;
+  box-sizing: border-box;
+
+  padding: 8px 10px;
 
   display: flex;
   flex-direction: column;
   justify-content: space-between;
-  
 
-  color: $color-light;
+  background: rgba(0, 0, 0, 0.55);
+  backdrop-filter: blur(3px);
+}
 
-  cursor: pointer;
+/* Release year and rating */
 
-  .img {
-    width: 100px;
-    height: 100px;
-    overflow: hidden;
-    background-size: cover;
-    background-position: center;
-    background-repeat: no-repeat;
-  }
+.top {
+  width: 100%;
+  min-height: 18px;
+
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 5px;
+
+  color: blanchedalmond;
+  font-size: 0.85rem;
+  font-weight: 600;
+}
+
+.releaseYear,
+.rating {
+  white-space: nowrap;
+}
+
+/* Season title */
+
+.bottom {
+  width: 100%;
+  min-height: 36px;
+
+  display: flex;
+  justify-content: center;
+  align-items: center;
+}
+
+.seasonTitle {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 2;
+
+  overflow: hidden;
+
+  width: 100%;
+  max-height: 36px;
+  margin: 0;
+
+  color: blanchedalmond;
+  font-size: 1rem;
+  font-weight: 600;
+  text-align: center;
+
+  line-height: 18px;
+  overflow-wrap: anywhere;
 }

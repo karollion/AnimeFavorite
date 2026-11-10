@@ -110,6 +110,7 @@ const Home = () => {
       </Container>
       
       <section>
+        <p>!!! Dodac strone sezonu i dac linka do niej w karcie sezonu w anime</p>
         <p>!!! Dokonczyć tłumaczenia wszystkich stron, i przerabianie motywów wszsystkich scss !!!</p>
         <p>!!! Zrobic podstrony do sekcji w home po kliknieciu pokaz wiecej !!!</p>
         <p>!!! Sprawdzic rewiew i season rating i ich powiazania , chyba trzeba dodac rating sezonu!!!</p>

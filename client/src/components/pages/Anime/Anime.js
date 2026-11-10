@@ -50,11 +50,11 @@ import { useMessage } from '../../../context/MessageContext'
 
 import noImage from '../../../assets/no-image.png'
 import CharacterSection from '../../features/CharacterSection/CharacterSection'
-import SeasonCard from '../../features/SeasonCard/SeasonCard'
 import ReviewCard from '../../features/ReviewCard/ReviewCard'
 
 import Container from '../../common/container/Container'
 import Button from '../../common/Button/Button'
+import SeasonSection from '../../features/SeasonSection/SeasonSection'
 
 /* =====================================================
    HELPER FUNCTIONS
@@ -762,19 +762,10 @@ const Anime = () => {
         />
 
         {/* Anime seasons */}
-        <section className={styles.seasonsSection}>
-          <h2>{t('anime.seasons')}</h2>
-
-          {selectedAnime.seasons?.length > 0 ? (
-            selectedAnime.seasons.map(season => (
-              <div key={season._id}>
-                <SeasonCard season={season} />
-              </div>
-            ))
-          ) : (
-            <p>{t('anime.noSeasons')}</p>
-          )}
-        </section>
+        <SeasonSection
+          title={t('anime.seasons')}
+          seasons={selectedAnime.seasons || []}
+        />
 
         {/* Anime reviews */}
         <section className={styles.reviewsSection}>
