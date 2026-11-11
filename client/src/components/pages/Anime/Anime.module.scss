@@ -1,152 +1,661 @@
+
 @import '../../../styles/settings.scss';
 
+/* =====================================================
+   ROOT
+   ===================================================== */
+
 .root {
-	min-height: 100vh;
-	//background-color: $homePage-bg-color;
-	color: var(--color-text);
+  min-height: 100vh;
+  color: var(--color-text);
+}
 
-	.img {
-		height: $anime-card-height;
-  		width: $anime-card-width;
-	}
+/* =====================================================
+   MAIN ANIME DETAILS LAYOUT
+   ===================================================== */
 
-	/* =====================================================
-	   USER ANIME LIST
-	   ===================================================== */
-	
-	.userAnime {
-	  display: flex;
-	  flex-direction: column;
-	  align-items: flex-start;
-	  gap: 10px;
-	  margin: 24px 0;
-	
-	  h2 {
-	    margin-bottom: 4px;
-	  }
-	}
-	
-	.statusSelect {
-	  width: 100%;
-	  max-width: 320px;
-	  padding: 10px;
-	  border: 1px solid #ccc;
-	  border-radius: 6px;
-	  background: inherit;
-	  color: inherit;
-	}
-	
-	.favoriteButton {
-	  padding: 10px 16px;
-	  border: 1px solid #d9534f;
-	  border-radius: 6px;
-	  background: transparent;
-	  color: #d9534f;
-	  cursor: pointer;
-	
-	  &:hover:not(:disabled) {
-	    background: #d9534f;
-	    color: white;
-	  }
-  
-	  &:disabled {
-	    cursor: not-allowed;
-	    opacity: 0.6;
-	  }
-	}
+.animeDetails {
+  display: grid;
+  grid-template-columns:
+    minmax(190px, 0.85fr)
+    minmax(0, 2.2fr)
+    minmax(230px, 1fr);
 
-	/* =====================================================
-	   PERSONAL ANIME RATING
-	   ===================================================== */
-	
-	.ratingSection {
-	  display: flex;
-	  flex-direction: column;
-	  align-items: flex-start;
-	  gap: 8px;
-	
-	  h3 {
-	    margin: 0;
-	  }
-	}
-	
-	.ratingStars {
-	  display: flex;
-	  align-items: center;
-	  flex-wrap: wrap;
-	  gap: 2px;
-	}
-	
-	.starButton,
-	.starButtonActive {
-	  padding: 0;
-	  border: none;
-	  background: transparent;
-	  font-size: 28px;
-	  line-height: 1.2;
-	  cursor: pointer;
-	  transition: color 0.15s ease, transform 0.15s ease;
-	
-	  &:hover:not(:disabled) {
-	    transform: scale(1.15);
-	  }
-  
-	  &:disabled {
-	    cursor: not-allowed;
-	    opacity: 0.6;
-	  }
-  
-	  &:focus-visible {
-	    outline: 2px solid currentColor;
-	    outline-offset: 2px;
-	    border-radius: 3px;
-	  }
-	}
-	
-	.starButton {
-	  color: #777;
-	}
-	
-	.starButtonActive {
-	  color: #f5b301;
-	}
-	
-	.ratingValue {
-	  margin-left: 8px;
-	  font-size: 14px;
-	  white-space: nowrap;
-	}
-	
-	.clearRatingButton {
-	  padding: 5px 0;
-	  border: none;
-	  background: transparent;
-	  color: inherit;
-	  text-decoration: underline;
-	  cursor: pointer;
-	
-	  &:disabled {
-	    cursor: not-allowed;
-	    opacity: 0.6;
-	  }
-	}
+  align-items: stretch;
+  gap: 24px;
 
-	/* =====================================================
-	   REVIEWS
-	   ===================================================== */
-	
-	.reviewsSection {
-	  margin: 2rem 0;
-	
-	  h2 {
-	    margin-bottom: 1rem;
-	  }
-	}
-	
-	.reviewsList {
-	  display: flex;
-	  flex-direction: column;
-	  gap: 1rem;
-	  width: 100%;
-	}
+  margin: 24px 0 40px;
+}
+
+/* =====================================================
+   LEFT COLUMN
+   ===================================================== */
+
+.leftColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 14px;
+
+  min-width: 0;
+}
+
+/* Cover */
+
+.coverWrapper {
+  width: 100%;
+  overflow: hidden;
+
+  border: 1px solid var(--color-border, rgba(255, 255, 255, 0.2));
+  border-radius: 10px;
+  background-color: var(--color-surface-secondary, #222);
+}
+
+.cover {
+  display: block;
+
+  width: 100%;
+  aspect-ratio: 2 / 3;
+
+  object-fit: cover;
+  object-position: center;
+}
+
+/* Cover metadata */
+
+.coverMetadata {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+  gap: 10px;
+
+  min-height: 38px;
+  padding: 8px 12px;
+
+  background-color: rgba(0, 0, 0, 0.65);
+  color: #fff;
+
+  font-size: 0.85rem;
+  font-weight: 600;
+
+  span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  span:last-child {
+    text-align: right;
+  }
+}
+
+/* User controls */
+
+.userControls {
+  display: grid;
+  grid-template-columns: minmax(0, 1fr) 46px;
+  align-items: end;
+  gap: 10px;
+
+  margin-top: auto;
+  min-width: 0;
+}
+
+.statusControl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+  min-width: 0;
+
+  label {
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+}
+
+.statusSelect {
+  width: 100%;
+  min-width: 0;
+  padding: 10px;
+
+  border: 1px solid var(--color-border, #777);
+  border-radius: 6px;
+
+  background-color: var(--color-surface-secondary, transparent);
+  color: var(--color-text);
+
+  font-size: 0.9rem;
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color, #d98b42);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  option {
+    background-color: var(--color-surface, #222);
+    color: var(--color-text, #fff);
+  }
+}
+
+/* Favorite button */
+
+.favoriteButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 46px;
+  height: 42px;
+  padding: 0;
+
+  border: 1px solid var(--color-border, #777);
+  border-radius: 8px;
+
+  background-color: transparent;
+  color: #999;
+
+  font-size: 2rem;
+  line-height: 1;
+
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: #e05265;
+    border-color: #e05265;
+    transform: scale(1.05);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color, #d98b42);
+    outline-offset: 3px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.favoriteActive {
+  color: #e05265;
+  border-color: #e05265;
+  background-color: rgba(224, 82, 101, 0.08);
+}
+
+.loginMessage {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.statusMessage,
+.errorMessage {
+  grid-column: 1 / -1;
+  margin: 0;
+  font-size: 0.85rem;
+}
+
+.errorMessage {
+  color: #e05265;
+}
+
+/* =====================================================
+   MIDDLE COLUMN
+   ===================================================== */
+
+.mainColumn {
+  display: flex;
+  flex-direction: column;
+
+  min-width: 0;
+}
+
+/* Anime title */
+
+.animeHeader {
+  margin-bottom: 24px;
+
+  h1 {
+    margin: 0 0 8px;
+
+    font-size: clamp(1.7rem, 3vw, 2.5rem);
+    line-height: 1.15;
+    font-family: var(--theme-heading);
+    overflow-wrap: anywhere;
+  }
+}
+
+.originalTitle {
+  margin: 0;
+
+  color: var(--color-text-muted, #999);
+  font-size: 1rem;
+  font-style: italic;
+  overflow-wrap: anywhere;
+}
+
+/* Anime metadata */
+
+.animeMetadata {
+  display: flex;
+  flex-direction: column;
+  gap: 16px;
+
+  margin-bottom: 24px;
+}
+
+.metadataItem {
+  min-width: 0;
+
+  h3 {
+    margin: 0 0 5px;
+
+    font-size: 0.9rem;
+    font-weight: 700;
+  }
+
+  p {
+    margin: 0;
+
+    font-size: 0.95rem;
+    line-height: 1.5;
+    overflow-wrap: anywhere;
+  }
+}
+
+/* Anime description */
+
+.descriptionSection {
+  margin-bottom: 24px;
+
+  h2 {
+    margin: 0 0 10px;
+    font-size: 1.1rem;
+  }
+}
+
+.descriptionText {
+  display: -webkit-box;
+  -webkit-box-orient: vertical;
+  -webkit-line-clamp: 4;
+
+  overflow: hidden;
+
+  margin: 0;
+
+  line-height: 1.6;
+  white-space: pre-line;
+  overflow-wrap: anywhere;
+}
+
+.descriptionExpanded {
+  display: block;
+  overflow: visible;
+  -webkit-line-clamp: unset;
+}
+
+.descriptionToggle {
+  margin-top: 8px;
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  color: var(--primary-color, #d98b42);
+  font-size: 0.9rem;
+  font-weight: 600;
+
+  cursor: pointer;
+
+  &:hover {
+    text-decoration: underline;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 3px;
+    border-radius: 2px;
+  }
+}
+
+/* Administrative actions */
+
+.adminActions {
+  display: flex;
+  flex-wrap: wrap;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: auto;
+  padding-top: 16px;
+}
+
+/* =====================================================
+   RIGHT COLUMN
+   ===================================================== */
+
+.rightColumn {
+  display: flex;
+  flex-direction: column;
+  gap: 20px;
+
+  min-width: 0;
+}
+
+.ratingSummary,
+.personalRating,
+.communityStatistics {
+  min-width: 0;
+  padding-bottom: 18px;
+
+  border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.2));
+
+  h2 {
+    margin: 0 0 12px;
+    font-size: 1.05rem;
+    font-weight: 700;
+  }
+}
+
+/* Community rating */
+
+.communityRating {
+  display: flex;
+  justify-content: center;
+  align-items: flex-end;
+  gap: 20px;
+
+  strong {
+    font-size: 2rem;
+    line-height: 1.2;
+    color: var(--primary-color, #d98b42);
+
+    span {
+      margin-left: 3px;
+      font-size: 1.5rem;
+      font-weight: 400;
+      color: var(--color-text-muted, #999);
+    }
+  }
+}
+
+.ratingCount {
+  color: var(--color-text-muted, #999);
+  font-size: 1,5rem;
+}
+
+/* Personal rating */
+
+.personalRating {
+  p {
+    margin: 0;
+    font-size: 0.9rem;
+  }
+}
+
+.ratingContainer {
+  display: flex;
+  justify-content: space-between;
+  align-items: center;
+}
+
+.ratingStars {
+  display: flex;
+  align-items: center;
+  flex-wrap: wrap;
+  gap: 1px;
+}
+
+.starButton,
+.starButtonActive {
+  padding: 0;
+
+  border: none;
+  background: transparent;
+
+  font-size: 22px;
+  line-height: 1.2;
+
+  cursor: pointer;
+  transition:
+    color 0.15s ease,
+    transform 0.15s ease;
+
+  &:hover:not(:disabled) {
+    transform: scale(1.15);
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+    border-radius: 3px;
+  }
+}
+
+.starButton {
+  color: #777;
+}
+
+.starButtonActive {
+  color: #f5b301;
+}
+
+.personalRatingFooter {
+  display: flex;
+  align-items: center;
+  gap: 10px;
+
+  margin-top: 5px;
+}
+
+.ratingValue {
+  color: var(--color-text-muted, #999);
+  font-size: 0.85rem;
+}
+
+/* Remove rating button */
+
+.clearRatingButton {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  width: 28px;
+  height: 28px;
+  padding: 0;
+
+  border: none;
+  border-radius: 5px;
+
+  background: transparent;
+  color: var(--color-text-muted, #999);
+
+  font-size: 1rem;
+  cursor: pointer;
+
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: #e05265;
+    background-color: rgba(224, 82, 101, 0.1);
+  }
+
+  &:focus-visible {
+    outline: 2px solid currentColor;
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+/* Community statistics */
+
+.communityStatistics {
+  h3 {
+    margin: 16px 0 10px;
+    font-size: 0.95rem;
+  }
+}
+
+.statisticRow {
+  display: flex;
+  justify-content: space-between;
+  align-items: baseline;
+  gap: 12px;
+
+  padding: 5px 0;
+
+  font-size: 0.85rem;
+
+  span {
+    min-width: 0;
+    overflow-wrap: anywhere;
+  }
+
+  strong {
+    flex-shrink: 0;
+    font-weight: 700;
+  }
+}
+
+.watchStatistics {
+  display: flex;
+  flex-direction: column;
+}
+
+/* =====================================================
+   REVIEWS
+   ===================================================== */
+
+.reviewsSection {
+  margin: 2rem 0;
+
+  h2 {
+    margin-bottom: 1rem;
+  }
+}
+
+.reviewsList {
+  display: flex;
+  flex-direction: column;
+  gap: 1rem;
+
+  width: 100%;
+}
+
+/* =====================================================
+   HOME BUTTON
+   ===================================================== */
+
+.homeButton {
+  margin: 24px 0;
+}
+
+/* =====================================================
+   RESPONSIVE LAYOUT
+   ===================================================== */
+
+@media (max-width: 1050px) {
+  .animeDetails {
+    grid-template-columns:
+      minmax(180px, 0.8fr)
+      minmax(0, 2fr);
+  }
+
+  .rightColumn {
+    grid-column: 1 / -1;
+
+    display: grid;
+    grid-template-columns: repeat(3, minmax(0, 1fr));
+    align-items: start;
+    gap: 20px;
+  }
+
+  .ratingSummary,
+  .personalRating,
+  .communityStatistics {
+    border-bottom: none;
+    border-top: 1px solid var(--color-border, rgba(255, 255, 255, 0.2));
+    padding-top: 16px;
+  }
+}
+
+@media (max-width: 700px) {
+  .animeDetails {
+    grid-template-columns: minmax(0, 1fr);
+    gap: 24px;
+    margin-top: 16px;
+  }
+
+  .leftColumn {
+    width: 100%;
+    max-width: 360px;
+    margin: 0 auto;
+  }
+
+  .mainColumn {
+    width: 100%;
+  }
+
+  .adminActions {
+    margin-top: 20px;
+  }
+
+  .rightColumn {
+    grid-column: auto;
+
+    display: flex;
+    flex-direction: column;
+    gap: 16px;
+  }
+
+  .ratingSummary,
+  .personalRating,
+  .communityStatistics {
+    border-top: none;
+    border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.2));
+    padding-top: 0;
+  }
+}
+
+@media (max-width: 400px) {
+  .coverMetadata {
+    font-size: 0.8rem;
+  }
+
+  .favoriteButton {
+    width: 42px;
+  }
+
+  .ratingStars {
+    gap: 0;
+  }
+
+  .starButton,
+  .starButtonActive {
+    font-size: 19px;
+  }
+
+  .adminActions {
+    flex-direction: column;
+    align-items: stretch;
+  }
 }

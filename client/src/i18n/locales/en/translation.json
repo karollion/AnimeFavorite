@@ -93,6 +93,9 @@
     "sciFi": "Science Fiction"
   },
   "anime": {
+    "descriptionMore": "Show more",
+    "descriptionLess": "Show less",
+    "ratingVotes": "votes: ",
     "notFound": "Anime not found.",
     "searchPlaceholder": "Enter an anime title...",
     "noResults": "No anime found.",

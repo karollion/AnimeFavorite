@@ -1,3 +1,8 @@
+
+/* =====================================================
+   ANIME DETAILS PAGE
+   ===================================================== */
+
 /**
  * @file Anime.js
  * @description Displays detailed information about a single anime,
@@ -7,16 +12,18 @@
  *              anime and character management actions.
  */
 
+/* =====================================================
+   REACT AND ROUTER
+   ===================================================== */
+
 import { useEffect, useState } from 'react'
 import { useParams } from 'react-router-dom'
-import { useDispatch, useSelector } from 'react-redux'
-import { useTranslation } from 'react-i18next'
-
-import styles from './Anime.module.scss'
 
 /* =====================================================
-   REDUX STATE MANAGEMENT
+   REDUX
    ===================================================== */
+
+import { useDispatch, useSelector } from 'react-redux'
 
 import {
   fetchAnimeBySlug,
@@ -39,6 +46,18 @@ import {
 import { getUser } from '../../../redux/reducers/userRedux'
 
 /* =====================================================
+   INTERNATIONALIZATION
+   ===================================================== */
+
+import { useTranslation } from 'react-i18next'
+
+/* =====================================================
+   STYLES
+   ===================================================== */
+
+import styles from './Anime.module.scss'
+
+/* =====================================================
    CONTEXT
    ===================================================== */
 
@@ -49,12 +68,13 @@ import { useMessage } from '../../../context/MessageContext'
    ===================================================== */
 
 import noImage from '../../../assets/no-image.png'
+
 import CharacterSection from '../../features/CharacterSection/CharacterSection'
+import SeasonSection from '../../features/SeasonSection/SeasonSection'
 import ReviewCard from '../../features/ReviewCard/ReviewCard'
 
 import Container from '../../common/container/Container'
 import Button from '../../common/Button/Button'
-import SeasonSection from '../../features/SeasonSection/SeasonSection'
 
 /* =====================================================
    HELPER FUNCTIONS
@@ -67,7 +87,7 @@ import SeasonSection from '../../features/SeasonSection/SeasonSection'
  * @param {*} value - Value to display.
  * @returns {string | number} Displayable value or fallback.
  */
-const getDisplayValue = value => {
+const getDisplayValue = (value) => {
   if (
     value === null ||
     value === undefined ||
@@ -99,37 +119,23 @@ const Anime = () => {
      ROUTE PARAMETERS
      ===================================================== */
 
-  /**
-   * Slug identifying the anime in the current URL.
-   */
   const { slug } = useParams()
 
   /* =====================================================
-     HOOKS AND REDUX STATE
+     HOOKS
      ===================================================== */
 
   const dispatch = useDispatch()
   const { t } = useTranslation()
   const { showMessage } = useMessage()
 
-  /**
-   * Anime entity currently selected in the Redux store.
-   */
+  /* =====================================================
+     REDUX STATE
+     ===================================================== */
+
   const anime = useSelector(getSelectedAnime)
-
-  /**
-   * Indicates whether anime details are currently being loaded.
-   */
   const loading = useSelector(getAnimesLoading)
-
-  /**
-   * Error returned by the anime fetching process, if any.
-   */
   const error = useSelector(getAnimesError)
-
-  /**
-   * Currently authenticated user's data.
-   */
   const user = useSelector(getUser)
 
   /* =====================================================
@@ -140,9 +146,6 @@ const Anime = () => {
   const statsLoading = useSelector(getAnimeStatsLoading)
   const statsError = useSelector(getAnimeStatsError)
 
-  /**
-   * ID of the anime for which community statistics were fetched.
-   */
   const statsAnimeId = useSelector(
     state => state.animes.statsAnimeId
   )
@@ -162,13 +165,16 @@ const Anime = () => {
 
   /**
    * Currently hovered rating value.
-   * Used to provide visual feedback when selecting a rating.
    */
   const [ratingHover, setRatingHover] = useState(0)
 
   /**
+   * Controls whether the anime description is expanded.
+   */
+  const [descriptionExpanded, setDescriptionExpanded] = useState(false)
+
+  /**
    * Ensures that the selected anime matches the URL slug.
-   * Prevents displaying previously selected anime data.
    */
   const selectedAnime =
     anime?.slug === slug ? anime : null
@@ -179,7 +185,6 @@ const Anime = () => {
 
   /**
    * Fetches anime details whenever the URL slug changes.
-   * Skips the request if no slug is available.
    */
   useEffect(() => {
     if (!slug) return
@@ -188,7 +193,7 @@ const Anime = () => {
   }, [dispatch, slug])
 
   /**
-   * Fetches community statistics for the currently selected anime.
+   * Fetches community statistics for the selected anime.
    */
   useEffect(() => {
     if (!selectedAnime?._id) return
@@ -213,10 +218,11 @@ const Anime = () => {
   }, [dispatch, selectedAnime?._id, user])
 
   /**
-   * Resets the rating hover state when navigating to another anime.
+   * Resets local interaction states when navigating to another anime.
    */
   useEffect(() => {
     setRatingHover(0)
+    setDescriptionExpanded(false)
   }, [slug])
 
   /* =====================================================
@@ -250,6 +256,32 @@ const Anime = () => {
     userAnimeRelation?.favorite_anime === true
 
   /* =====================================================
+     COMMUNITY RATING HELPERS
+     ===================================================== */
+
+  /**
+   * Determines whether the statistics belong to the selected anime.
+   */
+  const hasCurrentStats =
+    statsAnimeId === selectedAnime?._id && stats
+
+  /**
+   * Community average rating.
+   */
+  const communityRating = hasCurrentStats
+    ? Number.isFinite(stats.ratingAvg)
+      ? stats.ratingAvg.toFixed(1)
+      : '—'
+    : selectedAnime?.rating_avg ?? '—'
+
+  /**
+   * Number of community ratings.
+   */
+  const communityRatingCount = hasCurrentStats
+    ? stats.ratingCount
+    : selectedAnime?.rating_count ?? 0
+
+  /* =====================================================
      USER INTERACTION HANDLERS
      ===================================================== */
 
@@ -258,7 +290,7 @@ const Anime = () => {
    *
    * @param {React.ChangeEvent<HTMLSelectElement>} event
    */
-  const handleStatusChange = async event => {
+  const handleStatusChange = async (event) => {
     const status = event.target.value
 
     if (!user || !selectedAnime?._id || !status) return
@@ -326,7 +358,7 @@ const Anime = () => {
    *
    * @param {number} rating - Integer rating between 1 and 10.
    */
-  const handleRatingChange = async rating => {
+  const handleRatingChange = async (rating) => {
     if (
       !user ||
       !selectedAnime?._id ||
@@ -401,12 +433,33 @@ const Anime = () => {
   }
 
   /* =====================================================
-     LOADING AND ERROR HANDLING
+     IMAGE HANDLING
      ===================================================== */
 
   /**
-   * Displays a loading message while anime details are being fetched.
+   * Replaces an unavailable anime cover with the fallback image.
+   *
+   * @param {React.SyntheticEvent<HTMLImageElement>} event
    */
+  const handleImageError = (event) => {
+    event.currentTarget.onerror = null
+    event.currentTarget.src = noImage
+  }
+
+  /* =====================================================
+     DESCRIPTION HANDLING
+     ===================================================== */
+
+  const description =
+    selectedAnime?.description_short || ''
+
+  const shouldShowDescriptionToggle =
+    description.length > 180
+
+  /* =====================================================
+     LOADING AND ERROR HANDLING
+     ===================================================== */
+
   if (loading) {
     return (
       <Container>
@@ -415,9 +468,6 @@ const Anime = () => {
     )
   }
 
-  /**
-   * Displays an error message if anime details could not be loaded.
-   */
   if (error) {
     return (
       <Container>
@@ -432,10 +482,6 @@ const Anime = () => {
     )
   }
 
-  /**
-   * Displays a not-found message when the requested anime
-   * is not available in the Redux store.
-   */
   if (!selectedAnime) {
     return (
       <Container>
@@ -456,318 +502,382 @@ const Anime = () => {
     <div className={styles.root}>
       <Container>
 
-        {/* Main anime information */}
+        {/* =====================================================
+            MAIN ANIME INFORMATION
+            ===================================================== */}
+
         <section className={styles.animeDetails}>
-          <h1>{selectedAnime.title}</h1>
 
-          {/* Anime cover */}
-          <img
-            src={selectedAnime.anime_cover || noImage}
-            alt={selectedAnime.title}
-            className={styles.img}
-          />
+          {/* LEFT COLUMN: COVER AND USER CONTROLS */}
+          <div className={styles.leftColumn}>
 
-          {/* Basic anime metadata */}
-          <p>
-            {t('anime.titleLabel')}{' '}
-            {getDisplayValue(selectedAnime.title)}
-          </p>
+            {/* Anime cover */}
+            <div className={styles.coverWrapper}>
+              <img
+                src={selectedAnime.anime_cover || noImage}
+                alt={selectedAnime.title}
+                className={styles.cover}
+                onError={handleImageError}
+              />
 
-          <p>
-            {t('anime.originalTitle')}{' '}
-            {getDisplayValue(selectedAnime.original_title)}
-          </p>
+              {/* Age rating and anime type */}
+              <div className={styles.coverMetadata}>
+                <span>
+                  {selectedAnime.age_rating != null
+                    ? `${selectedAnime.age_rating}+`
+                    : '—'}
+                </span>
 
-          <p>
-            {t('anime.ageRating')}{' '}
-            {getDisplayValue(selectedAnime.age_rating)}
-          </p>
+                <span>
+                  {getDisplayValue(selectedAnime.type)}
+                </span>
+              </div>
+            </div>
 
-          <p>
-            {t('anime.type')}{' '}
-            {getDisplayValue(selectedAnime.type)}
-          </p>
+            {/* User controls */}
+            <div className={styles.userControls}>
 
-          <p>
-            {t('anime.world')}{' '}
-            {getDisplayValue(selectedAnime.world)}
-          </p>
+              {user ? (
+                <>
+                  {/* Watch status */}
+                  <div className={styles.statusControl}>
+                    <select
+                      id="anime-status"
+                      className={styles.statusSelect}
+                      value={
+                        hasCurrentRelation
+                          ? userAnimeRelation?.status || ''
+                          : ''
+                      }
+                      onChange={handleStatusChange}
+                      disabled={userAnimeLoading}
+                    >
+                      <option value="" disabled>
+                        {t('anime.selectWatchStatus')}
+                      </option>
 
-          <p>
-            {t('anime.genres')}{' '}
-            {getDisplayValue(selectedAnime.genres)}
-          </p>
+                      <option value="not watched">
+                        {t('anime.status.notWatched')}
+                      </option>
 
-          <p>
-            {t('anime.categories')}{' '}
-            {getDisplayValue(selectedAnime.categories)}
-          </p>
+                      <option value="planned">
+                        {t('anime.status.planned')}
+                      </option>
 
-          <p>
-            {t('anime.description')}{' '}
-            {getDisplayValue(selectedAnime.description_short)}
-          </p>
-        </section>
+                      <option value="watching">
+                        {t('anime.status.watching')}
+                      </option>
 
-        {/* Community rating */}
-        <section className={styles.statistics}>
-          <h2>{t('anime.communityRating')}</h2>
+                      <option value="completed">
+                        {t('anime.status.completed')}
+                      </option>
 
-          <p>
-            {t('anime.ratingAverage')}{' '}
-            <strong>
-              {statsAnimeId === selectedAnime._id && stats
-                ? Number.isFinite(stats.ratingAvg)
-                  ? stats.ratingAvg.toFixed(1)
-                  : '—'
-                : selectedAnime.rating_avg ?? '—'}
-            </strong>
-          </p>
+                      <option value="suspended">
+                        {t('anime.status.suspended')}
+                      </option>
 
-          <p>
-            {t('anime.ratingCount')}{' '}
-            <strong>
-              {statsAnimeId === selectedAnime._id && stats
-                ? stats.ratingCount
-                : selectedAnime.rating_count ?? 0}
-            </strong>
-          </p>
-        </section>
+                      <option value="abandoned">
+                        {t('anime.status.abandoned')}
+                      </option>
+                    </select>
+                  </div>
 
-        {/* Personal anime list */}
-        <section className={styles.userAnime}>
-          <h2>{t('anime.myAnimeList')}</h2>
-
-          {!user ? (
-            <p>{t('anime.loginToManage')}</p>
-          ) : (
-            <>
-              {/* Personal rating */}
-              <div className={styles.ratingSection}>
-                <h3>{t('anime.yourRating')}</h3>
-
-                <div
-                  className={styles.ratingStars}
-                  role="group"
-                  aria-label={t('anime.ratingAriaLabel')}
-                  onMouseLeave={() => setRatingHover(0)}
-                >
-                  {Array.from({ length: 10 }, (_, index) => {
-                    const starValue = index + 1
-
-                    return (
-                      <button
-                        key={starValue}
-                        type="button"
-                        className={
-                          starValue <= displayedRating
-                            ? styles.starButtonActive
-                            : styles.starButton
-                        }
-                        onClick={() =>
-                          handleRatingChange(starValue)
-                        }
-                        onMouseEnter={() =>
-                          setRatingHover(starValue)
-                        }
-                        disabled={userAnimeLoading}
-                        aria-label={t('anime.rateValue', {
-                          rating: starValue,
-                        })}
-                        aria-pressed={
-                          currentRating === starValue
-                        }
-                        title={`${starValue}/10`}
-                      >
-                        ★
-                      </button>
-                    )
-                  })}
-
-                  <span className={styles.ratingValue}>
-                    {currentRating > 0
-                      ? `${currentRating}/10`
-                      : t('anime.notRated')}
-                  </span>
-                </div>
-
-                {/* Remove the current rating */}
-                {currentRating > 0 && (
+                  {/* Favorite toggle */}
                   <button
                     type="button"
-                    className={styles.clearRatingButton}
-                    onClick={handleRatingClear}
+                    className={`${styles.favoriteButton} ${
+                      isFavorite ? styles.favoriteActive : ''
+                    }`}
+                    onClick={handleFavoriteToggle}
                     disabled={userAnimeLoading}
+                    aria-pressed={isFavorite}
+                    aria-label={
+                      isFavorite
+                        ? t('anime.removeFromFavorites')
+                        : t('anime.addToFavorites')
+                    }
+                    title={
+                      isFavorite
+                        ? t('anime.removeFromFavorites')
+                        : t('anime.addToFavorites')
+                    }
                   >
-                    {t('anime.removeRating')}
+                    <span aria-hidden="true">
+                      {isFavorite ? '♥' : '♡'}
+                    </span>
                   </button>
-                )}
-              </div>
-
-              {/* Watch status */}
-              <label htmlFor="anime-status">
-                {t('anime.watchStatus')}
-              </label>
-
-              <select
-                id="anime-status"
-                className={styles.statusSelect}
-                value={
-                  hasCurrentRelation
-                    ? userAnimeRelation?.status || ''
-                    : ''
-                }
-                onChange={handleStatusChange}
-                disabled={userAnimeLoading}
-              >
-                <option value="" disabled>
-                  {t('anime.selectWatchStatus')}
-                </option>
-
-                <option value="not watched">
-                  {t('anime.status.notWatched')}
-                </option>
-
-                <option value="planned">
-                  {t('anime.status.planned')}
-                </option>
-
-                <option value="watching">
-                  {t('anime.status.watching')}
-                </option>
-
-                <option value="completed">
-                  {t('anime.status.completed')}
-                </option>
-
-                <option value="suspended">
-                  {t('anime.status.suspended')}
-                </option>
-
-                <option value="abandoned">
-                  {t('anime.status.abandoned')}
-                </option>
-              </select>
-
-              {/* Favorite toggle */}
-              <button
-                type="button"
-                className={styles.favoriteButton}
-                onClick={handleFavoriteToggle}
-                disabled={userAnimeLoading}
-                aria-pressed={isFavorite}
-              >
-                {isFavorite
-                  ? t('anime.removeFromFavorites')
-                  : t('anime.addToFavorites')}
-              </button>
+                </>
+              ) : (
+                <p className={styles.loginMessage}>
+                  {t('anime.loginToManage')}
+                </p>
+              )}
 
               {/* Relation loading and error states */}
               {userAnimeLoading && (
-                <p>{t('anime.savingOrLoading')}</p>
+                <p className={styles.statusMessage}>
+                  {t('anime.savingOrLoading')}
+                </p>
               )}
 
               {userAnimeError && (
-                <p role="alert">
+                <p className={styles.errorMessage} role="alert">
                   {userAnimeError}
                 </p>
               )}
-            </>
-          )}
-        </section>
-
-        {/* Community statistics */}
-        <section className={styles.statistics}>
-          <h2>{t('anime.communityStatistics')}</h2>
-
-          {statsLoading && (
-            <p>{t('anime.loadingStatistics')}</p>
-          )}
-
-          {statsError && (
-            <p role="alert">
-              {t('anime.statisticsError')}: {statsError}
-            </p>
-          )}
-
-          {!statsLoading &&
-            !statsError &&
-            stats &&
-            statsAnimeId === selectedAnime._id && (
-              <>
-                <p>
-                  {t('anime.totalUsersOnList')}:{' '}
-                  <strong>{stats.total}</strong>
-                </p>
-
-                <p>
-                  {t('anime.favorites')}:{' '}
-                  <strong>{stats.favorites}</strong>
-                </p>
-
-                <h3>{t('anime.watchStatus')}</h3>
-
-                <ul>
-                  <li>
-                    {t('anime.status.notWatched')}:{' '}
-                    {stats.notWatched}
-                  </li>
-
-                  <li>
-                    {t('anime.status.planned')}:{' '}
-                    {stats.planned}
-                  </li>
-
-                  <li>
-                    {t('anime.status.watching')}:{' '}
-                    {stats.watching}
-                  </li>
-
-                  <li>
-                    {t('anime.status.completed')}:{' '}
-                    {stats.completed}
-                  </li>
-
-                  <li>
-                    {t('anime.status.suspended')}:{' '}
-                    {stats.suspended}
-                  </li>
-
-                  <li>
-                    {t('anime.status.abandoned')}:{' '}
-                    {stats.abandoned}
-                  </li>
-                </ul>
-              </>
-            )}
-        </section>
-
-        {/* Administrative actions */}
-        {user?.role === 'admin' && (
-          <div className={styles.adminActions}>
-            <Button to={`/anime/EditAnime/${selectedAnime.slug}`}>
-              {t('anime.edit')}
-            </Button>
-
-            <Button to={`/character/add?animeId=${selectedAnime._id}`}>
-              {t('anime.addCharacter')}
-            </Button>
+            </div>
           </div>
-        )}
 
-        {/* Anime characters */}
+          {/* MIDDLE COLUMN: ANIME INFORMATION */}
+          <div className={styles.mainColumn}>
+
+            {/* Anime title */}
+            <header className={styles.animeHeader}>
+              <h1>{selectedAnime.title}</h1>
+
+              <p className={styles.originalTitle}>
+                {getDisplayValue(selectedAnime.original_title)}
+              </p>
+            </header>
+
+            {/* Anime metadata */}
+            <div className={styles.animeMetadata}>
+
+              <div className={styles.metadataItem}>
+                <h3>{t('anime.world')}</h3>
+                <p>{getDisplayValue(selectedAnime.world)}</p>
+              </div>
+
+              <div className={styles.metadataItem}>
+                <h3>{t('anime.genres')}</h3>
+                <p>{getDisplayValue(selectedAnime.genres)}</p>
+              </div>
+
+              <div className={styles.metadataItem}>
+                <h3>{t('anime.categories')}</h3>
+                <p>{getDisplayValue(selectedAnime.categories)}</p>
+              </div>
+
+            </div>
+
+            {/* Anime description */}
+            <div className={styles.descriptionSection}>
+              <h2>{t('anime.description')}</h2>
+
+              <p
+                className={`${styles.descriptionText} ${
+                  descriptionExpanded ? styles.descriptionExpanded : ''
+                }`}
+              >
+                {getDisplayValue(description)}
+              </p>
+
+              {shouldShowDescriptionToggle && (
+                <button
+                  type="button"
+                  className={styles.descriptionToggle}
+                  onClick={() =>
+                    setDescriptionExpanded(prev => !prev)
+                  }
+                  aria-expanded={descriptionExpanded}
+                >
+                  {descriptionExpanded
+                    ? t('anime.descriptionLess')
+                    : t('anime.descriptionMore')}
+                </button>
+              )}
+            </div>
+
+            {/* Administrative actions */}
+            {user?.role === 'admin' && (
+              <div className={styles.adminActions}>
+                <Button to={`/anime/EditAnime/${selectedAnime.slug}`}>
+                  {t('anime.edit')}
+                </Button>
+
+                <Button to={`/character/add?animeId=${selectedAnime._id}`}>
+                  {t('anime.addCharacter')}
+                </Button>
+              </div>
+            )}
+          </div>
+
+          {/* RIGHT COLUMN: RATINGS AND COMMUNITY STATISTICS */}
+          <aside className={styles.rightColumn}>
+
+            {/* Community rating */}
+            <section className={styles.ratingSummary}>
+
+              <div className={styles.communityRating}>
+                <strong>
+                  {communityRating}
+                  <span>/10</span>
+                </strong>
+
+                <span className={styles.ratingCount}>
+                  {t('anime.ratingVotes')}{communityRatingCount} 
+                </span>
+              </div>
+
+              {statsLoading && (
+                <p className={styles.statusMessage}>
+                  {t('anime.loadingStatistics')}
+                </p>
+              )}
+            </section>
+
+            {/* Personal rating */}
+            <section className={styles.personalRating}>
+              <h2>{t('anime.yourRating')}</h2>
+
+              {!user ? (
+                <p>{t('anime.loginToManage')}</p>
+              ) : (
+                <div className={styles.ratingContainer}>
+                  <div
+                    className={styles.ratingStars}
+                    role="group"
+                    aria-label={t('anime.ratingAriaLabel')}
+                    onMouseLeave={() => setRatingHover(0)}
+                  >
+                    {Array.from({ length: 10 }, (_, index) => {
+                      const starValue = index + 1
+
+                      return (
+                        <button
+                          key={starValue}
+                          type="button"
+                          className={
+                            starValue <= displayedRating
+                              ? styles.starButtonActive
+                              : styles.starButton
+                          }
+                          onClick={() =>
+                            handleRatingChange(starValue)
+                          }
+                          onMouseEnter={() =>
+                            setRatingHover(starValue)
+                          }
+                          disabled={userAnimeLoading}
+                          aria-label={t('anime.rateValue', {
+                            rating: starValue,
+                          })}
+                          aria-pressed={
+                            currentRating === starValue
+                          }
+                          title={`${starValue}/10`}
+                        >
+                          ★
+                        </button>
+                      )
+                    })}
+                  </div>
+
+                  <div className={styles.personalRatingFooter}>
+                    {/* Remove rating */}
+                    {currentRating > 0 && (
+                      <button
+                        type="button"
+                        className={styles.clearRatingButton}
+                        onClick={handleRatingClear}
+                        disabled={userAnimeLoading}
+                        aria-label={t('anime.removeRating')}
+                        title={t('anime.removeRating')}
+                      >
+                        <span aria-hidden="true">▤</span>
+                      </button>
+                    )}
+                  </div>
+                </div>
+              )}
+            </section>
+
+            {/* Community statistics */}
+            <section className={styles.communityStatistics}>
+              <h2>{t('anime.communityStatistics')}</h2>
+
+              {statsError && (
+                <p className={styles.errorMessage} role="alert">
+                  {t('anime.statisticsError')}: {statsError}
+                </p>
+              )}
+
+              {!statsLoading &&
+                !statsError &&
+                hasCurrentStats && (
+                  <>
+                    <div className={styles.statisticRow}>
+                      <span>{t('anime.totalUsersOnList')}</span>
+                      <strong>{stats.total}</strong>
+                    </div>
+
+                    <div className={styles.statisticRow}>
+                      <span>{t('anime.favorites')}</span>
+                      <strong>{stats.favorites}</strong>
+                    </div>
+
+                    <h3>{t('anime.watchStatus')}</h3>
+
+                    <div className={styles.watchStatistics}>
+                      <div className={styles.statisticRow}>
+                        <span>{t('anime.status.notWatched')}</span>
+                        <strong>{stats.notWatched}</strong>
+                      </div>
+
+                      <div className={styles.statisticRow}>
+                        <span>{t('anime.status.planned')}</span>
+                        <strong>{stats.planned}</strong>
+                      </div>
+
+                      <div className={styles.statisticRow}>
+                        <span>{t('anime.status.watching')}</span>
+                        <strong>{stats.watching}</strong>
+                      </div>
+
+                      <div className={styles.statisticRow}>
+                        <span>{t('anime.status.completed')}</span>
+                        <strong>{stats.completed}</strong>
+                      </div>
+
+                      <div className={styles.statisticRow}>
+                        <span>{t('anime.status.suspended')}</span>
+                        <strong>{stats.suspended}</strong>
+                      </div>
+
+                      <div className={styles.statisticRow}>
+                        <span>{t('anime.status.abandoned')}</span>
+                        <strong>{stats.abandoned}</strong>
+                      </div>
+                    </div>
+                  </>
+                )}
+            </section>
+
+          </aside>
+        </section>
+
+        {/* =====================================================
+            ANIME CHARACTERS
+            ===================================================== */}
+
         <CharacterSection
           title={t('anime.characters')}
           characters={selectedAnime.characters || []}
         />
 
-        {/* Anime seasons */}
+        {/* =====================================================
+            ANIME SEASONS
+            ===================================================== */}
+
         <SeasonSection
           title={t('anime.seasons')}
           seasons={selectedAnime.seasons || []}
         />
 
-        {/* Anime reviews */}
+        {/* =====================================================
+            ANIME REVIEWS
+            ===================================================== */}
+
         <section className={styles.reviewsSection}>
           <h2>{t('anime.reviews')}</h2>
 
@@ -785,10 +895,15 @@ const Anime = () => {
           )}
         </section>
 
-        {/* Return to the home page */}
-        <Button to="/">
-          {t('common.home')}
-        </Button>
+        {/* =====================================================
+            RETURN TO HOME PAGE
+            ===================================================== */}
+
+        <div className={styles.homeButton}>
+          <Button to="/">
+            {t('common.home')}
+          </Button>
+        </div>
 
       </Container>
     </div>
