@@ -87,126 +87,6 @@
   }
 }
 
-/* User controls */
-
-.userControls {
-  display: grid;
-  grid-template-columns: minmax(0, 1fr) 46px;
-  align-items: end;
-  gap: 10px;
-
-  margin-top: auto;
-  min-width: 0;
-}
-
-.statusControl {
-  display: flex;
-  flex-direction: column;
-  gap: 6px;
-  min-width: 0;
-
-  label {
-    font-size: 0.85rem;
-    font-weight: 600;
-  }
-}
-
-.statusSelect {
-  width: 100%;
-  min-width: 0;
-  padding: 10px;
-
-  border: 1px solid var(--color-border, #777);
-  border-radius: 6px;
-
-  background-color: var(--color-surface-secondary, transparent);
-  color: var(--color-text);
-
-  font-size: 0.9rem;
-
-  &:focus-visible {
-    outline: 2px solid var(--primary-color, #d98b42);
-    outline-offset: 2px;
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.6;
-  }
-
-  option {
-    background-color: var(--color-surface, #222);
-    color: var(--color-text, #fff);
-  }
-}
-
-/* Favorite button */
-
-.favoriteButton {
-  display: flex;
-  justify-content: center;
-  align-items: center;
-
-  width: 46px;
-  height: 42px;
-  padding: 0;
-
-  border: 1px solid var(--color-border, #777);
-  border-radius: 8px;
-
-  background-color: transparent;
-  color: #999;
-
-  font-size: 2rem;
-  line-height: 1;
-
-  cursor: pointer;
-  transition:
-    color 0.2s ease,
-    background-color 0.2s ease,
-    border-color 0.2s ease,
-    transform 0.2s ease;
-
-  &:hover:not(:disabled) {
-    color: #e05265;
-    border-color: #e05265;
-    transform: scale(1.05);
-  }
-
-  &:focus-visible {
-    outline: 2px solid var(--primary-color, #d98b42);
-    outline-offset: 3px;
-  }
-
-  &:disabled {
-    cursor: not-allowed;
-    opacity: 0.5;
-  }
-}
-
-.favoriteActive {
-  color: #e05265;
-  border-color: #e05265;
-  background-color: rgba(224, 82, 101, 0.08);
-}
-
-.loginMessage {
-  grid-column: 1 / -1;
-  margin: 0;
-  font-size: 0.9rem;
-}
-
-.statusMessage,
-.errorMessage {
-  grid-column: 1 / -1;
-  margin: 0;
-  font-size: 0.85rem;
-}
-
-.errorMessage {
-  color: #e05265;
-}
-
 /* =====================================================
    MIDDLE COLUMN
    ===================================================== */
@@ -216,6 +96,15 @@
   flex-direction: column;
 
   min-width: 0;
+  padding: 24px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+
+  background-color: var(--color-surface);
+  color: var(--color-text);
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
 }
 
 /* Anime title */
@@ -309,7 +198,7 @@
   border: none;
   background: transparent;
 
-  color: var(--primary-color, #d98b42);
+  color: var(--accent-color);
   font-size: 0.9rem;
   font-weight: 600;
 
@@ -326,16 +215,158 @@
   }
 }
 
-/* Administrative actions */
+/* =====================================================
+   MAIN ACTIONS
+   ===================================================== */
+
+.mainActions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 12px;
+
+  width: 100%;
+  min-width: 0;
+
+  margin-top: auto;
+  padding-top: 20px;
+
+  border-top: 1px solid var(--color-border);
+}
+
+/* Watch status and favorite */
+
+.userActions {
+  display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  gap: 10px;
+
+  flex: 1 1 auto;
+  min-width: 0;
+}
+
+.statusControl {
+  display: flex;
+  flex-direction: column;
+  gap: 6px;
+
+  flex: 1 1 auto;
+  min-width: 0;
+
+  label {
+    color: var(--color-text-muted);
+    font-size: 0.85rem;
+    font-weight: 600;
+  }
+}
+
+.statusSelect {
+  width: 100%;
+  min-width: 0;
+  padding: 10px 8px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 6px;
+
+  background-color: var(--color-background);
+  color: var(--color-text);
+
+  font-family: var(--theme-primary);
+  font-size: 1rem;
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 2px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.6;
+  }
+
+  option {
+    background-color: var(--color-surface);
+    color: var(--color-text);
+  }
+}
+
+/* Favorite button */
+
+.favoriteButton {
+  display: flex;
+  justify-content: center;
+  align-items: center;
+
+  flex: 0 0 44px;
+  width: 44px;
+  height: 42px;
+  padding: 0;
+
+  border: 1px solid var(--color-border);
+  border-radius: 8px;
+
+  background-color: var(--color-background);
+  color: var(--color-text-muted);
+
+  font-size: 2rem;
+  line-height: 1;
+
+  cursor: pointer;
+  transition:
+    color 0.2s ease,
+    background-color 0.2s ease,
+    border-color 0.2s ease,
+    transform 0.2s ease;
+
+  &:hover:not(:disabled) {
+    color: #e05265;
+    border-color: #e05265;
+    transform: scale(1.05);
+  }
+
+  &:focus-visible {
+    outline: 2px solid var(--primary-color);
+    outline-offset: 3px;
+  }
+
+  &:disabled {
+    cursor: not-allowed;
+    opacity: 0.5;
+  }
+}
+
+.favoriteActive {
+  color: #e05265;
+  border-color: #e05265;
+  background-color: rgba(224, 82, 101, 0.08);
+}
+
+/* Admin buttons */
 
 .adminActions {
   display: flex;
-  flex-wrap: wrap;
-  align-items: center;
-  gap: 10px;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  align-items: flex-end;
+  justify-content: flex-end;
+  gap: 8px;
 
-  margin-top: auto;
-  padding-top: 16px;
+  flex: 0 1 auto;
+  min-width: 0;
+}
+
+.loginMessage,
+.statusMessage,
+.errorMessage {
+  margin: 0;
+  font-size: 0.9rem;
+}
+
+.errorMessage {
+  color: #e05265;
 }
 
 /* =====================================================
@@ -348,6 +379,15 @@
   gap: 20px;
 
   min-width: 0;
+  padding: 24px;
+
+  border: 1px solid var(--color-border);
+  border-radius: 12px;
+
+  background-color: var(--color-surface);
+  color: var(--color-text);
+
+  box-shadow: 0 4px 14px rgba(0, 0, 0, 0.10);
 }
 
 .ratingSummary,
@@ -359,7 +399,7 @@
   border-bottom: 1px solid var(--color-border, rgba(255, 255, 255, 0.2));
 
   h2 {
-    margin: 0 0 12px;
+    margin: 0;
     font-size: 1.05rem;
     font-weight: 700;
   }
@@ -376,7 +416,7 @@
   strong {
     font-size: 2rem;
     line-height: 1.2;
-    color: var(--primary-color, #d98b42);
+    color: var(--accent-color);
 
     span {
       margin-left: 3px;
@@ -388,41 +428,93 @@
 }
 
 .ratingCount {
-  color: var(--color-text-muted, #999);
-  font-size: 1,5rem;
+  color: var(--color-text-muted);
+  font-size: 1rem;
 }
 
-/* Personal rating */
+/* =====================================================
+   PERSONAL RATING
+   ===================================================== */
 
 .personalRating {
+  display: flex;
+  flex-direction: column;
+  align-items: flex-start;
+  gap: 10px;
+
+  min-width: 0;
+
   p {
     margin: 0;
     font-size: 0.9rem;
   }
 }
 
-.ratingContainer {
+/* Heading and remove button in one row */
+
+.personalRatingHeader {
   display: flex;
   justify-content: space-between;
   align-items: center;
+  gap: 10px;
+
+  width: 100%;
+  min-width: 0;
+
+  h2 {
+    margin: 0;
+  }
 }
+
+/* Rating stars container */
+
+.ratingContainer {
+  display: flex;
+  justify-content: flex-start;
+  align-items: center;
+
+  width: 100%;
+  min-width: 0;
+  overflow: visible;
+}
+
+/* Ten stars in one row */
 
 .ratingStars {
   display: flex;
+  flex-direction: row;
+  flex-wrap: nowrap;
+  justify-content: flex-start;
   align-items: center;
-  flex-wrap: wrap;
+
   gap: 1px;
+
+  width: max-content;
+  max-width: 100%;
+  min-width: 0;
+
+  white-space: nowrap;
 }
+
+/* Individual stars */
 
 .starButton,
 .starButtonActive {
+  display: inline-flex;
+  justify-content: center;
+  align-items: center;
+
+  flex: 0 0 auto;
+
+  width: 21px;
+  height: 28px;
   padding: 0;
 
   border: none;
   background: transparent;
 
   font-size: 22px;
-  line-height: 1.2;
+  line-height: 1;
 
   cursor: pointer;
   transition:
@@ -453,25 +545,16 @@
   color: #f5b301;
 }
 
-.personalRatingFooter {
-  display: flex;
-  align-items: center;
-  gap: 10px;
-
-  margin-top: 5px;
-}
-
-.ratingValue {
-  color: var(--color-text-muted, #999);
-  font-size: 0.85rem;
-}
-
-/* Remove rating button */
+/* =====================================================
+   REMOVE RATING BUTTON
+   ===================================================== */
 
 .clearRatingButton {
   display: inline-flex;
   justify-content: center;
   align-items: center;
+
+  flex: 0 0 28px;
 
   width: 28px;
   height: 28px;
@@ -506,7 +589,9 @@
   }
 }
 
-/* Community statistics */
+/* =====================================================
+   COMMUNITY STATISTICS
+   ===================================================== */
 
 .communityStatistics {
   h3 {
@@ -570,10 +655,48 @@
 }
 
 /* =====================================================
+   THEME TYPOGRAPHY
+   ===================================================== */
+
+.mainColumn,
+.rightColumn {
+  h2,
+  h3 {
+    color: var(--color-text);
+    font-family: var(--theme-heading);
+  }
+
+  p,
+  span,
+  label,
+  select {
+    font-family: var(--theme-primary);
+  }
+}
+
+.originalTitle,
+.ratingCount {
+  color: var(--color-text-muted);
+}
+
+.descriptionToggle {
+  color: var(--accent-color);
+}
+
+.communityRating strong {
+  color: var(--accent-color);
+}
+
+/* =====================================================
    RESPONSIVE LAYOUT
    ===================================================== */
 
 @media (max-width: 1050px) {
+  .mainColumn,
+  .rightColumn {
+    padding: 20px;
+  }
+
   .animeDetails {
     grid-template-columns:
       minmax(180px, 0.8fr)
@@ -599,6 +722,11 @@
 }
 
 @media (max-width: 700px) {
+  .mainColumn,
+  .rightColumn {
+    padding: 18px;
+  }
+
   .animeDetails {
     grid-template-columns: minmax(0, 1fr);
     gap: 24px;
@@ -615,8 +743,47 @@
     width: 100%;
   }
 
+  /*
+    Keep status, favorite and admin buttons in one row.
+    Allow their contents to shrink instead of wrapping.
+  */
+
+  .mainActions {
+    flex-direction: row;
+    flex-wrap: nowrap;
+    align-items: flex-end;
+    gap: 8px;
+  }
+
+  .userActions {
+    flex: 1 1 auto;
+    flex-wrap: nowrap;
+    width: auto;
+    min-width: 0;
+    gap: 6px;
+  }
+
+  .statusControl {
+    flex: 1 1 auto;
+    min-width: 0;
+  }
+
+  .statusSelect {
+    padding: 9px 5px;
+    font-size: 0.9rem;
+  }
+
+  .favoriteButton {
+    flex: 0 0 40px;
+    width: 40px;
+    height: 40px;
+  }
+
   .adminActions {
-    margin-top: 20px;
+    flex: 0 1 auto;
+    flex-wrap: nowrap;
+    width: auto;
+    gap: 6px;
   }
 
   .rightColumn {
@@ -636,13 +803,34 @@
   }
 }
 
-@media (max-width: 400px) {
-  .coverMetadata {
-    font-size: 0.8rem;
+@media (max-width: 480px) {
+  .mainColumn,
+  .rightColumn {
+    padding: 14px;
+  }
+
+  .mainActions {
+    gap: 6px;
+  }
+
+  .userActions {
+    gap: 5px;
+  }
+
+  .statusSelect {
+    padding: 8px 4px;
+    font-size: 0.85rem;
   }
 
   .favoriteButton {
-    width: 42px;
+    flex-basis: 36px;
+    width: 36px;
+    height: 38px;
+    font-size: 1.7rem;
+  }
+
+  .adminActions {
+    gap: 5px;
   }
 
   .ratingStars {
@@ -651,11 +839,39 @@
 
   .starButton,
   .starButtonActive {
+    width: 19px;
+    height: 26px;
     font-size: 19px;
   }
 
-  .adminActions {
-    flex-direction: column;
-    align-items: stretch;
+  .coverMetadata {
+    font-size: 0.8rem;
+  }
+}
+
+@media (max-width: 360px) {
+  .mainColumn,
+  .rightColumn {
+    padding: 12px;
+  }
+
+  .mainActions {
+    gap: 4px;
+  }
+
+  .statusSelect {
+    font-size: 0.78rem;
+  }
+
+  .favoriteButton {
+    flex-basis: 32px;
+    width: 32px;
+    height: 36px;
+  }
+
+  .starButton,
+  .starButtonActive {
+    width: 17px;
+    font-size: 17px;
   }
 }

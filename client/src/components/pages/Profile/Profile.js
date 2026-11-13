@@ -1,4 +1,3 @@
-
 /**
  * @file Profile.js
  * @description Page component for displaying the authenticated user's profile.
@@ -46,8 +45,10 @@ const Profile = () => {
     return (
       <div className={styles.root}>
         <Container>
-          <h1>{t('profile.title')}</h1>
-          <p>{t('profile.loginRequired')}</p>
+          <h1 className={styles.title}>{t('profile.title')}</h1>
+          <p className={styles.loginRequired}>
+            {t('profile.loginRequired')}
+          </p>
         </Container>
       </div>
     )
@@ -73,57 +74,74 @@ const Profile = () => {
           {t('profile.title')}
         </h1>
 
-        {/* User avatar and personal information */}
-        <div className={styles.about}>
+        {/* User profile information */}
+        <section className={styles.about}>
 
-          {/* User avatar with a fallback image */}
-          <img
-            src={user.avatar || noImage}
-            alt={t('profile.avatarAlt', {
-              login: user.login || '',
-            })}
-            className={styles.img}
-            onError={handleImageError}
-          />
+          {/* User avatar */}
+          <div className={styles.avatarWrapper}>
+            <img
+              src={user.avatar || noImage}
+              alt={t('profile.avatarAlt', {
+                login: user.login || '',
+              })}
+              className={styles.img}
+              onError={handleImageError}
+            />
+          </div>
 
-          <div>
+          {/* Personal information */}
+          <div className={styles.profileInfo}>
+
+            <h2 className={styles.username}>
+              {user.login || t('profile.notSpecified')}
+            </h2>
+
+            <div className={styles.infoList}>
+              <p className={styles.infoItem}>
+                <span className={styles.infoLabel}>
+                  {t('profile.role')}
+                </span>
+                <span>{role}</span>
+              </p>
+
+              <p className={styles.infoItem}>
+                <span className={styles.infoLabel}>
+                  {t('profile.email')}
+                </span>
+                <span>{user.email || t('profile.notSpecified')}</span>
+              </p>
+
+              <p className={styles.infoItem}>
+                <span className={styles.infoLabel}>
+                  {t('profile.birthYear')}
+                </span>
+                <span>{birthYear}</span>
+              </p>
+
+              <div className={`${styles.infoItem} ${styles.descriptionItem}`}>
+                <span className={styles.infoLabel}>
+                  {t('profile.description')}
+                </span>
+                <p>{description}</p>
+              </div>
+            </div>
 
             {/* Navigation to the profile editing page */}
-            <Button to="/ProfileEdit">
-              {t('common.edit')}
-            </Button>
-
-            {/* Basic account information */}
-            <p>
-              {t('profile.login')} {user.login || t('profile.notSpecified')}
-            </p>
-
-            <p>
-              {t('profile.role')} {role}
-            </p>
-
-            <p>
-              {t('profile.email')} {user.email || t('profile.notSpecified')}
-            </p>
-
-            <p>
-              {t('profile.birthYear')} {birthYear}
-            </p>
-
-            <p>
-              {t('profile.description')} {description}
-            </p>
+            <div className={styles.editButton}>
+              <Button to="/ProfileEdit">
+                {t('common.edit')}
+              </Button>
+            </div>
 
           </div>
-        </div>
+        </section>
 
         {/* Favorite characters section */}
         <section className={styles.favoriteSection}>
-          {/* Anime characters */}
-            <CharacterSection
-              title={t('profile.favoriteCharacters')}
-              characters={user.favorite_characters || []}
-            />
+          <CharacterSection
+            title={t('profile.favoriteCharacters')}
+            characters={user.favorite_characters || []}
+          />
         </section>
 
         {/* Navigation back to the home page */}

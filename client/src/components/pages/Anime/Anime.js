@@ -533,100 +533,8 @@ const Anime = () => {
                 </span>
               </div>
             </div>
-
-            {/* User controls */}
-            <div className={styles.userControls}>
-
-              {user ? (
-                <>
-                  {/* Watch status */}
-                  <div className={styles.statusControl}>
-                    <select
-                      id="anime-status"
-                      className={styles.statusSelect}
-                      value={
-                        hasCurrentRelation
-                          ? userAnimeRelation?.status || ''
-                          : ''
-                      }
-                      onChange={handleStatusChange}
-                      disabled={userAnimeLoading}
-                    >
-                      <option value="" disabled>
-                        {t('anime.selectWatchStatus')}
-                      </option>
-
-                      <option value="not watched">
-                        {t('anime.status.notWatched')}
-                      </option>
-
-                      <option value="planned">
-                        {t('anime.status.planned')}
-                      </option>
-
-                      <option value="watching">
-                        {t('anime.status.watching')}
-                      </option>
-
-                      <option value="completed">
-                        {t('anime.status.completed')}
-                      </option>
-
-                      <option value="suspended">
-                        {t('anime.status.suspended')}
-                      </option>
-
-                      <option value="abandoned">
-                        {t('anime.status.abandoned')}
-                      </option>
-                    </select>
-                  </div>
-
-                  {/* Favorite toggle */}
-                  <button
-                    type="button"
-                    className={`${styles.favoriteButton} ${
-                      isFavorite ? styles.favoriteActive : ''
-                    }`}
-                    onClick={handleFavoriteToggle}
-                    disabled={userAnimeLoading}
-                    aria-pressed={isFavorite}
-                    aria-label={
-                      isFavorite
-                        ? t('anime.removeFromFavorites')
-                        : t('anime.addToFavorites')
-                    }
-                    title={
-                      isFavorite
-                        ? t('anime.removeFromFavorites')
-                        : t('anime.addToFavorites')
-                    }
-                  >
-                    <span aria-hidden="true">
-                      {isFavorite ? '♥' : '♡'}
-                    </span>
-                  </button>
-                </>
-              ) : (
-                <p className={styles.loginMessage}>
-                  {t('anime.loginToManage')}
-                </p>
-              )}
-
-              {/* Relation loading and error states */}
-              {userAnimeLoading && (
-                <p className={styles.statusMessage}>
-                  {t('anime.savingOrLoading')}
-                </p>
-              )}
-
-              {userAnimeError && (
-                <p className={styles.errorMessage} role="alert">
-                  {userAnimeError}
-                </p>
-              )}
-            </div>
           </div>
+           
 
           {/* MIDDLE COLUMN: ANIME INFORMATION */}
           <div className={styles.mainColumn}>
@@ -688,18 +596,119 @@ const Anime = () => {
               )}
             </div>
 
-            {/* Administrative actions */}
-            {user?.role === 'admin' && (
-              <div className={styles.adminActions}>
-                <Button to={`/anime/EditAnime/${selectedAnime.slug}`}>
-                  {t('anime.edit')}
-                </Button>
-
-                <Button to={`/character/add?animeId=${selectedAnime._id}`}>
-                  {t('anime.addCharacter')}
-                </Button>
-              </div>
-            )}
+            {/* User and administrative actions */}
+            <div className={styles.mainActions}>
+                        
+              {/* Authenticated user's controls */}
+              {user ? (
+                <div className={styles.userActions}>
+                
+                  {/* Watch status */}
+                  <div className={styles.statusControl}>
+                    <label htmlFor="anime-status">
+                      {t('anime.watchStatus')}
+                    </label>
+              
+                    <select
+                      id="anime-status"
+                      className={styles.statusSelect}
+                      value={
+                        hasCurrentRelation
+                          ? userAnimeRelation?.status || ''
+                          : ''
+                      }
+                      onChange={handleStatusChange}
+                      disabled={userAnimeLoading}
+                    >
+                      <option value="" disabled>
+                        {t('anime.selectWatchStatus')}
+                      </option>
+                    
+                      <option value="not watched">
+                        {t('anime.status.notWatched')}
+                      </option>
+                    
+                      <option value="planned">
+                        {t('anime.status.planned')}
+                      </option>
+                    
+                      <option value="watching">
+                        {t('anime.status.watching')}
+                      </option>
+                    
+                      <option value="completed">
+                        {t('anime.status.completed')}
+                      </option>
+                    
+                      <option value="suspended">
+                        {t('anime.status.suspended')}
+                      </option>
+                    
+                      <option value="abandoned">
+                        {t('anime.status.abandoned')}
+                      </option>
+                    </select>
+                  </div>
+                    
+                  {/* Favorite toggle */}
+                  <button
+                    type="button"
+                    className={`${styles.favoriteButton} ${
+                      isFavorite ? styles.favoriteActive : ''
+                    }`}
+                    onClick={handleFavoriteToggle}
+                    disabled={userAnimeLoading}
+                    aria-pressed={isFavorite}
+                    aria-label={
+                      isFavorite
+                        ? t('anime.removeFromFavorites')
+                        : t('anime.addToFavorites')
+                    }
+                    title={
+                      isFavorite
+                        ? t('anime.removeFromFavorites')
+                        : t('anime.addToFavorites')
+                    }
+                  >
+                    <span aria-hidden="true">
+                      {isFavorite ? '♥' : '♡'}
+                    </span>
+                  </button>
+                  
+                </div>
+              ) : (
+                <p className={styles.loginMessage}>
+                  {t('anime.loginToManage')}
+                </p>
+              )}
+            
+              {/* Administrative actions */}
+              {user?.role === 'admin' && (
+                <div className={styles.adminActions}>
+                  <Button to={`/anime/EditAnime/${selectedAnime.slug}`}>
+                    {t('anime.edit')}
+                  </Button>
+              
+                  <Button to={`/character/add?animeId=${selectedAnime._id}`}>
+                    {t('anime.addCharacter')}
+                  </Button>
+                </div>
+              )}
+            
+              {/* Relation loading and error states */}
+              {userAnimeLoading && (
+                <p className={styles.statusMessage}>
+                  {t('anime.savingOrLoading')}
+                </p>
+              )}
+            
+              {userAnimeError && (
+                <p className={styles.errorMessage} role="alert">
+                  {userAnimeError}
+                </p>
+              )}
+            
+            </div>
           </div>
 
           {/* RIGHT COLUMN: RATINGS AND COMMUNITY STATISTICS */}
@@ -728,53 +737,13 @@ const Anime = () => {
 
             {/* Personal rating */}
             <section className={styles.personalRating}>
-              <h2>{t('anime.yourRating')}</h2>
+              <div className={styles.personalRatingHeader}>
+                <h2>{t('anime.yourRating')}</h2>
 
-              {!user ? (
-                <p>{t('anime.loginToManage')}</p>
-              ) : (
-                <div className={styles.ratingContainer}>
-                  <div
-                    className={styles.ratingStars}
-                    role="group"
-                    aria-label={t('anime.ratingAriaLabel')}
-                    onMouseLeave={() => setRatingHover(0)}
-                  >
-                    {Array.from({ length: 10 }, (_, index) => {
-                      const starValue = index + 1
-
-                      return (
-                        <button
-                          key={starValue}
-                          type="button"
-                          className={
-                            starValue <= displayedRating
-                              ? styles.starButtonActive
-                              : styles.starButton
-                          }
-                          onClick={() =>
-                            handleRatingChange(starValue)
-                          }
-                          onMouseEnter={() =>
-                            setRatingHover(starValue)
-                          }
-                          disabled={userAnimeLoading}
-                          aria-label={t('anime.rateValue', {
-                            rating: starValue,
-                          })}
-                          aria-pressed={
-                            currentRating === starValue
-                          }
-                          title={`${starValue}/10`}
-                        >
-                          ★
-                        </button>
-                      )
-                    })}
-                  </div>
-
-                  <div className={styles.personalRatingFooter}>
-                    {/* Remove rating */}
+                {!user ? (
+                  <p></p>
+                ) : (
+                <div className={styles.personalRatingActions}>
                     {currentRating > 0 && (
                       <button
                         type="button"
@@ -784,11 +753,52 @@ const Anime = () => {
                         aria-label={t('anime.removeRating')}
                         title={t('anime.removeRating')}
                       >
-                        <span aria-hidden="true">▤</span>
+                        <span aria-hidden="true">🗑️</span>
                       </button>
                     )}
                   </div>
-                </div>
+              )}
+              </div>
+
+              {!user ? (
+                <p>{t('anime.loginToManage')}</p>
+              ) : (
+                <>
+                  <div className={styles.ratingContainer}>
+                    <div
+                      className={styles.ratingStars}
+                      role="group"
+                      aria-label={t('anime.ratingAriaLabel')}
+                      onMouseLeave={() => setRatingHover(0)}
+                    >
+                      {Array.from({ length: 10 }, (_, index) => {
+                        const starValue = index + 1
+                      
+                        return (
+                          <button
+                            key={starValue}
+                            type="button"
+                            className={
+                              starValue <= displayedRating
+                                ? styles.starButtonActive
+                                : styles.starButton
+                            }
+                            onClick={() => handleRatingChange(starValue)}
+                            onMouseEnter={() => setRatingHover(starValue)}
+                            disabled={userAnimeLoading}
+                            aria-label={t('anime.rateValue', {
+                              rating: starValue,
+                            })}
+                            aria-pressed={currentRating === starValue}
+                            title={`${starValue}/10`}
+                          >
+                            ★
+                          </button>
+                        )
+                      })}
+                    </div>
+                  </div>
+                </>
               )}
             </section>
 
